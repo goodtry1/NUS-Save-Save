@@ -1,0 +1,23 @@
+{
+  "name": "save-save-frontend",
+  "version": "1.0.0",
+  "description": "\"# Save-Save-FrontEnd\"",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/FinTechLab-NUS/Save-Save-FrontEnd.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/FinTechLab-NUS/Save-Save-FrontEnd/issues"
+  },
+  "homepage": "https://github.com/FinTechLab-NUS/Save-Save-FrontEnd#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
