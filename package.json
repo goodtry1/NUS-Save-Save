@@ -18,6 +18,9 @@
   },
   "homepage": "https://github.com/FinTechLab-NUS/Save-Save-FrontEnd#readme",
   "dependencies": {
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "express-fileupload": "^1.1.7-alpha.3",
+    "mssql": "^6.2.0",
+    "pdf-parse": "^1.1.1"
   }
 }

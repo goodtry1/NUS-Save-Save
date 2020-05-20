@@ -21,8 +21,8 @@ var sqlConfig = {
     database: 'SaveSave'
 }
 
-// Start server and listen on http://localhost:8081/
-var server = app.listen(8081, function () {
+// Start server and listen on http://localhost:5001/
+var server = app.listen(5001, function () {
     var host = server.address().address
     var port = server.address().port
     console.log("app listening at %s", port)
