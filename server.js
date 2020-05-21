@@ -173,3 +173,10 @@ app.post('/upload', upload.single('file'), (req, res) => {
 	   });
   }
 });
+
+//Deletes files in the folder. To-DO : add this after analyse result api
+function deleteFile(path)
+{
+	const fsExtra = require('fs-extra')
+	fsExtra.emptyDirSync(path)
+}
