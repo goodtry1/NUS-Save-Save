@@ -5,13 +5,11 @@ const path = require('path');
 const fs = require('fs');
 const readline = require('readline');
 const PDFParser = require('pdf-parse');
-const fileupload = require('express-fileupload')
 var bcrypt = require('bcryptjs');
-
 const bodyParser = require('body-parser');
 
-// parse application/json
-app.use(bodyParser.json())
+var multer = require('multer');
+var upload = multer({dest:'uploads/'});
 
 
 // Connection string parameters.
@@ -63,7 +61,6 @@ app.post('/signin', (req, res) => {
           WHERE username= '` + req.body.email + `'`;
  
   request.query(qu, async function (error, results, fields) {
-    console.log()
     if (error)
     {
        console.log("error occured");
@@ -109,4 +106,70 @@ app.post('/signin', (req, res) => {
   });
 }); 
 
+//get banks
+app.get('/banks', function (req, res) {
+    sql.connect(sqlConfig, function() {
+        var request = new sql.Request();
+        request.query('select * from dbo.bank', function(error, results) {
+			if (error)
+			{
+			   console.log("error occured");
+			   res.send({
+				"code":400,
+				"failed":"error ocurred"
+			   });
+			}
+			else 
+			{
+				res.send({
+				  "code":200,
+				  "banks":results.recordset,
+				})
+			}
+        });
+    });
+})
 
+//choose bank
+
+
+//get account type
+app.get('/accountType', function (req, res) {
+    sql.connect(sqlConfig, function() {
+        var request = new sql.Request();
+        request.query('select * from dbo.account', function(error, results) {
+			if (error)
+			{
+			   console.log("error occured");
+			   res.send({
+				"code":400,
+				"failed":"error ocurred"
+			   });
+			}
+			else 
+			{
+				res.send({
+				  "code":200,
+				  "account":results.recordset,
+				})
+			}
+        });
+    });
+})
+
+
+//uploading bank statement
+app.post('/upload', upload.single('file'), (req, res) => {
+  try {
+	res.send({
+		"code":200,
+		"filedetails":req.file,
+				})
+  }catch(err) {
+    console.log("error occured");
+	   res.send({
+		"code":400,
+		"failed":"error ocurred"
+	   });
+  }
+});
