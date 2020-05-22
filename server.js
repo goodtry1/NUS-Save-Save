@@ -11,6 +11,8 @@ const bodyParser = require('body-parser');
 var multer = require('multer');
 var upload = multer({dest:'uploads/'});
 
+app.use(bodyParser.json())
+
 
 // Connection string parameters.
 var sqlConfig = {
@@ -34,8 +36,8 @@ app.post('/signUp', (req, res) => {
   console.log('body' + req.body.email);
   sql.connect(sqlConfig, function() {
   var request = new sql.Request();
-  let qu = `INSERT INTO dbo.[User](username,password) 
-               VALUES ('` + req.body.email+ `', '`+ req.body.password + `')`;
+  let qu = `INSERT INTO dbo.[User](username,password, bank, account) 
+               VALUES ('` + req.body.email+ `', '`+ req.body.password + `', NULL, NULL)`;
 
   request.query(qu, function(err, recordset) {
         if(err) console.log(err);
@@ -180,3 +182,96 @@ function deleteFile(path)
 	const fsExtra = require('fs-extra')
 	fsExtra.emptyDirSync(path)
 }
+
+//choose bank
+app.post('/chooseBank', (req, res) => {
+
+  sql.connect(sqlConfig, function() {
+  var request = new sql.Request();
+
+  let qu  = `UPDATE dbo.[User]
+			 SET bank = '` + req.body.bank + `'
+			 WHERE username = '` + req.body.email + `'`;
+				 
+  request.query(qu, function(err, recordset) {
+	if(err){
+		res.send({
+			"code":400,
+			
+		})
+	}
+	else 
+	{
+		res.send({
+			"code":200,
+			"success": "bank details updated"
+		})
+	}
+	});
+
+  });
+})
+
+
+//choose account 
+app.post('/chooseaccount', (req, res) => {
+
+  sql.connect(sqlConfig, function() {
+  var request = new sql.Request();
+
+  let qu  = `UPDATE dbo.[User]
+			 SET account = '` + req.body.account + `'
+			 WHERE username = '` + req.body.email + `'`;
+				 
+  request.query(qu, function(err, recordset) {
+	if(err){
+		res.send({
+			"code":400,
+			
+		})
+	}
+	else 
+	{
+		res.send({
+			"code":200,
+			"success": "account details updated"
+		})
+	}
+	});
+
+  });
+})
+
+
+function retrieve_userdetails(user)
+{
+	sql.connect(sqlConfig, function() {
+	var request = new sql.Request();
+	let qu = `SELECT * FROM dbo.[User]
+          WHERE username= '` + user + `'`;
+ 
+    request.query(qu, async function (error, results, fields) {
+		if (error)
+		{
+		   console.log("error occured");
+		   return null;
+		}
+		else
+		{
+		  if(results.recordset && results.recordset.length >0)
+		  {
+			  console.log(results.recordset)
+			  return results.recordset;
+		  }
+		  else 
+		  {
+			  console.log("user not present")
+			  return null
+		  }
+		}
+	  
+	});
+	});
+}
+
+
