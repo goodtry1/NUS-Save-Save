@@ -36,7 +36,7 @@ app.post('/signUp', (req, res) => {
   console.log('body' + req.body.email);
   sql.connect(sqlConfig, function() {
   var request = new sql.Request();
-  let qu = `INSERT INTO dbo.[User](username,password, bank, account) 
+  let qu = `INSERT INTO dbo.[User](username,password, bankId, accountTypeId) 
                VALUES ('` + req.body.email+ `', '`+ req.body.password + `', NULL, NULL)`;
 
   request.query(qu, function(err, recordset) {
@@ -109,7 +109,7 @@ app.post('/signin', (req, res) => {
 }); 
 
 //get banks
-app.get('/banks', function (req, res) {
+app.get('/bankdetails', function (req, res) {
     sql.connect(sqlConfig, function() {
         var request = new sql.Request();
         request.query('select * from dbo.bank', function(error, results) {
@@ -135,17 +135,22 @@ app.get('/banks', function (req, res) {
 //choose bank
 
 
-//get account type
-app.get('/accountType', function (req, res) {
+//get account type based on bank id
+app.post('/fetchAccountType', (req, res) =>  {
+	bank_id = req.body.bankid;
+	console.log('bankid' + bank_id)
     sql.connect(sqlConfig, function() {
         var request = new sql.Request();
-        request.query('select * from dbo.account', function(error, results) {
+		  let qu = `SELECT * FROM dbo.account
+                   WHERE bankId= '` + req.body.bankid + `'`;
+	      console.log(qu)
+        request.query(qu, function(error, results) {
 			if (error)
 			{
 			   console.log("error occured");
 			   res.send({
 				"code":400,
-				"failed":"error ocurred"
+				"failed":"The bank id is invalid or error occured"
 			   });
 			}
 			else 
@@ -159,23 +164,6 @@ app.get('/accountType', function (req, res) {
     });
 })
 
-
-//uploading bank statement
-app.post('/upload', upload.single('file'), (req, res) => {
-  try {
-	res.send({
-		"code":200,
-		"filedetails":req.file,
-				})
-  }catch(err) {
-    console.log("error occured");
-	   res.send({
-		"code":400,
-		"failed":"error ocurred"
-	   });
-  }
-});
-
 //Deletes files in the folder. To-DO : add this after analyse result api
 function deleteFile(path)
 {
@@ -183,28 +171,35 @@ function deleteFile(path)
 	fsExtra.emptyDirSync(path)
 }
 
-//choose bank
-app.post('/chooseBank', (req, res) => {
+
+
+// setting for url encoding
+app.use(bodyParser.urlencoded({ extended: false })) 
+
+
+//Receive bank id, acount type id, and bank statement
+app.post('/updateUserDetails', upload.single('file'),(req, res) => {
 
   sql.connect(sqlConfig, function() {
   var request = new sql.Request();
 
   let qu  = `UPDATE dbo.[User]
-			 SET bank = '` + req.body.bank + `'
-			 WHERE username = '` + req.body.email + `'`;
-				 
+			SET bankId = '` + req.body.bankId + `', accountTypeId = '` + req.body.accountTypeId + `'
+			WHERE username = '`+ req.body.username +`'`
+			
+  console.log(qu)
+			 
   request.query(qu, function(err, recordset) {
 	if(err){
 		res.send({
 			"code":400,
-			
 		})
 	}
 	else 
 	{
 		res.send({
 			"code":200,
-			"success": "bank details updated"
+			"filedetails":req.file,
 		})
 	}
 	});
@@ -212,35 +207,6 @@ app.post('/chooseBank', (req, res) => {
   });
 })
 
-
-//choose account 
-app.post('/chooseaccount', (req, res) => {
-
-  sql.connect(sqlConfig, function() {
-  var request = new sql.Request();
-
-  let qu  = `UPDATE dbo.[User]
-			 SET account = '` + req.body.account + `'
-			 WHERE username = '` + req.body.email + `'`;
-				 
-  request.query(qu, function(err, recordset) {
-	if(err){
-		res.send({
-			"code":400,
-			
-		})
-	}
-	else 
-	{
-		res.send({
-			"code":200,
-			"success": "account details updated"
-		})
-	}
-	});
-
-  });
-})
 
 
 function retrieve_userdetails(user)
@@ -273,5 +239,7 @@ function retrieve_userdetails(user)
 	});
 	});
 }
+
+
 
 
