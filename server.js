@@ -8,7 +8,6 @@ const PDFParser = require('pdf-parse');
 var bcrypt = require('bcryptjs');
 const bodyParser = require('body-parser');
 var multer = require('multer');
-var parser = require('./parser/parser.js')
 
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -182,7 +181,7 @@ app.post('/fetchAccountType', (req, res) =>  {
     });
 })
 
-//Deletes files in the folder. To-DO : add this after analyse result api
+//Deletes files in the folder.
 function deleteFile(path)
 {
 	const fsExtra = require('fs-extra')
