@@ -43,6 +43,9 @@ import LoginPage from "views/Pages/LoginPage.jsx";
 import RegisterPage from "views/Pages/RegisterPage.jsx";
 import LockScreenPage from "views/Pages/LockScreenPage.jsx";
 
+import Banks from './views/Banks/Banks'
+import AddBanks from './views/Banks/AddBanks'
+
 let routes = [
   {
     path: "/dashboard",
@@ -50,6 +53,32 @@ let routes = [
     icon: "now-ui-icons design_app",
     component: Dashboard,
     layout: "/admin"
+  },
+  {
+    collapse: true,
+    path: "/banks",
+    name: "Banks",
+    state: "openBanks",
+    icon: "now-ui-icons business_bank",
+    views: [
+      {
+        path: "/myBanks",
+        name: "My Banks",
+        mini: "MB",
+        /* icon: "now-ui-icons business_badge", */
+        component: Banks,
+        layout: "/admin"
+      },
+      {
+        path: "/addBanks",
+        name: "Add Banks",
+        mini: "AB",
+        /* icon: "now-ui-icons business_badge", */
+        component: AddBanks,
+        layout: "/admin"
+      }
+    ]
+
   },
   {
     collapse: true,

@@ -137,12 +137,12 @@ class LoginPage extends React.Component {
           console.log("Log in successful")
           this.setState({ message: "Login Successful! Redirecting you now" })
           //this.successAlert()
-          this.notify("tr", 5)
+          this.notify("tc", 5)
           this.redirect()
         } else {
           console.log("Log in unsuccessful")
           this.setState({ message: "Invalid login credentials" })
-          this.notify("tr", 3)
+          this.notify("tc", 3)
         }
 
       })
@@ -202,7 +202,7 @@ class LoginPage extends React.Component {
                       <InputGroup
                         className={
                           "no-border form-control-lg " +
-                          (this.state.firstnameFocus ? "input-group-focus" : "")
+                          (this.state.emailFocus ? "input-group-focus" : "")
                         }
                       >
                         <InputGroupAddon addonType="prepend">
@@ -215,8 +215,8 @@ class LoginPage extends React.Component {
                           name="email"
                           type="text"
                           placeholder="Email"
-                          onFocus={e => this.setState({ firstnameFocus: true })}
-                          onBlur={e => this.setState({ firstnameFocus: false })}
+                          onFocus={e => this.setState({ emailFocus: true })}
+                          onBlur={e => this.setState({ emailFocus: false })}
                           onChange={this.handleUserInput}
                         />
                       </InputGroup>
