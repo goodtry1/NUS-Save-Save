@@ -50,18 +50,24 @@ app.post('/signUp', (req, res) => {
 		request.query(qu, function(err, recordset) {
 			if(err)
 			{
-				console.log("error occured");
-			    res.send({
+        if (err.message.includes("Violation of UNIQUE KEY constraint")) {
+          console.log("Duplicated email")
+          res.status(400).send({
+            "message": "Duplicated email"
+          })
+        }
+				/* console.log("error occured");
+			    res.status(400).send({
 					"code":400,
 					"failed":"error ocurred"
-			    });
+			    }); */
 				
 			}
 			else
 			{
-				res.send({
+				res.status(200).send({
 					"code":200,
-					"success": 'register user success'
+					"success": 'Sign up successful'
 				});
 			}		
 		});
@@ -83,7 +89,7 @@ app.post('/signin', (req, res) => {
     if (error)
     {
        console.log("error occured");
-	   res.send({
+	   res.status(400).send({
         "code":400,
         "failed":"error ocurred"
        });
@@ -98,7 +104,7 @@ app.post('/signin', (req, res) => {
         if(comparision)
         {
            console.log("login successful")
-		    res.send({
+		    res.status(200).send({
               "code":200,
               "success":"login successfull"
             })
@@ -106,7 +112,7 @@ app.post('/signin', (req, res) => {
         else
         {
           console.log("Email and password does not match")
-		  res.send({
+		  res.status(204).send({
                "code":204,
                "success":"Email and password does not match"
           });
@@ -115,7 +121,7 @@ app.post('/signin', (req, res) => {
       else
       {
          console.log("Email does not exits")
-		 res.send({
+		 res.status(206).send({
           "code":206,
           "success":"Email does not exits"
          });

@@ -26,6 +26,9 @@ import "assets/css/demo.css";
 import AdminLayout from "layouts/Admin.jsx";
 import AuthLayout from "layouts/Auth.jsx";
 
+import LoginPage from '../src/views/Pages/LoginPage'
+
+
 const hist = createBrowserHistory();
 
 ReactDOM.render(
@@ -45,6 +48,10 @@ ReactDOM.render(
       />
       <Redirect to="/admin/dashboard" />
     </Switch>
+
+
+    
+
   </Router>,
   document.getElementById("root")
 );

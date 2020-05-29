@@ -144,12 +144,12 @@ class Admin extends React.Component {
             <Footer fluid />
           )}
         </div>
-        <FixedPlugin
+        {/* <FixedPlugin
           handleMiniClick={this.minimizeSidebar}
           sidebarMini={this.state.sidebarMini}
           bgColor={this.state.backgroundColor}
           handleColorClick={this.handleColorClick}
-        />
+        /> */}
       </div>
     );
   }

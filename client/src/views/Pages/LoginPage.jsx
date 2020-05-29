@@ -53,7 +53,7 @@ class LoginPage extends React.Component {
       show: false
     };
 
-    
+
   }
 
   componentDidMount() {
@@ -68,6 +68,51 @@ class LoginPage extends React.Component {
       [event.target.name]: event.target.value,
     });
   };
+
+  redirect = () => {
+    setTimeout(() => {
+      this.setState({ redirect: true })
+    }, 2000);
+  }
+
+  notify(place, color) {
+    //var color = 5;
+    var type;
+    switch (color) {
+      case 1:
+        type = "primary";
+        break;
+      case 2:
+        type = "success";
+        break;
+      case 3:
+        type = "danger";
+        break;
+      case 4:
+        type = "warning";
+        break;
+      case 5:
+        type = "info";
+        break;
+      default:
+        break;
+    }
+    var options = {};
+    options = {
+      place: place,
+      message: (
+        <div>
+          <div>
+            {this.state.message}
+          </div>
+        </div>
+      ),
+      type: type,
+      icon: "now-ui-icons ui-1_bell-53",
+      autoDismiss: 7
+    };
+    this.refs.notificationAlert.notificationAlert(options);
+  }
 
   handleSubmit = (event) => {
     let values = {
@@ -90,16 +135,14 @@ class LoginPage extends React.Component {
         if (response.status === 200) {
           localStorage.setItem("email", this.state.email)
           console.log("Log in successful")
-          this.setState({ message: "Login Successful! Redirecting you now.." })
-          //this.setState({ redirect: true })
-          this.successAlert()
-          
-          console.log("Supposed to show sweet alert")
-          // this.redirect()
+          this.setState({ message: "Login Successful! Redirecting you now" })
+          //this.successAlert()
+          this.notify("tr", 5)
+          this.redirect()
         } else {
           console.log("Log in unsuccessful")
           this.setState({ message: "Invalid login credentials" })
-          //this.notify("tr", 3)
+          this.notify("tr", 3)
         }
 
       })
@@ -118,12 +161,12 @@ class LoginPage extends React.Component {
         <SweetAlert
           success
           style={{ display: "block", marginTop: "-100px" }}
-          title="Good job!"
+          title="Success!"
           onConfirm={() => this.hideAlert()}
           onCancel={() => this.hideAlert()}
-          confirmBtnBsStyle="info"
+        //confirmBtnBsStyle="info"
         >
-          You clicked the button!
+          {this.state.message}
         </SweetAlert>
       )
     });
@@ -136,9 +179,14 @@ class LoginPage extends React.Component {
   }
 
   render() {
+
+    if (this.state.redirect) {
+      return <Redirect to="/Admin" />;
+    }
     return (
       <>
-       {this.state.alert}
+        {/* {this.state.alert} */}
+        <NotificationAlert ref="notificationAlert" />
         <div className="content">
           <div className="login-page">
             <Container>
@@ -206,7 +254,7 @@ class LoginPage extends React.Component {
                       </Button>
                       <div className="pull-left">
                         <h6>
-                          <a href="#pablo" className="link footer-link">
+                          <a href="/auth/register-page" className="link footer-link">
                             Create Account
                           </a>
                         </h6>
