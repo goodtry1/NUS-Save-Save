@@ -79,10 +79,10 @@ class Auth extends React.Component {
             <Footer fluid />
           </div>
         </div>
-        <FixedPlugin
+        {/* <FixedPlugin
           bgColor={this.state.filterColor}
           handleColorClick={this.handleColorClick}
-        />
+        /> */}
       </>
     );
   }
