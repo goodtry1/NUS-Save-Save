@@ -228,7 +228,7 @@ class LoginPage extends React.Component {
                       >
                         <InputGroupAddon addonType="prepend">
                           <InputGroupText>
-                            <i className="now-ui-icons text_caps-small" />
+                            <i className="now-ui-icons objects_key-25" />
                           </InputGroupText>
                         </InputGroupAddon>
                         <Input
@@ -254,16 +254,16 @@ class LoginPage extends React.Component {
                       </Button>
                       <div className="pull-left">
                         <h6>
-                          <a href="/auth/register-page" className="link footer-link">
+                          {/* <a href="/auth/register-page" className="link footer-link">
                             Create Account
-                          </a>
+                          </a> */}
                         </h6>
                       </div>
                       <div className="pull-right">
                         <h6>
-                          <a href="#pablo" className="link footer-link">
+                          {/* <a href="#pablo" className="link footer-link">
                             Need Help?
-                          </a>
+                          </a> */}
                         </h6>
                       </div>
                     </CardFooter>

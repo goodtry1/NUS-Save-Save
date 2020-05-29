@@ -57,9 +57,9 @@ class AuthNavbar extends React.Component {
                 <span className="navbar-toggler-bar bar3" />
               </NavbarToggler>
             </div>
-            <Link to="/" className="navbar-brand">
+            {/* <Link to="/" className="navbar-brand">
               Now Ui Dashboard Pro - React
-            </Link>
+            </Link> */}
           </div>
           <Collapse isOpen={this.state.isOpen} navbar>
             <Nav className="ml-auto" navbar>

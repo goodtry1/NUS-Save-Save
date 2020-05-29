@@ -133,19 +133,19 @@ class RegisterPage extends React.Component {
         if (response.status === 200) {
           console.log("Signup successful")
           //this.setState({ message: 'Sign Up successful! You have achieved your first step as a smart saver!' })
-          this.setState({notificationColor : 5})
-         // this.notify('tc', 5)
+          this.setState({ notificationColor: 5 })
+          // this.notify('tc', 5)
         } else {
 
           // console.log("An error occured")
-          this.setState({notificationColor : 4})
+          this.setState({ notificationColor: 4 })
           //this.notify('tc', 4)
         }
 
         return response.json();
 
       }).then((data) => {
-        this.setState({message: data.message})
+        this.setState({ message: data.message })
         this.notify('tc', this.state.notificationColor)
       })
 
@@ -207,7 +207,7 @@ class RegisterPage extends React.Component {
                     <Card className="card-signup">
                       <CardHeader className="text-center">
                         <CardTitle tag="h4">Register</CardTitle>
-                        <div className="social btns-mr-5">
+                        {/* <div className="social btns-mr-5">
                           <Button className="btn-icon btn-round" color="twitter">
                             <i className="fab fa-twitter" />
                           </Button>
@@ -218,7 +218,7 @@ class RegisterPage extends React.Component {
                             <i className="fab fa-facebook-f" />
                           </Button>
                           <h5 className="card-description">or be classical</h5>
-                        </div>
+                        </div> */}
                       </CardHeader>
                       <CardBody>
 
