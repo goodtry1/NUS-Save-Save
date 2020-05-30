@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import { Redirect } from 'react-router-dom';
 
 // reactstrap components
 import {
@@ -23,7 +24,20 @@ import {
 import PanelHeader from "components/PanelHeader/PanelHeader.jsx";
 
 export class Banks extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            redirectToAddBanks: false
+        }
+    }
+
+    redirectToAddBanks = () => {
+        this.setState({redirectToAddBanks: true})
+    }
     render() {
+        if (this.state.redirectToAddBanks) {
+            return <Redirect to="/admin/addBanks" />;
+        }
         return (
             <div>
                 <PanelHeader
@@ -33,10 +47,10 @@ export class Banks extends Component {
                 <Row>
                     <Col xs={12} md={12}>
                         <Card className="card-chart">
-                            
+
                             <CardBody>
                                 <center>
-                                    <Button color="alert" className="btn-round btn-icon">
+                                    <Button color="alert" onClick={this.redirectToAddBanks} className="btn-round btn-icon">
                                         <i className="now-ui-icons ui-1_simple-add" />
                                     </Button>
 
@@ -45,7 +59,7 @@ export class Banks extends Component {
 
 
                             </CardBody>
-                           
+
                         </Card>
                     </Col>
                 </Row>
