@@ -169,14 +169,14 @@ class Sidebar extends React.Component {
               </div>
             </a>
             <a
-              href="https://www.creative-tim.com?ref=nudr-sidebar"
+              href="/admin/dashboard"
               className="simple-text logo-normal"
-              target="_blank"
+              /* target="/admin/dashboard" */
             >
-              Creative Tim
+              Save Save
             </a>
             <div className="navbar-minimize">
-              <Button
+              {/* <Button
                 outline
                 className="btn-round btn-icon"
                 color="neutral"
@@ -185,7 +185,7 @@ class Sidebar extends React.Component {
               >
                 <i className="now-ui-icons text_align-center visible-on-sidebar-regular" />
                 <i className="now-ui-icons design_bullet-list-67 visible-on-sidebar-mini" />
-              </Button>
+              </Button> */}
             </div>
           </div>
 
