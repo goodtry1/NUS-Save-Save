@@ -57,7 +57,7 @@ export class AddBanks extends Component {
 
                 banks = res.data.banks
 
-             
+
 
                 this.setState({ banks: banks })
             })
@@ -119,18 +119,13 @@ export class AddBanks extends Component {
         })
     }
 
-    bankOnClick = (e) => {
+    bankOnClick = (e, bank) => {
 
-        this.setState({ selectedBankId: e.target.id })
-        this.setState({ selectedBank: e.target.name })
+        this.setState({ selectedBank: bank })
+        this.setState({ selectedBankId: bank.bankId })
+        this.setState({ accountTypes: bank.accountTypes })
         this.setState({ selectedAccountType: '' })
         this.setState({ selectedAccountTypeId: '' })
-
-        this.state.banks.map(bank => {
-            if (bank.bankId == this.state.selectedBankId) {
-                this.setState({ accountTypes: bank.accountTypes })
-            }
-        })
 
     }
 
@@ -138,6 +133,20 @@ export class AddBanks extends Component {
         this.setState({ selectedAccountTypeId: e.target.id })
         this.setState({ selectedAccountType: e.target.name })
     }
+
+    clearSelectionOnClick = (e) => {
+        this.setState({ selectedBank: '' })
+        this.setState({ selectedBankId: '' })
+        this.setState({ selectedAccountType: '' })
+        this.setState({ selectedAccountTypeId: '' })
+        this.setState({ accountTypes: [] })
+    }
+
+    createAccountOnClick = (e) => {
+
+    }
+
+
 
 
     render() {
@@ -156,29 +165,26 @@ export class AddBanks extends Component {
                                 <h5 className="card-category">Step 1: Choose your bank</h5>
                             </CardHeader>
                             <CardBody>
+
                                 <Row>
                                     {this.state.banks.map((bank) =>
 
 
                                         <Col xs={12} md={4} key={bank.bankId} >
-                                            <Button style={{ width: '100%' }} id={bank.bankId} name={bank.bankName} onClick={this.bankOnClick}>{bank.bankName}</Button>
-
-
-
-                                            {/* <Card className="card-chart" value={bank.bankName} onClick={this.bankOnClick} >
-                                                <CardBody style={{ textAlign: 'center' }}>{bank.bankName}</CardBody>
-                                            </Card> */}
+                                            <Button style={{ width: '100%' }} onClick={((e) => this.bankOnClick(e, bank))}>{bank.bankName}</Button>
                                         </Col>
                                     )}
 
                                 </Row>
 
 
+
+
                             </CardBody>
 
                         </Card>
                     </Col>
-                </Row>
+                </Row >
 
                 <Row>
                     <Col xs={12} md={12}>
@@ -217,16 +223,31 @@ export class AddBanks extends Component {
 
 
                                     <Col xs={12} md={4}>
-                                        <Card className="card-chart">
 
-                                            <CardBody style={{ textAlign: 'center' }}>
-                                                <h3>{this.state.selectedBank}</h3>
-                                                <h5>{this.state.selectedAccountType}</h5>
+                                        <div>
+                                            {this.state.selectedBank ? (
+                                                <div>
+                                                    <Card className="card-chart">
+
+                                                        <CardBody style={{ textAlign: 'center' }}>
+                                                            <h3>{this.state.selectedBank.bankName}</h3>
+                                                            <h5>{this.state.selectedAccountType}</h5>
 
 
-                                            </CardBody>
+                                                        </CardBody>
 
-                                        </Card>
+                                                    </Card>
+                                                </div>
+
+                                            ) : (
+                                                    <div></div>
+                                                )}
+                                        </div>
+
+
+
+
+
                                     </Col>
 
                                     <Col xs={12} md={4}></Col>
@@ -234,10 +255,15 @@ export class AddBanks extends Component {
                                 </Row>
 
                                 <Row>
-                                    <Col xs={12} md={10}></Col>
+                                    <Col xs={12} md={9}></Col>
 
-                                    <Col xs={12} md={2}>
-                                        <Button color="primary" className="btn-round">
+
+
+                                    <Col xs={12} md={3}>
+                                        <Button onClick={this.clearSelectionOnClick} color="danger" className="btn-round">
+                                            Clear Selection
+                                        </Button>
+                                        <Button color="" className="btn-round">
                                             Create
                                         </Button>
                                     </Col>
@@ -249,12 +275,12 @@ export class AddBanks extends Component {
 
                         </Card>
                     </Col>
-                </Row>
+                </Row >
 
 
 
 
-            </div>
+            </div >
         )
     }
 }
