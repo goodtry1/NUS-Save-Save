@@ -114,7 +114,45 @@ class LoginPage extends React.Component {
     this.refs.notificationAlert.notificationAlert(options);
   }
 
+
+
+  testLogin = () => {
+    console.log("Testing now!")
+    var email = this.state.email;
+    //login["email"] = e.target.value;
+    var emailRex = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    if (emailRex.test(email) && this.state.password.length > 0) {
+
+    } else if (emailRex.test(email) && this.state.password.length <= 0) {
+      this.setState({ message: 'Please enter your password' })
+      throw new Error()
+    } else if (!emailRex.test(email) && this.state.password.length > 0) {
+      this.setState({ message: 'Please enter a correct email format' })
+      throw new Error()
+    } else if (!emailRex.test(email) && this.state.password.length <= 0) {
+      this.setState({ message: 'Please enter a correct email format and password' })
+      throw new Error()
+
+    }
+  }
+
   handleSubmit = (event) => {
+    try {
+      this.testLogin()
+      this.loginViaServer()
+    } catch (err) {
+
+    } finally {
+      setTimeout(() => {
+        this.notify('br', 4)
+      }, 200);
+
+    }
+
+    event.preventDefault();
+  }
+
+  loginViaServer = () => {
     let values = {
       email: this.state.email,
       password: this.state.password
@@ -137,12 +175,12 @@ class LoginPage extends React.Component {
           console.log("Log in successful")
           this.setState({ message: "Login Successful! Redirecting you now" })
           //this.successAlert()
-          this.notify("tr", 5)
+          this.notify("tc", 5)
           this.redirect()
         } else {
           console.log("Log in unsuccessful")
           this.setState({ message: "Invalid login credentials" })
-          this.notify("tr", 3)
+          this.notify("tc", 3)
         }
 
       })
@@ -151,32 +189,11 @@ class LoginPage extends React.Component {
         this.setState({ message: err.message })
         console.log(this.state.message)
       })
-
-    event.preventDefault();
   }
 
-  successAlert() {
-    this.setState({
-      alert: (
-        <SweetAlert
-          success
-          style={{ display: "block", marginTop: "-100px" }}
-          title="Success!"
-          onConfirm={() => this.hideAlert()}
-          onCancel={() => this.hideAlert()}
-        //confirmBtnBsStyle="info"
-        >
-          {this.state.message}
-        </SweetAlert>
-      )
-    });
-  }
 
-  hideAlert() {
-    this.setState({
-      alert: null
-    });
-  }
+
+
 
   render() {
 
@@ -202,7 +219,7 @@ class LoginPage extends React.Component {
                       <InputGroup
                         className={
                           "no-border form-control-lg " +
-                          (this.state.firstnameFocus ? "input-group-focus" : "")
+                          (this.state.emailFocus ? "input-group-focus" : "")
                         }
                       >
                         <InputGroupAddon addonType="prepend">
@@ -215,8 +232,8 @@ class LoginPage extends React.Component {
                           name="email"
                           type="text"
                           placeholder="Email"
-                          onFocus={e => this.setState({ firstnameFocus: true })}
-                          onBlur={e => this.setState({ firstnameFocus: false })}
+                          onFocus={e => this.setState({ emailFocus: true })}
+                          onBlur={e => this.setState({ emailFocus: false })}
                           onChange={this.handleUserInput}
                         />
                       </InputGroup>
@@ -228,7 +245,7 @@ class LoginPage extends React.Component {
                       >
                         <InputGroupAddon addonType="prepend">
                           <InputGroupText>
-                            <i className="now-ui-icons text_caps-small" />
+                            <i className="now-ui-icons objects_key-25" />
                           </InputGroupText>
                         </InputGroupAddon>
                         <Input
@@ -254,16 +271,16 @@ class LoginPage extends React.Component {
                       </Button>
                       <div className="pull-left">
                         <h6>
-                          <a href="/auth/register-page" className="link footer-link">
+                          {/* <a href="/auth/register-page" className="link footer-link">
                             Create Account
-                          </a>
+                          </a> */}
                         </h6>
                       </div>
                       <div className="pull-right">
                         <h6>
-                          <a href="#pablo" className="link footer-link">
+                          {/* <a href="#pablo" className="link footer-link">
                             Need Help?
-                          </a>
+                          </a> */}
                         </h6>
                       </div>
                     </CardFooter>

@@ -140,9 +140,9 @@ class Admin extends React.Component {
             <Redirect from="/admin" to="/admin/dashboard" />
           </Switch>
           {// we don't want the Footer to be rendered on full screen maps page
-          window.location.href.indexOf("full-screen-maps") !== -1 ? null : (
-            <Footer fluid />
-          )}
+            window.location.href.indexOf("full-screen-maps") !== -1 ? null : (
+              <Footer fluid />
+            )}
         </div>
         {/* <FixedPlugin
           handleMiniClick={this.minimizeSidebar}
