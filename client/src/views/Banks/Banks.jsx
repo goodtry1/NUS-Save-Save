@@ -23,21 +23,34 @@ import {
 // core components
 import PanelHeader from "components/PanelHeader/PanelHeader.jsx";
 
+//Axios
+import axios from 'axios';
+
 export class Banks extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            Banks: [],
             redirectToAddBanks: false
         }
     }
 
+    componentDidMount = () => {
+        //API to retrieve all banks of user
+    }
+
     redirectToAddBanks = () => {
-        this.setState({redirectToAddBanks: true})
+        this.props.history.push({
+            pathname: '/admin/addBanks',
+            data: "Whassup bro" // your data array of objects
+          })
+        
+        //this.setState({ redirectToAddBanks: true })
     }
     render() {
-        if (this.state.redirectToAddBanks) {
+        /* if (this.state.redirectToAddBanks) {
             return <Redirect to="/admin/addBanks" />;
-        }
+        } */
         return (
             <div>
                 <PanelHeader

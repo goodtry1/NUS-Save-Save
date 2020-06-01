@@ -136,7 +136,7 @@ class AdminNavbar extends React.Component {
             navbar
             className="justify-content-end"
           >
-            <form>
+            {/* <form>
               <InputGroup className="no-border">
                 <Input placeholder="Search..." />
 
@@ -146,9 +146,9 @@ class AdminNavbar extends React.Component {
                   </InputGroupText>
                 </InputGroupAddon>
               </InputGroup>
-            </form>
+            </form> */}
             <Nav navbar>
-              <NavItem>
+              {/* <NavItem>
                 <Link to="#pablo" className="nav-link">
                   <i className="now-ui-icons media-2_sound-wave" />
                   <p>
@@ -172,15 +172,15 @@ class AdminNavbar extends React.Component {
                   <DropdownItem tag="a">Another Action</DropdownItem>
                   <DropdownItem tag="a">Something else here</DropdownItem>
                 </DropdownMenu>
-              </Dropdown>
-              <NavItem>
+              </Dropdown> */}
+              {/* <NavItem>
                 <Link to="#pablo" className="nav-link">
                   <i className="now-ui-icons users_single-02" />
                   <p>
                     <span className="d-lg-none d-md-block">Account</span>
                   </p>
                 </Link>
-              </NavItem>
+              </NavItem> */}
             </Nav>
           </Collapse>
         </Container>

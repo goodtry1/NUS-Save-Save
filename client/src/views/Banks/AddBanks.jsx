@@ -46,6 +46,10 @@ export class AddBanks extends Component {
     }
 
     componentDidMount = () => {
+        var { data } = this.props.location
+        console.log(data)
+
+
         var email = localStorage.getItem('email')
         this.setState({ email: email })
 
