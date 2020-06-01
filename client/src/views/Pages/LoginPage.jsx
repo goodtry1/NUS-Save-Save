@@ -117,7 +117,6 @@ class LoginPage extends React.Component {
 
 
   testLogin = () => {
-    console.log("Testing now!")
     var email = this.state.email;
     //login["email"] = e.target.value;
     var emailRex = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -141,12 +140,9 @@ class LoginPage extends React.Component {
       this.testLogin()
       this.loginViaServer()
     } catch (err) {
-
-    } finally {
       setTimeout(() => {
-        this.notify('br', 4)
+        this.notify('tc', 4)
       }, 200);
-
     }
 
     event.preventDefault();
@@ -224,7 +220,7 @@ class LoginPage extends React.Component {
                       >
                         <InputGroupAddon addonType="prepend">
                           <InputGroupText>
-                            <i className="now-ui-icons users_circle-08" />
+                            <i className="now-ui-icons ui-1_email-85" />
                           </InputGroupText>
                         </InputGroupAddon>
                         <Input

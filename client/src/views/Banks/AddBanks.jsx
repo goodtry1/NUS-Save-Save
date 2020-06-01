@@ -244,30 +244,44 @@ export class AddBanks extends Component {
                                                 )}
                                         </div>
 
-
-
-
-
                                     </Col>
 
                                     <Col xs={12} md={4}></Col>
 
                                 </Row>
 
-                                <Row>
-                                    <Col xs={12} md={9}></Col>
 
 
 
-                                    <Col xs={12} md={3}>
-                                        <Button onClick={this.clearSelectionOnClick} color="danger" className="btn-round">
-                                            Clear Selection
-                                        </Button>
-                                        <Button color="" className="btn-round">
-                                            Create
-                                        </Button>
-                                    </Col>
-                                </Row>
+
+
+                                {this.state.selectedBank ? (
+                                    <div>
+                                        <Row><Col xs={12} md={9}></Col>
+                                            <Col xs={12} md={3}>
+                                                <Button onClick={this.clearSelectionOnClick} color="danger" className="btn-round">
+                                                    Clear Selection
+                                                    </Button>
+                                                <Button color="" className="btn-round">
+                                                    Create
+                                                    </Button>
+                                            </Col>
+                                        </Row>
+
+                                    </div>
+
+                                ) : (
+                                        <div></div>
+                                    )}
+
+
+
+
+
+
+
+
+
 
 
 
