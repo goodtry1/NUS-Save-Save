@@ -2,7 +2,7 @@
   "name": "now-ui-dashboard-pro-react",
   "version": "1.3.0",
   "private": true,
-  "homepage": "https://creativetimofficial.github.io/now-ui-dashboard-pro-react/#/documentation/tutorial",
+  "homepage": "localhost:3000/auth",
   "dependencies": {
     "axios": "^0.19.2",
     "bootstrap": "4.3.1",

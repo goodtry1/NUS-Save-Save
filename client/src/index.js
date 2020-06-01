@@ -46,7 +46,7 @@ ReactDOM.render(
           return <AuthLayout {...props} />;
         }}
       />
-      <Redirect to="/admin/dashboard" />
+      <Redirect to="/auth" />
     </Switch>
 
 
