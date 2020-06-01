@@ -89,65 +89,39 @@ class Dashboard extends React.Component {
   render() {
     return (
       <>
+
         <PanelHeader
-          size="lg"
-          content={
-            <Line
-              data={dashboardPanelChart.data}
-              options={dashboardPanelChart.options}
-            />
-          }
-        />
+          size="sm" />
+
+        {/** 
+            content={
+              <Line
+                data={dashboardPanelChart.data}
+                options={dashboardPanelChart.options}
+              }
+          */}
+
         <div className="content">
           <Row>
             <Col xs={12} md={12}>
               <Card className="card-stats card-raised">
                 <CardBody>
                   <Row>
-                    <Col md="3">
-                      <div className="statistics">
+                    <Col md="9">
+                      <div className="intro">
                         <div className="info">
-                          <div className="icon icon-primary">
-                            <i className="now-ui-icons ui-2_chat-round" />
-                          </div>
-                          <h3 className="info-title">859</h3>
-                          <h6 className="stats-title">Messages</h6>
+
+                          <h2 className="info-title">Welcome back,</h2>
+                          <p className="info-title">$user</p>
                         </div>
                       </div>
                     </Col>
                     <Col md="3">
-                      <div className="statistics">
+                      <div className="intro">
                         <div className="info">
-                          <div className="icon icon-success">
-                            <i className="now-ui-icons business_money-coins" />
-                          </div>
-                          <h3 className="info-title">
-                            <small>$</small>
-                            3,521
-                          </h3>
-                          <h6 className="stats-title">Today Revenue</h6>
-                        </div>
-                      </div>
-                    </Col>
-                    <Col md="3">
-                      <div className="statistics">
-                        <div className="info">
-                          <div className="icon icon-info">
-                            <i className="now-ui-icons users_single-02" />
-                          </div>
-                          <h3 className="info-title">562</h3>
-                          <h6 className="stats-title">Customers</h6>
-                        </div>
-                      </div>
-                    </Col>
-                    <Col md="3">
-                      <div className="statistics">
-                        <div className="info">
-                          <div className="icon icon-danger">
-                            <i className="now-ui-icons objects_support-17" />
-                          </div>
-                          <h3 className="info-title">353</h3>
-                          <h6 className="stats-title">Support Requests</h6>
+
+
+                          <p className="info-title">Member since:</p>
                         </div>
                       </div>
                     </Col>
@@ -156,12 +130,14 @@ class Dashboard extends React.Component {
               </Card>
             </Col>
           </Row>
+
           <Row>
-            <Col xs={12} md={4}>
+            <Col xs={12} md={12}>
               <Card className="card-chart">
                 <CardHeader>
-                  <h5 className="card-category">Active Users</h5>
-                  <CardTitle tag="h2">34,252</CardTitle>
+                  <h5 className="card-category"></h5>
+                  <CardTitle tag="h2" >Your Bank Accounts:</CardTitle>
+                  {/*  
                   <UncontrolledDropdown>
                     <DropdownToggle
                       className="btn-round btn-icon"
@@ -179,8 +155,48 @@ class Dashboard extends React.Component {
                       </DropdownItem>
                     </DropdownMenu>
                   </UncontrolledDropdown>
+                  */}
+
                 </CardHeader>
                 <CardBody>
+                  <Row>
+                    <Col xs={12} md={4}>
+                      <Card className="card-chart">
+                        <CardHeader>
+                          A
+                        </CardHeader>
+                        <CardBody>
+                          1231231
+                        </CardBody>
+                      </Card>
+
+                    </Col>
+                    <Col xs={12} md={4}>
+                      <Card className="card-chart">
+                        <CardHeader>
+                          B
+                        </CardHeader>
+                        <CardBody>
+                          1231231
+                        </CardBody>
+                      </Card>
+
+                    </Col>
+                    <Col xs={12} md={4}>
+                      <Card className="card-chart">
+                        <CardHeader>
+                          C
+                        </CardHeader>
+                        <CardBody>
+                          1231231
+                        </CardBody>
+                      </Card>
+
+                    </Col>
+
+
+                  </Row>
+                  {/*
                   <div className="chart-area">
                     <Line
                       data={dashboardActiveUsersChart.data}
@@ -190,6 +206,7 @@ class Dashboard extends React.Component {
                   <Table responsive>
                     <tbody>{this.createTableData()}</tbody>
                   </Table>
+                  */}
                 </CardBody>
                 <CardFooter>
                   <div className="stats">
@@ -199,6 +216,8 @@ class Dashboard extends React.Component {
                 </CardFooter>
               </Card>
             </Col>
+          </Row>
+          {/*
             <Col xs={12} md={4}>
               <Card className="card-chart">
                 <CardHeader>
@@ -417,6 +436,8 @@ class Dashboard extends React.Component {
               </Card>
             </Col>
           </Row>
+
+          */}
         </div>
       </>
     );
