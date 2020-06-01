@@ -47,8 +47,12 @@ class RegisterPage extends React.Component {
     super(props);
     this.state = {
       email: '',
+      emailState: "",
       password: '',
+      passwordState: '',
       firstName: '',
+      firstNameState: '',
+      lastNameState: '',
       lastName: '',
       message: '',
       notificationColor: '',
@@ -100,13 +104,103 @@ class RegisterPage extends React.Component {
     this.refs.notificationAlert.notificationAlert(options);
   }
 
+  emailChange(e) {
+    this.setState({
+      email: e.target.value
+    });
+    var emailRex = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    if (emailRex.test(e.target.value)) {
+      this.setState({
+        emailState: " has-success"
+      });
+    } else {
+      this.setState({
+        emailState: " has-danger"
+      });
+    }
+  }
+
+  firstNameChange(e) {
+    this.setState({
+      firstName: e.target.value
+    });
+    if (e.target.value.length > 0) {
+      this.setState({
+        firstNameState: " has-success"
+      });
+    } else {
+      this.setState({
+        firstNameState: " has-danger"
+      });
+    }
+  }
+
+  lastNameChange(e) {
+    this.setState({
+      lastName: e.target.value
+    });
+    if (e.target.value.length > 0) {
+      this.setState({
+        lastNameState: " has-success"
+      });
+    } else {
+      this.setState({
+        lastNameState: " has-danger"
+      });
+    }
+  }
+
+  passwordChange(e) {
+    this.setState({
+      password: e.target.value
+    });
+    if (e.target.value.length > 0) {
+      this.setState({
+        passwordState: " has-success"
+      });
+    } else {
+      this.setState({
+        passwordState: " has-danger"
+      });
+    }
+  }
+
+  isValidated() {
+    if (
+      this.state.firstNameState !== " has-success" ||
+      this.state.lastNameState !== " has-success" ||
+      this.state.emailState !== " has-success" ||
+      this.state.passwordState !== " has-success"
+    ) {
+      this.setState({
+        /* firstNameState: " has-danger",
+         lastNameState: " has-danger",
+         emailState: " has-danger",
+         passwordState: " has-danger" */
+      });
+      return false;
+    }
+    return true;
+  }
+
   handleUserInput = (event) => {
     this.setState({
       [event.target.name]: event.target.value,
     });
   };
 
+
+
+
   handleSubmit = (event) => {
+    if (this.isValidated()) {
+      this.registerViaServer()
+    }
+
+    event.preventDefault();
+  }
+
+  registerViaServer = () => {
     this.setState({ email: '', password: '', firstName: '', lastName: '' })
 
 
@@ -132,30 +226,31 @@ class RegisterPage extends React.Component {
 
         if (response.status === 200) {
           console.log("Signup successful")
-          //this.setState({ message: 'Sign Up successful! You have achieved your first step as a smart saver!' })
-          this.setState({ notificationColor: 5 })
-          // this.notify('tc', 5)
+          this.setState({ message: 'Sign Up successful! You have achieved your first step as a smart saver!' })
+          // this.setState({ notificationColor: 5 })
+          this.notify('tc', 5)
         } else {
 
           // console.log("An error occured")
-          this.setState({ notificationColor: 4 })
-          //this.notify('tc', 4)
+          // this.setState({ notificationColor: 4 })
+          this.notify('tc', 4)
         }
 
         return response.json();
 
       }).then((data) => {
         this.setState({ message: data.message })
-        this.notify('tc', this.state.notificationColor)
+        //this.notify('tc', this.state.notificationColor)
       })
 
       .catch(err => {
         console.log(err)
 
       })
-
-    event.preventDefault();
   }
+
+
+
   render() {
     return (
       <>
@@ -224,7 +319,9 @@ class RegisterPage extends React.Component {
 
                         <InputGroup
                           className={
-                            this.state.emailFocus ? "input-group-focus" : ""
+                            "form-control-lg" +
+                            (this.state.emailState ? this.state.emailState : "") +
+                            (this.state.emailFocus ? " input-group-focus" : "")
                           }
                         >
                           <InputGroupAddon addonType="prepend">
@@ -233,44 +330,44 @@ class RegisterPage extends React.Component {
                             </InputGroupText>
                           </InputGroupAddon>
                           <Input
-                            type="email"
+                            defaultValue={this.state.email}
+                            type="text"
+                            placeholder="Email (required)"
                             name="email"
-                            id="email"
-                            placeholder="Email..."
-                            value={this.state.email}
-                            onChange={this.handleUserInput}
                             onFocus={e => this.setState({ emailFocus: true })}
                             onBlur={e => this.setState({ emailFocus: false })}
+                            onChange={e => this.emailChange(e)}
                           />
                         </InputGroup>
+
                         <InputGroup
                           className={
-                            this.state.firstnameFocus ? "input-group-focus" : ""
+                            "form-control-lg" +
+                            (this.state.firstNameState ? this.state.firstNameState : "") +
+                            (this.state.firstNameFocus ? " input-group-focus" : "")
                           }
                         >
                           <InputGroupAddon addonType="prepend">
                             <InputGroupText>
-                              <i className="now-ui-icons users_circle-08" />
+                              <i className="now-ui-icons users_single-02" />
                             </InputGroupText>
                           </InputGroupAddon>
                           <Input
+                            defaultValue={this.state.firstName}
                             type="text"
-                            placeholder="First Name..."
-                            id="firstName"
+                            placeholder="First Name (required)"
                             name="firstName"
-                            value={this.state.firstName}
-                            onChange={this.handleUserInput}
-                            onFocus={e =>
-                              this.setState({ firstnameFocus: true })
-                            }
-                            onBlur={e =>
-                              this.setState({ firstnameFocus: false })
-                            }
+                            onFocus={e => this.setState({ firstNameFocus: true })}
+                            onBlur={e => this.setState({ firstNameFocus: false })}
+                            onChange={e => this.firstNameChange(e)}
                           />
                         </InputGroup>
+
                         <InputGroup
                           className={
-                            this.state.lastnameFocus ? "input-group-focus" : ""
+                            "form-control-lg" +
+                            (this.state.lastNameState ? this.state.lastNameState : "") +
+                            (this.state.lastNameFocus ? " input-group-focus" : "")
                           }
                         >
                           <InputGroupAddon addonType="prepend">
@@ -279,42 +376,39 @@ class RegisterPage extends React.Component {
                             </InputGroupText>
                           </InputGroupAddon>
                           <Input
+                            defaultValue={this.state.lastName}
                             type="text"
-                            placeholder="Last Name..."
-                            id="lastName"
+                            placeholder="Last Name (required)"
                             name="lastName"
-                            value={this.state.lastName}
-                            onChange={this.handleUserInput}
-                            onFocus={e =>
-                              this.setState({ lastnameFocus: true })
-                            }
-                            onBlur={e =>
-                              this.setState({ lastnameFocus: false })
-                            }
+                            onFocus={e => this.setState({ lastNameFocus: true })}
+                            onBlur={e => this.setState({ lastNameFocus: false })}
+                            onChange={e => this.lastNameChange(e)}
                           />
                         </InputGroup>
 
                         <InputGroup
                           className={
-                            this.state.passwordFocus ? "input-group-focus" : ""
+                            "form-control-lg" +
+                            (this.state.passwordState ? this.state.passwordState : "") +
+                            (this.state.passwordFocus ? " input-group-focus" : "")
                           }
                         >
                           <InputGroupAddon addonType="prepend">
                             <InputGroupText>
-                              <i className="now-ui-icons ui-1_email-85" />
+                              <i className="now-ui-icons objects_key-25" />
                             </InputGroupText>
                           </InputGroupAddon>
                           <Input
-                            type="password"
+                            defaultValue={this.state.password}
+                            type="text"
+                            placeholder="Password (required)"
                             name="password"
-                            id="password"
-                            placeholder="Password..."
-                            value={this.state.password}
-                            onChange={this.handleUserInput}
                             onFocus={e => this.setState({ passwordFocus: true })}
                             onBlur={e => this.setState({ passwordFocus: false })}
+                            onChange={e => this.passwordChange(e)}
                           />
                         </InputGroup>
+
 
                         <FormGroup check>
                           <Label check>
