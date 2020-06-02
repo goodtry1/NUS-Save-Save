@@ -210,7 +210,9 @@ class LoginPage extends React.Component {
         console.log(this.state.message)
       })
       .then((data) => {
-        console.log(data.userDetails)
+        localStorage.setItem('isLoggedIn', true)
+        localStorage.setItem('userDetails', data.userDetails)
+        this.redirect()
       })
   }
 
