@@ -3,18 +3,18 @@ import React, { Component } from 'react'
 // reactstrap components
 import {
     Button,
-    ButtonGroup,
+ /*    ButtonGroup, */
     Card,
     CardHeader,
     CardBody,
-    CardFooter,
+/*     CardFooter,
     CardTitle,
     DropdownToggle,
     DropdownMenu,
     DropdownItem,
     UncontrolledDropdown,
     Table,
-    Progress,
+    Progress, */
     Row,
     Col
 } from "reactstrap";
@@ -33,7 +33,7 @@ export class AddBanks extends Component {
         super(props);
         this.bankOnClick = this.bankOnClick.bind(this)
         this.state = {
-            email: '',
+            user: '',
             PDF: '',
             banks: [],
             selectedBank: '',
@@ -45,13 +45,13 @@ export class AddBanks extends Component {
         }
     }
 
+    
+
     componentDidMount = () => {
-        var { data } = this.props.location
-        console.log(data)
+        var user = localStorage.getItem('user')
+        this.setState({ user: JSON.parse(user) })
 
 
-        var email = localStorage.getItem('email')
-        this.setState({ email: email })
 
         axios.get('/bankDetails')
             .then((res) => {
@@ -147,6 +147,20 @@ export class AddBanks extends Component {
     }
 
     createAccountOnClick = (e) => {
+        console.log(this.state.user.userId)
+        console.log(this.state.selectedAccountTypeId)
+
+        axios({
+            method: 'post',
+            url: '/addBankAccount',
+            data: {
+                userId: this.state.user.userId,
+                accountTypeId: this.state.selectedAccountTypeId,
+
+            }
+        }).then(response => {
+            console.log(response.status)
+        })
 
     }
 
@@ -259,14 +273,32 @@ export class AddBanks extends Component {
 
 
 
-                                {this.state.selectedBank ? (
+                                {this.state.selectedBank && !this.state.selectedAccountType ? (
                                     <div>
                                         <Row><Col xs={12} md={9}></Col>
                                             <Col xs={12} md={3}>
                                                 <Button onClick={this.clearSelectionOnClick} color="danger" className="btn-round">
                                                     Clear Selection
                                                     </Button>
-                                                <Button color="" className="btn-round">
+
+                                            </Col>
+                                        </Row>
+
+                                    </div>
+
+                                ) : (
+                                        <div></div>
+                                    )}
+
+
+                                {this.state.selectedBank && this.state.selectedAccountType ? (
+                                    <div>
+                                        <Row><Col xs={12} md={9}></Col>
+                                            <Col xs={12} md={3}>
+                                                <Button onClick={this.clearSelectionOnClick} color="danger" className="btn-round">
+                                                    Clear Selection
+                                                    </Button>
+                                                <Button color="" className="btn-round" onClick={this.createAccountOnClick}>
                                                     Create
                                                     </Button>
                                             </Col>

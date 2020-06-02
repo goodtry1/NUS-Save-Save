@@ -34,19 +34,19 @@ import {
 
 import { Redirect } from 'react-router-dom';
 import NotificationAlert from "react-notification-alert";
-import SweetAlert from "react-bootstrap-sweetalert";
+//import SweetAlert from "react-bootstrap-sweetalert";
 
 //Redux
-import { useSelector, useDispatch } from 'react-redux';
+/* import { useSelector, useDispatch } from 'react-redux';
 import { connect } from 'react-redux';
-import { logIn } from '../../redux/actions/actions'
+import { logIn } from '../../redux/actions/actions' */
 
 // core components
 import nowLogo from "assets/img/now-logo.png";
 
 import bgImage from "assets/img/bg14.jpg";
 
-
+import { User } from '../../models/User'
 
 class LoginPage extends React.Component {
   constructor(props) {
@@ -190,7 +190,6 @@ class LoginPage extends React.Component {
 
         if (response.status === 200) {
          // this.redirect()
-          localStorage.setItem("email", this.state.email)
           console.log("Log in successful")
           this.setState({ message: "Login Successful! Redirecting you now" })
           //this.successAlert()
@@ -210,8 +209,13 @@ class LoginPage extends React.Component {
         console.log(this.state.message)
       })
       .then((data) => {
+        
+
+        var user = new User(data.userDetails.userId, data.userDetails.email, data.userDetails.firstName, data.userDetails.lastName, data.userDetails.joiningDate)
+
         localStorage.setItem('isLoggedIn', true)
-        localStorage.setItem('userDetails', data.userDetails)
+        localStorage.setItem('user', JSON.stringify(user))
+        
         this.redirect()
       })
   }

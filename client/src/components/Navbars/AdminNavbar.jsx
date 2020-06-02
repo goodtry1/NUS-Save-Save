@@ -15,7 +15,7 @@
 
 */
 import React from "react";
-import { Link } from "react-router-dom";
+//import { Link } from "react-router-dom";
 // used for making the prop types of this component
 import PropTypes from "prop-types";
 
@@ -26,16 +26,16 @@ import {
   NavbarToggler,
   NavbarBrand,
   Nav,
-  NavItem,
+  /* NavItem,
   Dropdown,
   DropdownToggle,
   DropdownMenu,
-  DropdownItem,
+  DropdownItem, */
   Container,
-  InputGroup,
+  /* InputGroup,
   InputGroupAddon,
   InputGroupText,
-  Input
+  Input */
 } from "reactstrap";
 
 class AdminNavbar extends React.Component {

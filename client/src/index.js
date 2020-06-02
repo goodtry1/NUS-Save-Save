@@ -26,7 +26,6 @@ import "assets/css/demo.css";
 import AdminLayout from "layouts/Admin.jsx";
 import AuthLayout from "layouts/Auth.jsx";
 
-import LoginPage from '../src/views/Pages/LoginPage'
 
 /* //Redux
 import { createStore } from 'redux';
@@ -41,10 +40,12 @@ const store = createStore(
 
 const hist = createBrowserHistory();
 
+/* var isLoggedIn = localStorage.getItem('isLoggedIn') */
 
 ReactDOM.render(
   
     <Router history={hist}>
+      
       <Switch>
         <Route
           path="/admin"
