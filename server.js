@@ -54,8 +54,8 @@ app.post('/signUp', async (req, res) => {
 		let qu = `INSERT INTO dbo.[User](email, password, firstName, lastName, joiningDate) 
 				   VALUES ('` + req.body.email+ `', '`+ req.body.password + `', '`+ req.body.firstName + `', '`+ req.body.lastName + `' , '`+ joiningDate + `')`;
 
-		request.query(qu, function(err, recordset) {
-			if(err)
+		request.query(qu, function(error, recordset) {
+			if(error)
 			{
 				console.log("error occured");
 			    res.status(400).send()
@@ -126,7 +126,32 @@ app.get('/bankdetails', function (req, res) {
 			}
 			else 
 			{
-				res.status(204).send({"banks":results.recordset})
+				res.status(200).send({"banks":results.recordset})
+			}
+        });
+    });
+})
+
+
+//get user bank account details
+app.post('/userBankAccountDetails', function (req, res) {
+	userId = req.body.userId;
+	
+    sql.connect(sqlConfig, function() {
+        var request = new sql.Request();
+		let qu = `SELECT userAccount.userBankAccountId, userAccount.userId, userAccount.accountTypeId, account.accountTypeName, account.bankId, account.baseInterestRate, userAccount.date, userAccount.status
+				FROM userAccount
+				INNER JOIN account ON userAccount.accountTypeId = account.accountTypeId
+				AND userAccount.userId = '` + userId + `'`;
+        request.query(qu, function(error, results) {
+			if (error)
+			{
+			   console.log("error occured");
+			   res.status(400).send()
+			}
+			else 
+			{
+				res.status(200).send({"userBankAccountDetails":results.recordset})
 			}
         });
     });
@@ -155,8 +180,6 @@ app.post('/addBankAccount', (req, res) =>  {
 			res.status(200).send()
 		}
 		});
-
-
     });
 })
 
@@ -231,11 +254,12 @@ function retrieveUserId(email)
 	});
 }
 
-//upload bank account statement
+//upload bank account statement client passes userId and accountTypeId
 app.post('/uploadBankStatement', upload.single('file'), async(req, res) => {
 	
 	analyzeBankStatement(req.file.originalname, req.body.accountTypeId);
 	res.status(200).send()
+	//parse and update the Bank acocunt details table
 })
 
 //Receive bank id, acount type id, and bank statement
@@ -254,8 +278,8 @@ app.post('/updateUserDetails', upload.single('file'), async(req, res) => {
 
 		console.log(qu)
 				 
-		request.query(qu, function(err, recordset) {
-		if(err){
+		request.query(qu, function(error, recordset) {
+		if(error){
 			res.status(400).send()
 		}
 		else 
@@ -267,6 +291,8 @@ app.post('/updateUserDetails', upload.single('file'), async(req, res) => {
 
 		});
 })
+
+
 
 
 function analyzeBankStatement(filename, accountTypeId)
@@ -312,7 +338,7 @@ function render_page(pageData) {
 }
 
 
-function parseStatement(accountTypeId)
+function parseStatement(parsestatement)
 {
   // record the index of each line in raw text data
   let lineIndex = 1;
