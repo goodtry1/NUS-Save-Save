@@ -8,6 +8,8 @@ const PDFParser = require('pdf-parse');
 var bcrypt = require('bcryptjs');
 const bodyParser = require('body-parser');
 var multer = require('multer');
+var promise = require('promise');
+const DATE_FORMATER = require( 'dateformat' );
 
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -39,36 +41,29 @@ var server = app.listen(5001, function () {
 
 
 // add new user
-app.post('/signUp', (req, res) => {
+app.post('/signUp', async (req, res) => {
 	let newUser = req.body;
 	console.log('body' + req.body.email);
+	const userId =  await retrieveUserId(req.body.email); //ToDo : if this value is 0, send an error message stating the user already present.
+	
 	sql.connect(sqlConfig, function() {
 		var request = new sql.Request();
-		let qu = `INSERT INTO dbo.[user_test1](email, password, firstName, lastName) 
-				   VALUES ('` + req.body.email+ `', '`+ req.body.password + `', '`+ req.body.firstName + `', '`+ req.body.lastName + `')`;
+		
+		var joiningDate = DATE_FORMATER( new Date(), "yyyy-mm-dd HH:MM:ss" );
+
+		let qu = `INSERT INTO dbo.[User](email, password, firstName, lastName, joiningDate) 
+				   VALUES ('` + req.body.email+ `', '`+ req.body.password + `', '`+ req.body.firstName + `', '`+ req.body.lastName + `' , '`+ joiningDate + `')`;
 
 		request.query(qu, function(err, recordset) {
 			if(err)
 			{
-        if (err.message.includes("Violation of UNIQUE KEY constraint")) {
-          console.log("Duplicated email")
-          res.status(400).send({
-            "message": "Duplicated email"
-          })
-        }
-				/* console.log("error occured");
-			    res.status(400).send({
-					"code":400,
-					"failed":"error ocurred"
-			    }); */
+				console.log("error occured");
+			    res.status(400).send()
 				
 			}
 			else
 			{
-				res.status(200).send({
-					"code":200,
-					"success": 'Sign up successful'
-				});
+				res.status(200).send()
 			}		
 		});
 	});
@@ -82,17 +77,14 @@ app.post('/signin', (req, res) => {
   sql.connect(sqlConfig, function() {
   var request = new sql.Request();
  
-  let qu = `SELECT * FROM dbo.[user_test1]
+  let qu = `SELECT * FROM dbo.[User]
           WHERE email= '` + req.body.email + `'`;
  
   request.query(qu, async function (error, results, fields) {
     if (error)
     {
        console.log("error occured");
-	   res.status(400).send({
-        "code":400,
-        "failed":"error ocurred"
-       });
+	   res.status(400).send()
     }
     else
     {
@@ -100,31 +92,22 @@ app.post('/signin', (req, res) => {
       {
         //const comparision = await bcrypt.compare(password, results.recordset[0].password //ToDO - encrypt the password
 		const comparision = (password == results.recordset[0].password)
-		console.log('comparison' + comparision)
         if(comparision)
         {
            console.log("login successful")
-		    res.status(200).send({
-              "code":200,
-              "success":"login successfull"
-            })
+		   res.status(200).send({"userDetails" : results.recordset[0]})
+
         }
         else
         {
           console.log("Email and password does not match")
-		  res.status(204).send({
-               "code":204,
-               "success":"Email and password does not match"
-          });
+		  res.status(204).send()
         }
       }
       else
       {
          console.log("Email does not exits")
-		 res.status(206).send({
-          "code":206,
-          "success":"Email does not exits"
-         });
+		 res.status(206).send()
       }
     }
   });
@@ -139,23 +122,44 @@ app.get('/bankdetails', function (req, res) {
 			if (error)
 			{
 			   console.log("error occured");
-			   res.send({
-				"code":400,
-				"failed":"error ocurred"
-			   });
+			   res.status(400).send()
 			}
 			else 
 			{
-				res.send({
-				  "code":200,
-				  "banks":results.recordset,
-				})
+				res.status(204).send({"banks":results.recordset})
 			}
         });
     });
 })
 
-//choose bank
+
+//add Bank Account for a particular user.
+app.post('/addBankAccount', (req, res) =>  {
+
+    sql.connect(sqlConfig, function() {
+        var request = new sql.Request();
+		
+		var dateNow = DATE_FORMATER( new Date(), "yyyy-mm-dd HH:MM:ss" );
+	
+		let qu = `INSERT INTO dbo.[userAccount](userId, accountTypeId, status, date) 
+			   VALUES ('` + req.body.userId + `', '`+ req.body.accountTypeId + `', 1 , '`+ dateNow + `')`;
+
+		console.log(qu)
+				 
+		request.query(qu, function(err, recordset) {
+		if(err){
+			res.status(400).send()
+		}
+		else 
+		{
+			res.status(200).send()
+		}
+		});
+
+
+    });
+})
+
 
 
 //get account type based on bank id
@@ -171,17 +175,12 @@ app.post('/fetchAccountType', (req, res) =>  {
 			if (error)
 			{
 			   console.log("error occured");
-			   res.send({
-				"code":400,
-				"failed":"The bank id is invalid or error occured"
-			   });
+			   res.status(400).send()
+			   
 			}
 			else 
 			{
-				res.send({
-				  "code":200,
-				  "account":results.recordset,
-				})
+				res.status(200).send({"account":results.recordset})
 			}
         });
     });
@@ -200,102 +199,69 @@ app.use(bodyParser.urlencoded({ extended: false }))
  
 function retrieveUserId(email)
 {
+	return new promise(function(resolve, reject) {
 	console.log("enter retrieve user id function");
 	sql.connect(sqlConfig, function() {
 	var request = new sql.Request();
-	let qu = `SELECT * FROM dbo.[user_test1]
+	let qu = `SELECT * FROM dbo.[User]
           WHERE email= '` + email + `'`;
 		  
-	console.log('query' + qu)
- 
     request.query(qu, function (error, results, fields) {
 		if (error)
 		{
 		   console.log("error occured");
-		   return 0;
+		   resolve( 0);
 		}
 		else
 		{
 		  if(results.recordset && results.recordset.length >0)
 		  {
 			  console.log(results.recordset[0].userId);
-			  return results.recordset[0].userId;
+			  resolve(results.recordset[0].userId);
 		  }
 		  else 
 		  {
 			  console.log("user not present")
-			  return 0;
+			  resolve(0);
 		  }
 		}
 	  
 	});
 	});
-}
-
-
-//To Do Check why error in retrieval 
-function retrieveUserAccountCombination(userId, accountTypeId, bankId)
-{
-	sql.connect(sqlConfig, function() {
-	var request = new sql.Request();
-	let qu = `SELECT * FROM dbo.[userBankAccountDetails]
-          WHERE userId= '` + userId + `'
-		  AND accountTypeId = '` + accountTypeId + `'
-		  AND bankId = '` + accountTypeId + `'`;
- 
-    request.query(qu, async function (error, results, fields) {
-		if (error)
-		{
-		   console.log("error occured");
-		   return 0;
-		}
-		else
-		{
-		  if(results.recordset && results.recordset.length >0)
-		  {
-			  return 1;
-		  }
-		  else 
-		  {
-			  console.log("user not present")
-			  return 0;
-		  }
-		}
-	  
-	});
 	});
 }
+
+//upload bank account statement
+app.post('/uploadBankStatement', upload.single('file'), async(req, res) => {
+	
+	analyzeBankStatement(req.file.originalname, req.body.accountTypeId);
+	res.status(200).send()
+})
 
 //Receive bank id, acount type id, and bank statement
-app.post('/updateUserDetails', upload.single('file'),(req, res) => {
-
-	sql.connect(sqlConfig, function() {
+app.post('/updateUserDetails', upload.single('file'), async(req, res) => {
+	
+	const userId =  await retrieveUserId(req.body.email);
+		console.log('userid' + userId)
+		//check if the user id, bank id, account id combination exist.  
+		
+		
+	sql.connect(sqlConfig,  function() {
 		var request = new sql.Request();
 
+		let qu = `INSERT INTO dbo.[userAccount](userId, accountTypeId, status, date) 
+			   VALUES ('` + userId + `', '`+ req.body.bankId + `', '`+ req.body.accountTypeId + `', 1, '`+ req.body.date + `')`;
 
-		//userId =  retrieveUserId();
-		//console.log('userid' + userId)
-		//check if the user id, bank id, account id combination exist.  
-
-		userId = 1; //check if the user exist. retrieve userId
-
-		let qu = `INSERT INTO dbo.[userBankAccountDetails](userId, bankId, accountTypeId, status) 
-			   VALUES ('` + userId + `', '`+ req.body.bankId + `', '`+ req.body.accountTypeId + `', 1)`;
-
+		console.log(qu)
 				 
 		request.query(qu, function(err, recordset) {
 		if(err){
-			res.send({
-				"code":400,
-			})
+			res.status(400).send()
 		}
 		else 
 		{
 			analyzeBankStatement(req.file.originalname, req.body.accountTypeId);
-			res.send({
-				"code":200,
-				"filedetails":req.file,
-			})
+			res.status(200).send()
 		}
 		});
 
@@ -368,6 +334,9 @@ function parseStatement(accountTypeId)
     if (line === 'BALANCE B/F') {
       indexMap.set('previous_month_balance', lineIndex - 1);
       result['previous_month_balance'] = parseFloat(textMap.get(lineIndex - 1).replace(/\s|,|/g, ''));
+	  
+	  indexMap.set('current_month', lineIndex - 2);
+      result['current_month'] = textMap.get(lineIndex - 2);
     }
 
     // get current month balance and current month

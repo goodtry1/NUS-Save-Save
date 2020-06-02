@@ -28,39 +28,38 @@ import AuthLayout from "layouts/Auth.jsx";
 
 import LoginPage from '../src/views/Pages/LoginPage'
 
-//Redux
+/* //Redux
 import { createStore } from 'redux';
 import combinedReducer from './redux/reducer/combinedReducer'
+import { Provider } from 'react-redux' //Connects global store to the whole app
 
 const store = createStore(
   combinedReducer,
   window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__() //For google chrome extension
-  );
+); */
 
 
 const hist = createBrowserHistory();
 
+
 ReactDOM.render(
-  <Router history={hist}>
-    <Switch>
-      <Route
-        path="/admin"
-        render={props => {
-          return <AdminLayout {...props} />;
-        }}
-      />
-      <Route
-        path="/auth"
-        render={props => {
-          return <AuthLayout {...props} />;
-        }}
-      />
-      <Redirect to="/auth" />
-    </Switch>
-
-
-
-
-  </Router>,
+  
+    <Router history={hist}>
+      <Switch>
+        <Route
+          path="/admin"
+          render={props => {
+            return <AdminLayout {...props} />;
+          }}
+        />
+        <Route
+          path="/auth"
+          render={props => {
+            return <AuthLayout {...props} />;
+          }}
+        />
+        <Redirect to="/auth" />
+      </Switch>
+    </Router>,
   document.getElementById("root")
 );

@@ -1,8 +1,8 @@
-import userSessionReducer from './userSessionReducer'
+import loginReducer from './loginReducer'
 import { combineReducers } from 'redux'
 
 const combinedReducer = combineReducers({
-    userSession : userSessionReducer
+    isLoggedIn : loginReducer
 })
 
 export default combinedReducer

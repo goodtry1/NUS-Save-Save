@@ -36,10 +36,17 @@ import { Redirect } from 'react-router-dom';
 import NotificationAlert from "react-notification-alert";
 import SweetAlert from "react-bootstrap-sweetalert";
 
+//Redux
+import { useSelector, useDispatch } from 'react-redux';
+import { connect } from 'react-redux';
+import { logIn } from '../../redux/actions/actions'
+
 // core components
 import nowLogo from "assets/img/now-logo.png";
 
 import bgImage from "assets/img/bg14.jpg";
+
+
 
 class LoginPage extends React.Component {
   constructor(props) {
@@ -54,9 +61,20 @@ class LoginPage extends React.Component {
     };
 
 
+
+
+
+
+
   }
 
+  
+
   componentDidMount() {
+    if (localStorage.getItem('isLoggedIn')) {
+      this.setState({ redirect : true })
+    }
+
     document.body.classList.add("login-page");
   }
   componentWillUnmount() {
@@ -136,16 +154,19 @@ class LoginPage extends React.Component {
   }
 
   handleSubmit = (event) => {
+    event.preventDefault();
+
     try {
       this.testLogin()
       this.loginViaServer()
+
     } catch (err) {
       setTimeout(() => {
         this.notify('tc', 4)
       }, 200);
     }
 
-    event.preventDefault();
+
   }
 
   loginViaServer = () => {
@@ -166,13 +187,16 @@ class LoginPage extends React.Component {
       .then((response) => {
         console.log("response status:" + response.status)
 
+
         if (response.status === 200) {
+         // this.redirect()
           localStorage.setItem("email", this.state.email)
           console.log("Log in successful")
           this.setState({ message: "Login Successful! Redirecting you now" })
           //this.successAlert()
           this.notify("tc", 5)
-          this.redirect()
+          //this.redirect()
+          return response.json();
         } else {
           console.log("Log in unsuccessful")
           this.setState({ message: "Invalid login credentials" })
@@ -185,8 +209,10 @@ class LoginPage extends React.Component {
         this.setState({ message: err.message })
         console.log(this.state.message)
       })
+      .then((data) => {
+        console.log(data.userDetails)
+      })
   }
-
 
 
 
@@ -198,7 +224,7 @@ class LoginPage extends React.Component {
     }
     return (
       <>
-        {/* {this.state.alert} */}
+
         <NotificationAlert ref="notificationAlert" />
         <div className="content">
           <div className="login-page">
@@ -295,4 +321,31 @@ class LoginPage extends React.Component {
   }
 }
 
-export default LoginPage;
+/* //getState from Redux
+function mapStateToProps(state) {
+  return {
+    isLoggedIn: state.isLoggedIn
+  }
+}
+
+//dispatch action to Redux
+function mapDispatchToProps(dispatch) {
+  return {
+    doLogin: () => {
+      dispatch(
+        {
+          type: 'SIGN_IN'
+        }
+      )
+    }
+  }
+} */
+
+
+
+
+
+
+
+/* export default connect(mapStateToProps, mapDispatchToProps)(LoginPage); */
+export default LoginPage
