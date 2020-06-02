@@ -28,6 +28,15 @@ import AuthLayout from "layouts/Auth.jsx";
 
 import LoginPage from '../src/views/Pages/LoginPage'
 
+//Redux
+import { createStore } from 'redux';
+import combinedReducer from './redux/reducer/combinedReducer'
+
+const store = createStore(
+  combinedReducer,
+  window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__() //For google chrome extension
+  );
+
 
 const hist = createBrowserHistory();
 
@@ -50,7 +59,7 @@ ReactDOM.render(
     </Switch>
 
 
-    
+
 
   </Router>,
   document.getElementById("root")
