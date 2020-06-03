@@ -48,6 +48,8 @@ import bgImage from "assets/img/bg14.jpg";
 
 import { User } from '../../models/User'
 
+import CustomNotification from '../../Notifications/CustomNotification'
+
 class LoginPage extends React.Component {
   constructor(props) {
     super(props);
@@ -59,20 +61,13 @@ class LoginPage extends React.Component {
       alert: null,
       show: false
     };
-
-
-
-
-
-
-
   }
 
-  
+
 
   componentDidMount() {
     if (localStorage.getItem('isLoggedIn')) {
-      this.setState({ redirect : true })
+      this.setState({ redirect: true })
     }
 
     document.body.classList.add("login-page");
@@ -93,7 +88,7 @@ class LoginPage extends React.Component {
     }, 2000);
   }
 
-  notify(place, color) {
+  /* notify(place, color) {
     //var color = 5;
     var type;
     switch (color) {
@@ -130,6 +125,10 @@ class LoginPage extends React.Component {
       autoDismiss: 7
     };
     this.refs.notificationAlert.notificationAlert(options);
+  } */
+
+  notify(place, color) {
+    this.refs.notificationAlert.notificationAlert(CustomNotification.notify(place, color, this.state.message));
   }
 
 
@@ -189,34 +188,37 @@ class LoginPage extends React.Component {
 
 
         if (response.status === 200) {
-         // this.redirect()
           console.log("Log in successful")
           this.setState({ message: "Login Successful! Redirecting you now" })
-          //this.successAlert()
           this.notify("tc", 5)
-          //this.redirect()
           return response.json();
-        } else {
+        } else if (response.status === 204) {
           console.log("Log in unsuccessful")
-          this.setState({ message: "Invalid login credentials" })
-          this.notify("tc", 3)
+          //this.setState({ message: "Invalid login credentials" })
+          //this.notify("tc", 3)
+          throw new Error("Invalid login credentials")
+        } else if (response.status === 400) {
+          throw new Error("An unknown error has occured")
+        } else if (response.status === 404 || response.status === 500) {
+          throw new Error("An error has occured, check your internet settings")
         }
 
-      })
-      .catch(err => {
+      }).catch(err => {
         console.log("Error has occured")
         this.setState({ message: err.message })
         console.log(this.state.message)
-      })
-      .then((data) => {
-        
+        this.notify("tc", 3)
+      }).then((data) => {
+
 
         var user = new User(data.userDetails.userId, data.userDetails.email, data.userDetails.firstName, data.userDetails.lastName, data.userDetails.joiningDate)
 
         localStorage.setItem('isLoggedIn', true)
         localStorage.setItem('user', JSON.stringify(user))
-        
+
         this.redirect()
+      }).catch((err) => {
+
       })
   }
 
@@ -230,7 +232,6 @@ class LoginPage extends React.Component {
     }
     return (
       <>
-
         <NotificationAlert ref="notificationAlert" />
         <div className="content">
           <div className="login-page">
