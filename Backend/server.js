@@ -9,7 +9,7 @@ var bcrypt = require('bcryptjs');
 const bodyParser = require('body-parser');
 var multer = require('multer');
 var promise = require('promise');
-const DATE_FORMATER = require( 'dateformat' );
+const DATE_FORMATER = require('dateformat');
 
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -26,17 +26,17 @@ app.use(bodyParser.json())
 
 // Connection string parameters.
 var sqlConfig = {
-    user: 'fintechlab',
-    password: 'InformationSystems88DISA!',
-    server: 'fintechlab.database.windows.net',
-    database: 'SaveSave'
+  user: 'fintechlab',
+  password: 'InformationSystems88DISA!',
+  server: 'fintechlab.database.windows.net',
+  database: 'SaveSave'
 }
 
 // Start server and listen on http://localhost:5001/
 var server = app.listen(5001, function () {
-    var host = server.address().address
-    var port = server.address().port
-    console.log("app listening at %s", port)
+  var host = server.address().address
+  var port = server.address().port
+  console.log("app listening at %s", port)
 });
 
 
@@ -44,27 +44,25 @@ var server = app.listen(5001, function () {
 app.post('/signUp', async (req, res) => {
   let newUser = req.body;
   console.log('body' + req.body.email);
-  const userId =  await retrieveUserId(req.body.email); //ToDo : if this value is 0, send an error message stating the user already present.
-  
-  sql.connect(sqlConfig, function() {
+  const userId = await retrieveUserId(req.body.email); //ToDo : if this value is 0, send an error message stating the user already present.
+
+  sql.connect(sqlConfig, function () {
     var request = new sql.Request();
-    
-    var joiningDate = DATE_FORMATER( new Date(), "yyyy-mm-dd HH:MM:ss" );
+
+    var joiningDate = DATE_FORMATER(new Date(), "yyyy-mm-dd HH:MM:ss");
 
     let qu = `INSERT INTO dbo.[User](email, password, firstName, lastName, joiningDate) 
-           VALUES ('` + req.body.email+ `', '`+ req.body.password + `', '`+ req.body.firstName + `', '`+ req.body.lastName + `' , '`+ joiningDate + `')`;
+           VALUES ('` + req.body.email + `', '` + req.body.password + `', '` + req.body.firstName + `', '` + req.body.lastName + `' , '` + joiningDate + `')`;
 
-    request.query(qu, function(error, recordset) {
-      if(error)
-      {
+    request.query(qu, function (error, recordset) {
+      if (error) {
         console.log("error occured");
-          res.status(400).send()
-        
+        res.status(400).send()
+
       }
-      else
-      {
+      else {
         res.status(200).send()
-      }   
+      }
     });
   });
 })
@@ -74,240 +72,241 @@ app.post('/signin', (req, res) => {
   let email = req.body.email;
   let password = req.body.password;
   console.log('body' + req.body.email + req.body.password);
-  sql.connect(sqlConfig, function() {
-  var request = new sql.Request();
- 
-  let qu = `SELECT * FROM dbo.[User]
-          WHERE email= '` + req.body.email + `'`;
- 
-  request.query(qu, async function (error, results, fields) {
-    if (error)
-    {
-       console.log("error occured");
-     res.status(400).send()
-    }
-    else
-    {
-      if(results.recordset && results.recordset.length >0)
-      {
-        //const comparision = await bcrypt.compare(password, results.recordset[0].password //ToDO - encrypt the password
-    const comparision = (password == results.recordset[0].password)
-        if(comparision)
-        {
-           console.log("login successful")
-       res.status(200).send({"userDetails" : results.recordset[0]})
+  sql.connect(sqlConfig, function () {
+    var request = new sql.Request();
 
+    let qu = `SELECT * FROM dbo.[User]
+          WHERE email= '` + req.body.email + `'`;
+
+    request.query(qu, async function (error, results, fields) {
+      if (error) {
+        console.log("error occured");
+        res.status(400).send()
+      }
+      else {
+        if (results.recordset && results.recordset.length > 0) {
+          //const comparision = await bcrypt.compare(password, results.recordset[0].password //ToDO - encrypt the password
+          const comparision = (password == results.recordset[0].password)
+          if (comparision) {
+            console.log("login successful")
+            res.status(200).send({ "userDetails": results.recordset[0] })
+
+          }
+          else {
+            console.log("Email and password does not match")
+            res.status(204).send()
+          }
         }
-        else
-        {
-          console.log("Email and password does not match")
-      res.status(204).send()
+        else {
+          console.log("Email does not exits")
+          res.status(206).send()
         }
       }
-      else
-      {
-         console.log("Email does not exits")
-     res.status(206).send()
-      }
-    }
+    });
   });
-  });
-}); 
+});
 
 //get banks
 app.get('/bankdetails', function (req, res) {
-    sql.connect(sqlConfig, function() {
-        var request = new sql.Request();
-        request.query('select * from dbo.bank', function(error, results) {
-      if (error)
-      {
-         console.log("error occured");
-         res.status(400).send()
+  sql.connect(sqlConfig, function () {
+    var request = new sql.Request();
+    request.query('select * from dbo.bank', function (error, results) {
+      if (error) {
+        console.log("error occured");
+        res.status(400).send()
       }
-      else 
-      {
-        res.status(200).send({"banks":results.recordset})
+      else {
+        res.status(200).send({ "banks": results.recordset })
       }
-        });
     });
+  });
 })
 
 
 //get user bank account details
 app.post('/userBankAccountDetails', function (req, res) {
   userId = req.body.userId;
-  
-    sql.connect(sqlConfig, function() {
-        var request = new sql.Request();
+
+  sql.connect(sqlConfig, function () {
+    var request = new sql.Request();
     let qu = `SELECT userAccount.userBankAccountId, userAccount.userId, userAccount.accountTypeId, account.accountTypeName, account.bankId, account.baseInterestRate, userAccount.date, userAccount.status
         FROM userAccount
         INNER JOIN account ON userAccount.accountTypeId = account.accountTypeId
         AND userAccount.userId = '` + userId + `'`;
-        request.query(qu, function(error, results) {
-      if (error)
-      {
-         console.log("error occured");
-         res.status(400).send()
+    request.query(qu, function (error, results) {
+      if (error) {
+        console.log("error occured");
+        res.status(400).send()
       }
-      else 
-      {
-        res.status(200).send({"userBankAccountDetails":results.recordset})
+      else {
+        res.status(200).send({ "userBankAccountDetails": results.recordset })
       }
-        });
     });
+  });
+})
+
+app.post('/userAccountsId', function (req, res) {
+  userId = req.body.userId;
+
+  sql.connect(sqlConfig, function () {
+    var request = new sql.Request();
+    let qu =
+      `SELECT account.accountTypeId
+      FROM userAccount
+      INNER JOIN account ON userAccount.accountTypeId = account.accountTypeId
+      AND userAccount.userId = '` + userId + `'`;
+    request.query(qu, function (error, results) {
+      if (error) {
+        console.log("error occured");
+        res.status(400).send()
+      }
+      else {
+        res.status(200).send({ "listOfAccountIds": results.recordset })
+      }
+    });
+  });
 })
 
 
 //add Bank Account for a particular user.
-app.post('/addBankAccount', (req, res) =>  {
+app.post('/addBankAccount', (req, res) => {
 
-    sql.connect(sqlConfig, function() {
-        var request = new sql.Request();
-    
-    var dateNow = DATE_FORMATER( new Date(), "yyyy-mm-dd HH:MM:ss" );
-  
+  sql.connect(sqlConfig, function () {
+    var request = new sql.Request();
+
+    var dateNow = DATE_FORMATER(new Date(), "yyyy-mm-dd HH:MM:ss");
+
     let qu = `INSERT INTO dbo.[userAccount](userId, accountTypeId, status, date) 
-         VALUES ('` + req.body.userId + `', '`+ req.body.accountTypeId + `', 1 , '`+ dateNow + `')`;
+         VALUES ('` + req.body.userId + `', '` + req.body.accountTypeId + `', 1 , '` + dateNow + `')`;
 
     console.log(qu)
-         
-    request.query(qu, function(err, recordset) {
-    if(err){
-      res.status(400).send()
-    }
-    else 
-    {
-      res.status(200).send()
-    }
+
+    request.query(qu, function (err, recordset) {
+      if (err) {
+        res.status(400).send()
+      }
+      else {
+        res.status(200).send()
+      }
     });
-    });
+  });
 })
 
 
 
 //get account type based on bank id
-app.post('/fetchAccountType', (req, res) =>  {
+app.post('/fetchAccountType', (req, res) => {
   bank_id = req.body.bankid;
   console.log('bankid' + bank_id)
-    sql.connect(sqlConfig, function() {
-        var request = new sql.Request();
-      let qu = `SELECT * FROM dbo.account
+  sql.connect(sqlConfig, function () {
+    var request = new sql.Request();
+    let qu = `SELECT * FROM dbo.account
                    WHERE bankId= '` + req.body.bankid + `'`;
-        console.log(qu)
-        request.query(qu, function(error, results) {
-      if (error)
-      {
-         console.log("error occured");
-         res.status(400).send()
-         
+    console.log(qu)
+    request.query(qu, function (error, results) {
+      if (error) {
+        console.log("error occured");
+        res.status(400).send()
+
       }
-      else 
-      {
-        res.status(200).send({"account":results.recordset})
+      else {
+        res.status(200).send({ "account": results.recordset })
       }
-        });
     });
+  });
 })
 
 //Deletes files in the folder.
-function deleteFile(path)
-{
+function deleteFile(path) {
   const fsExtra = require('fs-extra')
   fsExtra.emptyDirSync(path)
 }
 
 // setting for url encoding
-app.use(bodyParser.urlencoded({ extended: false })) 
+app.use(bodyParser.urlencoded({ extended: false }))
 
- 
-function retrieveUserId(email)
-{
-  return new promise(function(resolve, reject) {
-  console.log("enter retrieve user id function");
-  sql.connect(sqlConfig, function() {
-  var request = new sql.Request();
-  let qu = `SELECT * FROM dbo.[User]
+
+function retrieveUserId(email) {
+  return new promise(function (resolve, reject) {
+    console.log("enter retrieve user id function");
+    sql.connect(sqlConfig, function () {
+      var request = new sql.Request();
+      let qu = `SELECT * FROM dbo.[User]
           WHERE email= '` + email + `'`;
-      
-    request.query(qu, function (error, results, fields) {
-    if (error)
-    {
-       console.log("error occured");
-       resolve( 0);
-    }
-    else
-    {
-      if(results.recordset && results.recordset.length >0)
-      {
-        console.log(results.recordset[0].userId);
-        resolve(results.recordset[0].userId);
-      }
-      else 
-      {
-        console.log("user not present")
-        resolve(0);
-      }
-    }
-    
-  });
-  });
+
+      request.query(qu, function (error, results, fields) {
+        if (error) {
+          console.log("error occured");
+          resolve(0);
+        }
+        else {
+          if (results.recordset && results.recordset.length > 0) {
+            console.log(results.recordset[0].userId);
+            resolve(results.recordset[0].userId);
+          }
+          else {
+            console.log("user not present")
+            resolve(0);
+          }
+        }
+
+      });
+    });
   });
 }
 
 //upload bank account statement client passes userId and accountTypeId
-app.post('/uploadBankStatement', upload.single('file'), async(req, res) => {
-  
+app.post('/uploadBankStatement', upload.single('file'), async (req, res) => {
+
   analyzeBankStatement(req.file.originalname, req.body.accountTypeId);
   res.status(200).send()
   //parse and update the Bank acocunt details table
 })
 
 //Receive bank id, acount type id, and bank statement
-app.post('/updateUserDetails', upload.single('file'), async(req, res) => {
-  
-  const userId =  await retrieveUserId(req.body.email);
-    console.log('userid' + userId)
-    //check if the user id, bank id, account id combination exist.  
-    
-    
-  sql.connect(sqlConfig,  function() {
+app.post('/updateUserDetails', upload.single('file'), async (req, res) => {
+
+  const userId = await retrieveUserId(req.body.email);
+  console.log('userid' + userId)
+  //check if the user id, bank id, account id combination exist.  
+
+
+  sql.connect(sqlConfig, function () {
     var request = new sql.Request();
 
     let qu = `INSERT INTO dbo.[userAccount](userId, accountTypeId, status, date) 
-         VALUES ('` + userId + `', '`+ req.body.bankId + `', '`+ req.body.accountTypeId + `', 1, '`+ req.body.date + `')`;
+         VALUES ('` + userId + `', '` + req.body.bankId + `', '` + req.body.accountTypeId + `', 1, '` + req.body.date + `')`;
 
     console.log(qu)
-         
-    request.query(qu, function(error, recordset) {
-    if(error){
-      res.status(400).send()
-    }
-    else 
-    {
-      analyzeBankStatement(req.file.originalname, req.body.accountTypeId);
-      res.status(200).send()
-    }
+
+    request.query(qu, function (error, recordset) {
+      if (error) {
+        res.status(400).send()
+      }
+      else {
+        analyzeBankStatement(req.file.originalname, req.body.accountTypeId);
+        res.status(200).send()
+      }
     });
 
-    });
+  });
 })
 
 
 
 
-function analyzeBankStatement(filename, accountTypeId)
-{
+function analyzeBankStatement(filename, accountTypeId) {
   let dataBuffer = fs.readFileSync('./uploads/' + filename);
   const options = {
-  pagerender: render_page,
-  version: 'v1.10.100'
-  };                                                
+    pagerender: render_page,
+    version: 'v1.10.100'
+  };
 
   PDFParser(dataBuffer, options).then(function (data) {
     fs.writeFileSync('./uploads/result.txt', data.text);
-  //if(accountTypeId == 1)
+    //if(accountTypeId == 1)
     parseStatement(accountTypeId);
-  deleteFile("./uploads/")
+    deleteFile("./uploads/")
   });
 }
 
@@ -338,8 +337,7 @@ function render_page(pageData) {
 }
 
 
-function parseStatement(parsestatement)
-{
+function parseStatement(parsestatement) {
   // record the index of each line in raw text data
   let lineIndex = 1;
 
@@ -360,8 +358,8 @@ function parseStatement(parsestatement)
     if (line === 'BALANCE B/F') {
       indexMap.set('previous_month_balance', lineIndex - 1);
       result['previous_month_balance'] = parseFloat(textMap.get(lineIndex - 1).replace(/\s|,|/g, ''));
-    
-    indexMap.set('current_month', lineIndex - 2);
+
+      indexMap.set('current_month', lineIndex - 2);
       result['current_month'] = textMap.get(lineIndex - 2);
     }
 
@@ -408,7 +406,7 @@ function parseStatement(parsestatement)
 
     // send the final result for this month
     console.log(result);
-  
+
   });
 }
 

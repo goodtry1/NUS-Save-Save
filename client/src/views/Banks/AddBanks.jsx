@@ -17,7 +17,6 @@ import {
         Progress, */
     Row,
     Col,
-    Popover,
     Tooltip
 } from "reactstrap";
 
@@ -53,11 +52,33 @@ export class AddBanks extends Component {
         }
     }
 
-
-
-    componentDidMount = () => {
+    componentWillMount = () => {
         var user = localStorage.getItem('user')
         this.setState({ user: JSON.parse(user) })
+    }
+
+    componentDidMount = () => {
+
+
+        setTimeout(() => {
+            axios({
+                method: 'post',
+                url: '/userAccountsId',
+                data: {
+                    userId: this.state.user.userId
+                }
+            }).then((response) => {
+                if (response.status === 200) {
+                    console.log(response.data.listOfAccountIds)
+                    this.setState({ userAccounts: response.data.listOfAccountIds })
+                }
+            }).catch((err) => {
+                console.log(err.message)
+            })
+        }, 200);
+
+       
+
 
 
 
@@ -189,6 +210,15 @@ export class AddBanks extends Component {
     }
 
     checkAccountExists(accountId) {
+        for (var i = 0; i < this.state.userAccounts.length; i++) {
+            
+            if (this.state.userAccounts[i].accountTypeId === accountId) {
+                return true
+            } else {
+                console.log(this.state.userAccounts[i].accountTypeId + " != " + accountId)
+            }
+        }
+
         return false
     }
 
