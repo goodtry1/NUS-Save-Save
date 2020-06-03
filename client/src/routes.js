@@ -65,7 +65,6 @@ let routes = [
         path: "/myBanks",
         name: "My Banks",
         mini: "MB",
-        /* icon: "now-ui-icons business_badge", */
         component: Banks,
         layout: "/admin"
       },

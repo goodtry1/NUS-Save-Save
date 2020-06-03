@@ -3,20 +3,22 @@ import React, { Component } from 'react'
 // reactstrap components
 import {
     Button,
- /*    ButtonGroup, */
+    /*    ButtonGroup, */
     Card,
     CardHeader,
     CardBody,
-/*     CardFooter,
-    CardTitle,
-    DropdownToggle,
-    DropdownMenu,
-    DropdownItem,
-    UncontrolledDropdown,
-    Table,
-    Progress, */
+    /*     CardFooter,
+        CardTitle,
+        DropdownToggle,
+        DropdownMenu,
+        DropdownItem,
+        UncontrolledDropdown,
+        Table,
+        Progress, */
     Row,
-    Col
+    Col,
+    Popover,
+    Tooltip
 } from "reactstrap";
 
 // core components
@@ -28,6 +30,10 @@ import axios from 'axios';
 //models
 import { Bank } from '../../models/Bank'
 
+//Notification
+import CustomNotification from '../../Notifications/CustomNotification'
+import NotificationAlert from "react-notification-alert";
+
 export class AddBanks extends Component {
     constructor(props) {
         super(props);
@@ -35,17 +41,19 @@ export class AddBanks extends Component {
         this.state = {
             user: '',
             PDF: '',
+            userAccounts: [],
             banks: [],
             selectedBank: '',
             selectedBankId: '',
             accountTypes: [],
             selectedAccountType: '',
             selectedAccountTypeId: '',
-            message: ''
+            message: '',
+            accountToolTipState: false
         }
     }
 
-    
+
 
     componentDidMount = () => {
         var user = localStorage.getItem('user')
@@ -133,9 +141,9 @@ export class AddBanks extends Component {
 
     }
 
-    accountTypeOnClick = (e) => {
-        this.setState({ selectedAccountTypeId: e.target.id })
-        this.setState({ selectedAccountType: e.target.name })
+    accountTypeOnClick = (e, account) => {
+        this.setState({ selectedAccountTypeId: account.accountTypeId })
+        this.setState({ selectedAccountType: account })
     }
 
     clearSelectionOnClick = (e) => {
@@ -159,9 +167,37 @@ export class AddBanks extends Component {
 
             }
         }).then(response => {
-            console.log(response.status)
+            if (response.status === 200) {
+                this.setState({ message: "Account has been created successfully" })
+                this.notify("br", 5)
+
+                setTimeout(() => {
+                    this.props.history.push({
+                        pathname: '/admin/myBanks',
+                        data: '' // your data array of objects
+                    })
+                }, 2000);
+
+            } else {
+                this.setState({ message: "An error has occured, please try again later" })
+                this.notify("br", 3)
+            }
+
+
         })
 
+    }
+
+    checkAccountExists(accountId) {
+        return false
+    }
+
+    toggleToolTip = () => {
+        this.setState({ accountToolTipState: !this.state.accountToolTipState })
+    }
+
+    notify(place, color) {
+        this.refs.notificationAlert.notificationAlert(CustomNotification.notify(place, color, this.state.message));
     }
 
 
@@ -170,10 +206,17 @@ export class AddBanks extends Component {
     render() {
         return (
             <div>
+                <NotificationAlert ref="notificationAlert" />
 
                 <PanelHeader
                     size="sm"
-                    content={<div style={{ textAlign: 'center' }}><h5 style={{ color: 'white' }}>Add a new bank</h5></div>}
+                    content=
+                    {<div style={{ textAlign: 'center' }}><h5 style={{ color: 'white' }}>Add a new bank <i id="info" className="now-ui-icons travel_info" /></h5>
+                        <Tooltip placement="right" target="info" isOpen={this.state.accountToolTipState} toggle={this.toggleToolTip}>
+                            Add an account in 3 easy steps! Note: accounts that you currently own in Save save will be disabled.
+                        </Tooltip>
+                    </div>
+                    }
                 />
 
                 <Row>
@@ -189,7 +232,9 @@ export class AddBanks extends Component {
 
 
                                         <Col xs={12} md={4} key={bank.bankId} >
-                                            <Button style={{ width: '100%' }} onClick={((e) => this.bankOnClick(e, bank))}>{bank.bankName}</Button>
+
+                                            <Button style={{ width: '100%' }} onClick={((e) => this.bankOnClick(e, bank))} >{bank.bankName}</Button>
+
                                         </Col>
                                     )}
 
@@ -212,11 +257,12 @@ export class AddBanks extends Component {
                             </CardHeader>
                             <CardBody>
                                 <Row>
-                                    {this.state.accountTypes.map((account) =>
+                                    {this.state.accountTypes && this.state.accountTypes.map((account) =>
 
 
                                         <Col xs={12} md={4} key={account.accountTypeId} >
-                                            <Button style={{ width: '100%' }} id={account.accountTypeId} name={account.accountTypeName} onClick={this.accountTypeOnClick} >{account.accountTypeName}</Button>
+                                            <Button id="accountButton" style={accountStyle} onClick={((e) => this.accountTypeOnClick(e, account))} disabled={this.checkAccountExists(account.accountTypeId)}>{account.accountTypeName}</Button>
+
                                         </Col>
                                     )}
 
@@ -249,7 +295,7 @@ export class AddBanks extends Component {
 
                                                         <CardBody style={{ textAlign: 'center' }}>
                                                             <h3>{this.state.selectedBank.bankName}</h3>
-                                                            <h5>{this.state.selectedAccountType}</h5>
+                                                            <h5>{this.state.selectedAccountType.accountTypeName}</h5>
 
 
                                                         </CardBody>
@@ -333,6 +379,11 @@ export class AddBanks extends Component {
             </div >
         )
     }
+}
+
+const accountStyle = {
+
+    width: '100%'
 }
 
 export default AddBanks
