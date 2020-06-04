@@ -256,69 +256,53 @@ function retrieveUserId(email)
 
 //upload bank account statement client passes userId and accountTypeId
 app.post('/uploadBankStatement', upload.single('file'), async(req, res) => {
-	
-	analyzeBankStatement(req.file.originalname, req.body.accountTypeId);
-	res.status(200).send()
-	//parse and update the Bank acocunt details table
-})
 
-//Receive bank id, acount type id, and bank statement
-app.post('/updateUserDetails', upload.single('file'), async(req, res) => {
-	
-	const userId =  await retrieveUserId(req.body.email);
-		console.log('userid' + userId)
-		//check if the user id, bank id, account id combination exist.  
-		
-		
-	sql.connect(sqlConfig,  function() {
-		var request = new sql.Request();
-
-		let qu = `INSERT INTO dbo.[userAccount](userId, accountTypeId, status, date) 
-			   VALUES ('` + userId + `', '`+ req.body.bankId + `', '`+ req.body.accountTypeId + `', 1, '`+ req.body.date + `')`;
-
-		console.log(qu)
-				 
-		request.query(qu, function(error, recordset) {
-		if(error){
-			res.status(400).send()
-		}
-		else 
-		{
-			analyzeBankStatement(req.file.originalname, req.body.accountTypeId);
-			res.status(200).send()
-		}
-		});
-
-		});
-})
-
-
-
-
-function analyzeBankStatement(filename, accountTypeId)
-{
-	let dataBuffer = fs.readFileSync('./uploads/' + filename);
+	let dataBuffer = fs.readFileSync('./uploads/' + req.file.originalname);
 	const options = {
 	pagerender: render_page,
 	version: 'v1.10.100'
 	};                                                
 
-  PDFParser(dataBuffer, options).then(function (data) {
-    fs.writeFileSync('./uploads/result.txt', data.text);
-	//if(accountTypeId == 1)
-    parseStatement(accountTypeId);
-	deleteFile("./uploads/")
-  });
-}
+	PDFParser(dataBuffer, options).then(async function (data) {
+		fs.writeFileSync('./uploads/result.txt', data.text);
+		result  = await parseStatement(req.body.accountTypeId);
+		console.log(result);
+		deleteFile("./uploads/")
+		res.status(200).send()
+	});
+  
+    var dateAnalysed = DATE_FORMATER( new Date(), "yyyy-mm-dd HH:MM:ss" );
+	//Update the Bank acocunt details table
+	
+	sql.connect(sqlConfig,  function() {
+	var request = new sql.Request();
+
+	let qu = `INSERT INTO dbo.[parsedBankStatementData](dateAnalysed, userId, accountTypeId, previousMonthBalance, statementDate, salary, currentMonthBalance, totalWithdrawal, totalDeposit,  totalInterest, averageDailyBalance) 
+		   VALUES ( '`+ dateAnalysed + `', '` + req.body.userId + `', '`+ req.body.accountTypeId + `', '`+ result['previousMonthBalance'] + `' , '`+ result['date'] + `' , '`+ result['salary'] + `' , '`+ result['currentMonthBalance'] + `' , '`+ result['totalWithdrawals'] + `' , '`+ result['totalDeposits'] + `' , '`+ result['totalInterests'] + `' , '`+ result['averageDailyBalance'] + `')`;
+
+			 
+	request.query(qu, function(error, recordset) {
+	if(error){
+		res.status(400).send()
+	}
+	else 
+	{
+		res.status(200).send()
+	}
+	});
+
+	});
+	
+	
+	
+	
+})
 
 
 // default render callback
 function render_page(pageData) {
-  //check documents https://mozilla.github.io/pdf.js/
   let render_options = {
-    //replaces all occurrences of whitespace with standard spaces (0x20). The default value is `false`.
     normalizeWhitespace: true,
-    //do not attempt to combine same line TextItem's. The default value is `false`.
     disableCombineTextItems: false
   }
 
@@ -340,6 +324,8 @@ function render_page(pageData) {
 
 function parseStatement(parsestatement)
 {
+	
+  return new promise(function(resolve, reject) {
   // record the index of each line in raw text data
   let lineIndex = 1;
 
@@ -358,28 +344,28 @@ function parseStatement(parsestatement)
     textMap.set(lineIndex, line);
     // get previous month balance
     if (line === 'BALANCE B/F') {
-      indexMap.set('previous_month_balance', lineIndex - 1);
-      result['previous_month_balance'] = parseFloat(textMap.get(lineIndex - 1).replace(/\s|,|/g, ''));
+      indexMap.set('previousMonthBalance', lineIndex - 1);
+      result['previousMonthBalance'] = parseFloat(textMap.get(lineIndex - 1).replace(/\s|,|/g, ''));
 	  
-	  indexMap.set('current_month', lineIndex - 2);
-      result['current_month'] = textMap.get(lineIndex - 2);
+	  indexMap.set('date', lineIndex - 2);
+      result['date'] = textMap.get(lineIndex - 2);
     }
 
     // get current month balance and current month
     if (line === 'BALANCE C/F') {
-      indexMap.set('current_month_balance', lineIndex - 1);
-      result['current_month_balance'] = parseFloat(textMap.get(lineIndex - 1).replace(/\s|,|/g, ''));
+      indexMap.set('currentMonthBalance', lineIndex - 1);
+      result['currentMonthBalance'] = parseFloat(textMap.get(lineIndex - 1).replace(/\s|,|/g, ''));
     }
 
     // get the indexes of the lines for this month's total withdraws/deposits, total interests this year and this month's average daily balance
     if (line === 'Total Withdrawals/Deposits') {
-      indexMap.set('total_withdrawals_deposits', lineIndex + 3);
+      indexMap.set('totalWithdrawalsDeposits', lineIndex + 3);
     }
     if (line === 'Total Interest Paid This Year') {
-      indexMap.set('total_interests', lineIndex + 3);
+      indexMap.set('totalInterests', lineIndex + 3);
     }
     if (line === 'Average Balance') {
-      indexMap.set('average_daily_balance', lineIndex + 3);
+      indexMap.set('averageDailyBalance', lineIndex + 3);
     }
 
     // try to find salary credit
@@ -390,8 +376,8 @@ function parseStatement(parsestatement)
 
     // try to find credit card payment
     if (line === 'BILL PAYMENT     INB') {
-      indexMap.set('credit_card_spend', lineIndex - 1);
-      result['credit_card_spend'] = parseFloat(textMap.get(lineIndex - 1).trim().split(/\s+/)[2].replace(/\s|,|/g, ''));
+      indexMap.set('creditCardSpend', lineIndex - 1);
+      result['creditCardSpend'] = parseFloat(textMap.get(lineIndex - 1).trim().split(/\s+/)[2].replace(/\s|,|/g, ''));
     }
 
     lineIndex++;
@@ -400,16 +386,20 @@ function parseStatement(parsestatement)
 
   readInterface.on('close', function () {
     // set this month's total withdraws/deposits, total interests this year and this month's average daily balance
-    let array = textMap.get(indexMap.get('total_withdrawals_deposits')).trim().split(/\s+/);
-    result['total_withdrawals'] = parseFloat(array[1].replace(/\s|,|/g, ''));
-    result['total_deposits'] = parseFloat(array[0].replace(/\s|,|/g, ''));
-    result['total_interests'] = parseFloat(textMap.get(indexMap.get('total_interests')).replace(/\s|,|/g, ''));
-    result['average_daily_balance'] = parseFloat(textMap.get(indexMap.get('average_daily_balance')).replace(/\s|,|/g, ''));
+    let array = textMap.get(indexMap.get('totalWithdrawalsDeposits')).trim().split(/\s+/);
+    result['totalWithdrawals'] = parseFloat(array[1].replace(/\s|,|/g, ''));
+    result['totalDeposits'] = parseFloat(array[0].replace(/\s|,|/g, ''));
+    result['totalInterests'] = parseFloat(textMap.get(indexMap.get('totalInterests')).replace(/\s|,|/g, ''));
+    result['averageDailyBalance'] = parseFloat(textMap.get(indexMap.get('averageDailyBalance')).replace(/\s|,|/g, ''));
 
     // send the final result for this month
-    console.log(result);
+   // console.log(result);
+	resolve (result)
 	
   });
+  
+  });
+
 }
 
 
