@@ -56,6 +56,9 @@ import swim from "assets/img/prada.jpg";
 
 import { table_data } from "variables/general.jsx";
 
+import CustomNotification from '../../Notifications/CustomNotification'
+import NotificationAlert from "react-notification-alert";
+
 var mapData = {
     AU: 760,
     BR: 550,
@@ -77,10 +80,16 @@ class BankAccountDetails extends React.Component {
         singleSelect: null,
         singleFileName: "",
         singleFile: null,
+        bankStatement: '',
+        message: ''
     }
 }
 
     singleFile = React.createRef();
+
+    notify(place, color) {
+        this.refs.notificationAlert.notificationAlert(CustomNotification.notify(place, color, this.state.message));
+      }
 
     handleFileInput = (e, type) => {
         this[type].current.click(e);
@@ -89,21 +98,41 @@ class BankAccountDetails extends React.Component {
     addFile = (e, type) => {
         let fileNames = "";
         let files = e.target.files;
+
+        var PDFtype = true;
+
         for (let i = 0; i < e.target.files.length; i++) {
           fileNames = fileNames + e.target.files[i].name;
+
+            if (fileNames.split('.').pop() !== 'pdf') {
+                this.setState({message : 'The file you\'ve uploaded is not a PDF file' })
+                PDFtype = false;
+
+                setTimeout(() => {
+                    this.notify('br', 4)
+                  }, 200);
+
+                  break;
+            } 
+
           if (type === "multipleFile" && i !== e.target.files.length - 1) {
             fileNames = fileNames + ", ";
           }
         }
-        this.setState({
-          [type + "Name"]: fileNames,
-          [type]: files
-        });
+
+        if (PDFtype) {
+            this.setState({
+                [type + "Name"]: fileNames,
+                bankStatement : files[0]
+              });
+        }
+       
       };
 
     uploadBankStatement = () => {
-        console.log(this.state.singleFile)
-        console.log(this.state.singleFileName.split('.').pop())
+        if (!this.state.bankStatement) {
+            console.log("Bank Statement empty")
+        }
     }
 
     createTableData() {
@@ -127,7 +156,7 @@ class BankAccountDetails extends React.Component {
     render() {
         return (
             <>
-
+                <NotificationAlert ref="notificationAlert" />
                 <PanelHeader
                     size="sm" />
 
@@ -235,7 +264,7 @@ class BankAccountDetails extends React.Component {
                                     <Input
                                     type="text"
                                     className="inputFileVisible"
-                                    placeholder="Simple chooser..."
+                                    placeholder="We accept PDF versions only..."
                                     onClick={e => this.handleFileInput(e, "singleFile")}
                                     defaultValue={this.state.singleFileName}
                                     />
@@ -248,7 +277,7 @@ class BankAccountDetails extends React.Component {
                                     onChange={e => this.addFile(e, "singleFile")}
                                     />
                                 </FormGroup>
-                                <Button onClick={this.uploadBankStatement}> Submit bank statement for analysing</Button>
+                                <Button onClick={this.uploadBankStatement}> Submit</Button>
                                   
                                 </CardBody>
                                 <CardFooter>
