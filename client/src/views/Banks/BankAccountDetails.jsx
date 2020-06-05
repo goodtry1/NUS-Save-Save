@@ -148,6 +148,14 @@ class BankAccountDetails extends React.Component {
             axios.post('/uploadBankStatement', formData)
             .then(res => {
                 console.log("Response status: " + res.status)
+               
+
+                if (res.status === 200) {
+                    this.setState({message : 'Your bank statement has been uploaded successfully'})
+                    this.notify('br', 5)
+                } else {
+
+                }
             })
             .catch(err => console.log(err))
         }
@@ -301,7 +309,7 @@ class BankAccountDetails extends React.Component {
                                 <CardFooter>
                                     <div className="stats">
                                         <i className="now-ui-icons arrows-1_refresh-69" />
-                                        Your bank statements will never be saved on our server
+                                        We do not keep a copy of your bank statements
                                     </div>
                                 </CardFooter>
                             </Card>

@@ -166,6 +166,31 @@ class RegisterPage extends React.Component {
   }
 
   isValidated() {
+    if (this.state.firstNameState !== " has-success") {
+      this.setState({
+        firstNameState: " has-danger"
+      });
+    }
+
+    if (this.state.lastNameState !== " has-success") {
+      this.setState({
+         lastNameState: " has-danger"
+      });
+    }
+
+    if (this.state.emailState !== " has-success") {
+      this.setState({
+         emailState: " has-danger"
+      });
+    }
+
+    if (this.state.passwordState !== " has-success") {
+      this.setState({
+         passwordState: " has-danger"
+      });
+    }
+
+
     if (
       this.state.firstNameState !== " has-success" ||
       this.state.lastNameState !== " has-success" ||
