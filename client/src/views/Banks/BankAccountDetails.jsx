@@ -38,6 +38,7 @@ import {
     FormGroup,
     Input,
     Button,
+    InputGroup
 } from "reactstrap";
 
 // core components
@@ -133,9 +134,29 @@ class BankAccountDetails extends React.Component {
        
       };
 
+    clearBankStatement = () => {
+        this.setState(
+            {
+                bankStatement : '',
+                singleFileName : ''
+            }
+        )
+    }
+
     uploadBankStatement = () => {
         if (!this.state.bankStatement) {
             console.log("Bank Statement empty")
+            /* this.setState(
+                {
+                    message : 'You have not uploaded a bank statement'
+                },
+
+                function() {
+                   this.notify('br', 4)
+                }
+                   
+                ) */
+            
         } else {
             const formData = new FormData();
             formData.append('file', this.state.bankStatement);
@@ -302,8 +323,17 @@ class BankAccountDetails extends React.Component {
                                     ref={this.singleFile}
                                     onChange={e => this.addFile(e, "singleFile")}
                                     />
+                                    
+
                                 </FormGroup>
-                                <Button onClick={this.uploadBankStatement}> Submit</Button>
+
+                                <div>
+                                    {this.state.bankStatement ? 
+                                    (<div><Button onClick={this.uploadBankStatement}> Submit</Button>
+                                        <Button onClick={this.clearBankStatement}> Clear </Button></div>) : (<div></div>) }
+
+                                </div>
+                                
                                   
                                 </CardBody>
                                 <CardFooter>
