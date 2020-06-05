@@ -70,6 +70,12 @@ export class Banks extends Component {
         })
     }
 
+    redirectToBankAccountDetails = (e) => {
+        this.props.history.push({
+            pathname: '/admin/BankAccountDetails',
+            data: '' // your data array of objects
+        })
+    }
 
     redirectToAddBanks = () => {
         this.props.history.push({

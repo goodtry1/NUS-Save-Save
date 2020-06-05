@@ -16,9 +16,9 @@
 */
 import React from "react";
 // react plugin used to create charts
-import { Line } from "react-chartjs-2";
+//import { Line } from "react-chartjs-2";
 // react plugin for creating vector maps
-import { VectorMap } from "react-jvectormap";
+//import { VectorMap } from "react-jvectormap";
 
 // reactstrap components
 import {
@@ -27,12 +27,12 @@ import {
     CardBody,
     CardFooter,
     CardTitle,
-    DropdownToggle,
+  /*   DropdownToggle,
     DropdownMenu,
     DropdownItem,
     UncontrolledDropdown,
     Table,
-    Progress,
+    Progress, */
     Row,
     Col,
     FormGroup,
@@ -43,23 +43,25 @@ import {
 // core components
 import PanelHeader from "components/PanelHeader/PanelHeader.jsx";
 
-import {
+/* import {
     dashboardPanelChart,
     dashboardActiveUsersChart,
     dashboardSummerChart,
     dashboardActiveCountriesCard
-} from "variables/charts.jsx";
+} from "variables/charts.jsx"; */
 
-import jacket from "assets/img/saint-laurent.jpg";
+/* import jacket from "assets/img/saint-laurent.jpg";
 import shirt from "assets/img/balmain.jpg";
-import swim from "assets/img/prada.jpg";
+import swim from "assets/img/prada.jpg"; */
 
 import { table_data } from "variables/general.jsx";
+
+import axios from 'axios'
 
 import CustomNotification from '../../Notifications/CustomNotification'
 import NotificationAlert from "react-notification-alert";
 
-var mapData = {
+/* var mapData = {
     AU: 760,
     BR: 550,
     CA: 120,
@@ -71,12 +73,14 @@ var mapData = {
     RO: 600,
     RU: 300,
     US: 2920
-};
+}; */
 
 class BankAccountDetails extends React.Component {
     constructor(props) {
         super(props);
     this.state = {
+        user : '',
+        account : '',
         singleSelect: null,
         singleFileName: "",
         singleFile: null,
@@ -132,6 +136,20 @@ class BankAccountDetails extends React.Component {
     uploadBankStatement = () => {
         if (!this.state.bankStatement) {
             console.log("Bank Statement empty")
+        } else {
+            const formData = new FormData();
+            formData.append('file', this.state.bankStatement);
+            formData.append('userId', 3/* this.state.accountTypeId */);
+            formData.append('accountTypeId', 2/* this.state.accountTypeId */);
+
+            this.setState({bankStatement : ''})
+            this.setState({singleFileName : ''})
+
+            axios.post('/uploadBankStatement', formData)
+            .then(res => {
+                console.log("Response status: " + res.status)
+            })
+            .catch(err => console.log(err))
         }
     }
 
