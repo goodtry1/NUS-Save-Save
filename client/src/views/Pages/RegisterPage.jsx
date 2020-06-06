@@ -42,6 +42,9 @@ import bgImage from "assets/img/bg16.jpg";
 //Additional imports
 import NotificationAlert from "react-notification-alert";
 
+//FaceBook
+import FacebookLogin from 'react-facebook-login'
+
 class RegisterPage extends React.Component {
   constructor(props) {
     super(props);
@@ -174,19 +177,19 @@ class RegisterPage extends React.Component {
 
     if (this.state.lastNameState !== " has-success") {
       this.setState({
-         lastNameState: " has-danger"
+        lastNameState: " has-danger"
       });
     }
 
     if (this.state.emailState !== " has-success") {
       this.setState({
-         emailState: " has-danger"
+        emailState: " has-danger"
       });
     }
 
     if (this.state.passwordState !== " has-success") {
       this.setState({
-         passwordState: " has-danger"
+        passwordState: " has-danger"
       });
     }
 
@@ -274,11 +277,23 @@ class RegisterPage extends React.Component {
       })
   }
 
+  componentClicked = () => {
+    console.log("Facebook login clicked")
+  }
+
+  responseFacebook = (response) => {
+    console.log(response)
+  }
+
+
+
 
 
   render() {
     return (
       <>
+        <div id="fb-root"></div>
+        <script async defer crossOrigin="anonymous" src="https://connect.facebook.net/en_GB/sdk.js#xfbml=1&version=v7.0&appId=1210844962589186&autoLogAppEvents=1"></script>
         <div className="content">
           <NotificationAlert ref="notificationAlert" />
           <div className="register-page">
@@ -435,7 +450,7 @@ class RegisterPage extends React.Component {
                         </InputGroup>
 
 
-                        <FormGroup check>
+                        {/* <FormGroup check>
                           <Label check>
                             <Input type="checkbox" />
                             <span className="form-check-sign" />
@@ -444,8 +459,17 @@ class RegisterPage extends React.Component {
                               <a href="#something">terms and conditions</a>.
                             </div>
                           </Label>
-                        </FormGroup>
+                        </FormGroup> */}
 
+                        <FacebookLogin
+                          appId="1210844962589186"
+                          autoLoad={false}
+                          fields="name,email,picture"
+                          onClick={this.componentClicked}
+                          callback={this.responseFacebook} />
+
+                        <div className="fb-login-button" data-size="large" data-button-type="continue_with" data-layout="default" data-auto-logout-link="true" data-use-continue-as="false" data-width=""></div>
+                     
                       </CardBody>
                       <CardFooter className="text-center">
                         <Button
