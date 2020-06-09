@@ -212,7 +212,7 @@ class LoginPage extends React.Component {
 
 
         var user = new User(data.userDetails.userId, data.userDetails.email, data.userDetails.firstName, data.userDetails.lastName, data.userDetails.joiningDate)
-
+        
         localStorage.setItem('isLoggedIn', true)
         localStorage.setItem('user', JSON.stringify(user))
 
