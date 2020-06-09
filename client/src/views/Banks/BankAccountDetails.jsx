@@ -62,6 +62,10 @@ import axios from 'axios'
 import CustomNotification from '../../Notifications/CustomNotification'
 import NotificationAlert from "react-notification-alert";
 
+//Feedback
+import FeedbackPlugin from '../../components/FeedbackPlugin/FeedbackPlugin'
+
+
 /* var mapData = {
     AU: 760,
     BR: 550,
@@ -86,7 +90,8 @@ class BankAccountDetails extends React.Component {
         singleFileName: "",
         singleFile: null,
         bankStatement: '',
-        message: ''
+        message: '',
+        feedbackDialogOpen: ''
     }
 }
 
@@ -110,7 +115,12 @@ class BankAccountDetails extends React.Component {
           fileNames = fileNames + e.target.files[i].name;
 
             if (fileNames.split('.').pop() !== 'pdf') {
-                this.setState({message : 'The file you\'ve uploaded is not a PDF file' })
+               
+                this.setState({
+                    message : 'The file you\'ve uploaded is not a PDF file',
+                    [type + "Name"]: '',
+                    bankStatement : ''
+                })
                 PDFtype = false;
 
                 setTimeout(() => {
@@ -174,8 +184,9 @@ class BankAccountDetails extends React.Component {
                 if (res.status === 200) {
                     this.setState({message : 'Your bank statement has been uploaded successfully'})
                     this.notify('br', 5)
+                    FeedbackPlugin.askForFeedBack()
                 } else {
-
+                    FeedbackPlugin.askForFeedBack()
                 }
             })
             .catch(err => console.log(err))
@@ -199,13 +210,30 @@ class BankAccountDetails extends React.Component {
             );
         }
         return tableRows;
+
     }
+
+    
     render() {
         return (
             <>
                 <NotificationAlert ref="notificationAlert" />
                 <PanelHeader
-                    size="sm" />
+                    size="sm" >
+                <Row >
+                <Col sm='9'>
+                
+                </Col>
+
+                <Col sm='3'>
+               
+                </Col>
+                </Row>
+                   
+
+
+                </PanelHeader>
+
 
                 {/** 
             content={
@@ -215,7 +243,7 @@ class BankAccountDetails extends React.Component {
               }
           */}
 
-                <div className="content">
+                <div className="">
                     <Row>
                         <Col xs={12} md={12}>
                             <Card className="card-stats card-raised">
@@ -345,8 +373,12 @@ class BankAccountDetails extends React.Component {
                             </Card>
                         </Col>
                     </Row>
+
+                   
+                   
                    
                 </div>
+                <FeedbackPlugin></FeedbackPlugin>
             </>
         );
     }

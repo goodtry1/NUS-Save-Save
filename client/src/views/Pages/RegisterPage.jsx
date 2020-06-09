@@ -259,6 +259,8 @@ class RegisterPage extends React.Component {
           this.notify('tc', 5)
         } else {
 
+          this.setState({ message: 'An error has occured' })
+
           // console.log("An error occured")
           // this.setState({ notificationColor: 4 })
           this.notify('tc', 4)
@@ -289,11 +291,19 @@ class RegisterPage extends React.Component {
 
 
 
+
+
+
+
   render() {
     return (
       <>
+
+
         <div id="fb-root"></div>
         <script async defer crossOrigin="anonymous" src="https://connect.facebook.net/en_GB/sdk.js#xfbml=1&version=v7.0&appId=1210844962589186&autoLogAppEvents=1"></script>
+
+
         <div className="content">
           <NotificationAlert ref="notificationAlert" />
           <div className="register-page">
@@ -440,7 +450,7 @@ class RegisterPage extends React.Component {
                           </InputGroupAddon>
                           <Input
                             defaultValue={this.state.password}
-                            type="text"
+                            type="password"
                             placeholder="Password (required)"
                             name="password"
                             onFocus={e => this.setState({ passwordFocus: true })}
@@ -461,15 +471,27 @@ class RegisterPage extends React.Component {
                           </Label>
                         </FormGroup> */}
 
+                      {/*   <div className="fb-login-button" data-size="medium" data-button-type="continue_with" data-layout="rounded" data-auto-logout-link="true" data-use-continue-as="false" data-width="" >
+
+                        </div> */}
+
+
+
                         <FacebookLogin
                           appId="1210844962589186"
                           autoLoad={false}
                           fields="name,email,picture"
                           onClick={this.componentClicked}
-                          callback={this.responseFacebook} />
+                          callback={this.responseFacebook}
+                          data-auto-logout-link="true"
+                        >
+                        </FacebookLogin>
 
-                        <div className="fb-login-button" data-size="large" data-button-type="continue_with" data-layout="default" data-auto-logout-link="true" data-use-continue-as="false" data-width=""></div>
-                     
+
+
+
+
+
                       </CardBody>
                       <CardFooter className="text-center">
                         <Button
