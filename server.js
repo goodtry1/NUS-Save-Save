@@ -441,7 +441,7 @@ function recommendationEngine(userid,accountTypeid)
         for (i=19;i<24;i++){
 
             var request = new sql.Request();
-            query_str = "exec [dbo].[usp_OCBCRecommendation] " + userid + ", " +accountTypeid+ ", " + 23 ;
+            query_str = "exec [dbo].[usp_OCBCRecommendation] " + userid + ", " +accountTypeid+ ", " + i ;
             console.log(query_str);
             request.query(query_str, function(err,rows){
             if(err) throw err;
