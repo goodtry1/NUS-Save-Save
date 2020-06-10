@@ -90,7 +90,11 @@ class Sidebar extends React.Component {
   // this function creates the links and collapses that appear in the sidebar (left menu)
   createLinks = routes => {
     return routes.map((prop, key) => {
-      if (prop.collapse) {
+      if (prop.invisible) {
+        return null
+      }
+      
+      else if (prop.collapse) {
         var st = {};
         st[prop["state"]] = !this.state[prop.state];
         return (
@@ -116,14 +120,14 @@ class Sidebar extends React.Component {
                   </p>
                 </>
               ) : (
-                <>
-                  <span className="sidebar-mini-icon">{prop.mini}</span>
-                  <span className="sidebar-normal">
-                    {prop.name}
-                    <b className="caret" />
-                  </span>
-                </>
-              )}
+                  <>
+                    <span className="sidebar-mini-icon">{prop.mini}</span>
+                    <span className="sidebar-normal">
+                      {prop.name}
+                      <b className="caret" />
+                    </span>
+                  </>
+                )}
             </a>
             <Collapse isOpen={this.state[prop.state]}>
               <ul className="nav">{this.createLinks(prop.views)}</ul>
@@ -140,11 +144,11 @@ class Sidebar extends React.Component {
                 <p>{prop.name}</p>
               </>
             ) : (
-              <>
-                <span className="sidebar-mini-icon">{prop.mini}</span>
-                <span className="sidebar-normal">{prop.name}</span>
-              </>
-            )}
+                <>
+                  <span className="sidebar-mini-icon">{prop.mini}</span>
+                  <span className="sidebar-normal">{prop.name}</span>
+                </>
+              )}
           </NavLink>
         </li>
       );
@@ -171,7 +175,7 @@ class Sidebar extends React.Component {
             <a
               href="/admin/dashboard"
               className="simple-text logo-normal"
-              /* target="/admin/dashboard" */
+            /* target="/admin/dashboard" */
             >
               Save Save
             </a>
@@ -244,7 +248,7 @@ Sidebar.defaultProps = {
   routes: [],
   showNotification: false,
   backgroundColor: "blue",
-  minimizeSidebar: () => {}
+  minimizeSidebar: () => { }
 };
 
 Sidebar.propTypes = {

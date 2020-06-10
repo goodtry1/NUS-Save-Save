@@ -75,7 +75,8 @@ let routes = [
         mini: "AB",
         /* icon: "now-ui-icons business_badge", */
         component: AddBanks,
-        layout: "/admin"
+        layout: "/admin",
+        invisible: true
       },
       {
         path: "/bankAccountDetails",
@@ -83,7 +84,8 @@ let routes = [
         mini: "BA",
         /* icon: "now-ui-icons business_badge", */
         component: BankAccountDetails,
-        layout: "/admin"
+        layout: "/admin",
+        invisible: true
       }
     ]
 

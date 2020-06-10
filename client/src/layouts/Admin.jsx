@@ -88,8 +88,7 @@ class Admin extends React.Component {
     return routes.map((prop, key) => {
       if (prop.collapse) {
         return this.getRoutes(prop.views);
-      }
-      if (prop.layout === "/admin") {
+      } else if (prop.layout === "/admin") {
         return (
           <Route
             path={prop.layout + prop.path}
@@ -129,7 +128,7 @@ class Admin extends React.Component {
         <Sidebar
           {...this.props}
           routes={routes}
-          minimizeSidebar={this.minimizeSidebar}
+          /* minimizeSidebar={this.minimizeSidebar} */
           backgroundColor={this.state.backgroundColor}
         />
         <div className="main-panel" ref={this.mainPanel}>
