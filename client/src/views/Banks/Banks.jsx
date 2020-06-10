@@ -80,7 +80,7 @@ export class Banks extends Component {
     redirectToAddBanks = () => {
         this.props.history.push({
             pathname: '/admin/addBanks',
-            data: '' // your data array of objects
+            data: this.state.accounts // your data array of objects
         })
 
         //this.setState({ redirectToAddBanks: true })
@@ -110,7 +110,7 @@ export class Banks extends Component {
                                             </Col>
 
                                             <Col xs={2}>
-                                                <Button color="info" className="btn-round btn-icon">
+                                                <Button onClick={this.redirectToBankAccountDetails} color="info" className="btn-round btn-icon">
                                                     <i className="now-ui-icons ui-1_zoom-bold" />
                                                 </Button>
 
