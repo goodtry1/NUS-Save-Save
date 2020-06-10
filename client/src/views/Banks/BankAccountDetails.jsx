@@ -243,7 +243,7 @@ class BankAccountDetails extends React.Component {
               }
           */}
 
-                <div className="">
+                <div className="content">
                     <Row>
                         <Col xs={12} md={12}>
                             <Card className="card-stats card-raised">

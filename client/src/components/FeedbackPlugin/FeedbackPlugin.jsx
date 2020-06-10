@@ -23,14 +23,12 @@ import { Button, Row, Col } from "reactstrap";
 
 
 //Feedback dialog
-
 import TextField from '@material-ui/core/TextField';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
-import StarRatingComponent from 'react-star-rating-component';
 import ReactStars from 'react-stars'
 
 class FeedbackPlugin extends Component {
@@ -38,17 +36,14 @@ class FeedbackPlugin extends Component {
         super(props);
         this.state = {
             classes: "dropdown show",
-            bg_checked: true,
-            switched: false,
-            mini_checked: this.props.mini,
             feedbackDialogOpen: '',
             rating: ''
         };
         this.handleClick = this.handleClick.bind(this);
-        this.onMiniClick = this.onMiniClick.bind(this);
+        
     }
 
-    onStarClick(nextValue, prevValue, name) {
+    onStarClick(nextValue) {
         this.setState({ rating: nextValue });
     }
 
@@ -57,20 +52,14 @@ class FeedbackPlugin extends Component {
             this.setState({ classes: "dropdown show" });
         } else {
             this.setState({ classes: "dropdown" });
+       
         }
     }
 
-    askForFeedBack = () => {
-        /* setTimeout(() => {
-            this.setState({ classes: "dropdown show" });
-          }, 10000); */
-    }
-    onMiniClick() {
-        this.props.handleMiniClick();
-    }
+    
+    
 
     handleClickOpen = () => {
-        this.handleClick()
         this.setState({ feedbackDialogOpen: true })
     }
 
@@ -83,9 +72,9 @@ class FeedbackPlugin extends Component {
         return (
             <div className="fixed-plugin">
                 <div className={this.state.classes}>
-                    <div onClick={this.handleClick}>
-                        <i className="" />
-                    </div>
+                   {/*  <div onClick={this.handleClick}>
+                        <i className="fa fa-cog fa-2x" />
+                    </div> */}
                     <ul className="dropdown-menu show">
                         <li className="header-title">
                             <Row>
@@ -125,7 +114,8 @@ class FeedbackPlugin extends Component {
                                             size={24}
                                             value={this.state.rating}
                                             half={false}
-                                            color2={'#ffd700'} />
+                                            color2={'#ffd700'}
+                                             />
                                     </center>
 
 

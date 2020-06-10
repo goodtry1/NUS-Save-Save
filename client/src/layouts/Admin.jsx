@@ -155,13 +155,7 @@ class Admin extends React.Component {
           handleColorClick={this.handleColorClick}
         /> */}
 
-        <FeedbackPlugin >
-       {/* handleMiniClick={this.minimizeSidebar}
-        sidebarMini={this.state.sidebarMini}
-        bgColor={this.state.backgroundColor}
-        handleColorClick={this.handleColorClick}> */}
-
-        </FeedbackPlugin>
+       
       </div>
     );
   }
