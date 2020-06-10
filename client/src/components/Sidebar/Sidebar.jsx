@@ -36,11 +36,16 @@ class Sidebar extends React.Component {
     super(props);
     this.state = {
       openAvatar: false,
-      ...this.getCollapseStates(props.routes)
+      ...this.getCollapseStates(props.routes),
+      user: ''
     };
     this.sidebar = React.createRef();
   }
   componentDidMount() {
+    var user = localStorage.getItem('user')
+    this.setState({ user: JSON.parse(user) })
+
+
     if (navigator.platform.indexOf("Win") > -1) {
       ps = new PerfectScrollbar(this.sidebar.current, {
         suppressScrollX: true,
@@ -208,7 +213,7 @@ class Sidebar extends React.Component {
                   }
                 >
                   <span>
-                    Ryan Gosling
+                    {this.state.user.firstName} {this.state.user.lastName}
                     <b className="caret" />
                   </span>
                 </a>

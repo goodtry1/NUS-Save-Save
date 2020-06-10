@@ -85,7 +85,7 @@ class BankAccountDetails extends React.Component {
         super(props);
     this.state = {
         user : '',
-        account : '',
+        bankAccountDetails : '',
         singleSelect: null,
         singleFileName: "",
         singleFile: null,
@@ -95,6 +95,11 @@ class BankAccountDetails extends React.Component {
     }
 }
 
+    componentDidMount = () => {
+        console.log(this.props.location.data)
+        this.setState({ bankAccountDetails : this.props.location.data})
+    }
+
     singleFile = React.createRef();
 
     notify(place, color) {
@@ -103,29 +108,36 @@ class BankAccountDetails extends React.Component {
 
     handleFileInput = (e, type) => {
         this[type].current.click(e);
+       
     };
 
     addFile = (e, type) => {
         let fileNames = "";
         let files = e.target.files;
+        
 
         var PDFtype = true;
 
         for (let i = 0; i < e.target.files.length; i++) {
+          console.log("Number of files:" + e.target.files.length)
           fileNames = fileNames + e.target.files[i].name;
+            console.log(fileNames)
 
             if (fileNames.split('.').pop() !== 'pdf') {
-               
+                console.log("Not PDF")
+                e.target.value = null;
                 this.setState({
                     message : 'The file you\'ve uploaded is not a PDF file',
                     [type + "Name"]: '',
-                    bankStatement : ''
-                })
+                    bankStatement : '',
+                    fileNames: '',
+                    singleFile: null
+                }, () => {this.notify('br', 4) })
                 PDFtype = false;
 
-                setTimeout(() => {
+                /* setTimeout(() => {
                     this.notify('br', 4)
-                  }, 200);
+                  }, 200); */
 
                   break;
             } 
@@ -170,8 +182,8 @@ class BankAccountDetails extends React.Component {
         } else {
             const formData = new FormData();
             formData.append('file', this.state.bankStatement);
-            formData.append('userId', 3/* this.state.accountTypeId */);
-            formData.append('accountTypeId', 2/* this.state.accountTypeId */);
+            formData.append('userId', this.state.bankAccountDetails.userId);
+            formData.append('accountTypeId', this.state.bankAccountDetails.accountTypeId);
 
             this.setState({bankStatement : ''})
             this.setState({singleFileName : ''})
@@ -213,6 +225,8 @@ class BankAccountDetails extends React.Component {
 
     }
 
+ 
+
     
     render() {
         return (
@@ -253,8 +267,8 @@ class BankAccountDetails extends React.Component {
                                             <div className="intro">
                                                 <div className="info">
 
-                                                    <h2 className="info-title">Welcome back,</h2>
-                                                    <p className="info-title">$user</p>
+                                                    <p className="">You are viewing</p>
+                                                    <h2 className="info-title">{this.state.bankAccountDetails.accountTypeName}</h2>
                                                 </div>
                                             </div>
                                         </Col>
@@ -263,7 +277,7 @@ class BankAccountDetails extends React.Component {
                                                 <div className="info">
 
 
-                                                    <p className="info-title">Member since:</p>
+                                                   <p className="">Created since: {this.state.bankAccountDetails.date}</p>
                                                 </div>
                                             </div>
                                         </Col>
