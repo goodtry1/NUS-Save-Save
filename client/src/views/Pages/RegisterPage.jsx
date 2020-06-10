@@ -477,7 +477,7 @@ class RegisterPage extends React.Component {
 
 
 
-                        <FacebookLogin
+                      {/*   <FacebookLogin
                           appId="1210844962589186"
                           autoLoad={false}
                           fields="name,email,picture"
@@ -485,7 +485,7 @@ class RegisterPage extends React.Component {
                           callback={this.responseFacebook}
                           data-auto-logout-link="true"
                         >
-                        </FacebookLogin>
+                        </FacebookLogin> */}
 
 
 

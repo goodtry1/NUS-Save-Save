@@ -140,13 +140,19 @@ class LoginPage extends React.Component {
     if (emailRex.test(email) && this.state.password.length > 0) {
 
     } else if (emailRex.test(email) && this.state.password.length <= 0) {
-      this.setState({ message: 'Please enter your password' })
+      this.setState({ message: 'Please enter your password' }, () => {
+        this.notify('tc', 4)
+      })
       throw new Error()
     } else if (!emailRex.test(email) && this.state.password.length > 0) {
-      this.setState({ message: 'Please enter a correct email format' })
+      this.setState({ message: 'Please enter a correct email format' }, () => {
+        this.notify('tc', 4)
+      })
       throw new Error()
     } else if (!emailRex.test(email) && this.state.password.length <= 0) {
-      this.setState({ message: 'Please enter a correct email format and password' })
+      this.setState({ message: 'Please enter a correct email format and password' }, () => {
+        this.notify('tc', 4)
+      })
       throw new Error()
 
     }
@@ -160,9 +166,11 @@ class LoginPage extends React.Component {
       this.loginViaServer()
 
     } catch (err) {
-      setTimeout(() => {
+      /* setTimeout(() => {
         this.notify('tc', 4)
-      }, 200);
+      }, 200); */
+
+      //this.notify('tc', 4)
     }
 
 
