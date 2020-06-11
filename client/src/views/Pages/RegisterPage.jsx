@@ -42,6 +42,9 @@ import bgImage from "assets/img/bg16.jpg";
 //Additional imports
 import NotificationAlert from "react-notification-alert";
 
+//FaceBook
+import FacebookLogin from 'react-facebook-login'
+
 class RegisterPage extends React.Component {
   constructor(props) {
     super(props);
@@ -166,6 +169,31 @@ class RegisterPage extends React.Component {
   }
 
   isValidated() {
+    if (this.state.firstNameState !== " has-success") {
+      this.setState({
+        firstNameState: " has-danger"
+      });
+    }
+
+    if (this.state.lastNameState !== " has-success") {
+      this.setState({
+        lastNameState: " has-danger"
+      });
+    }
+
+    if (this.state.emailState !== " has-success") {
+      this.setState({
+        emailState: " has-danger"
+      });
+    }
+
+    if (this.state.passwordState !== " has-success") {
+      this.setState({
+        passwordState: " has-danger"
+      });
+    }
+
+
     if (
       this.state.firstNameState !== " has-success" ||
       this.state.lastNameState !== " has-success" ||
@@ -231,6 +259,8 @@ class RegisterPage extends React.Component {
           this.notify('tc', 5)
         } else {
 
+          this.setState({ message: 'An error has occured' })
+
           // console.log("An error occured")
           // this.setState({ notificationColor: 4 })
           this.notify('tc', 4)
@@ -249,11 +279,31 @@ class RegisterPage extends React.Component {
       })
   }
 
+  componentClicked = () => {
+    console.log("Facebook login clicked")
+  }
+
+  responseFacebook = (response) => {
+    console.log(response)
+  }
+
+
+
+
+
+
+
 
 
   render() {
     return (
       <>
+
+
+        <div id="fb-root"></div>
+        <script async defer crossOrigin="anonymous" src="https://connect.facebook.net/en_GB/sdk.js#xfbml=1&version=v7.0&appId=1210844962589186&autoLogAppEvents=1"></script>
+
+
         <div className="content">
           <NotificationAlert ref="notificationAlert" />
           <div className="register-page">
@@ -400,7 +450,7 @@ class RegisterPage extends React.Component {
                           </InputGroupAddon>
                           <Input
                             defaultValue={this.state.password}
-                            type="text"
+                            type="password"
                             placeholder="Password (required)"
                             name="password"
                             onFocus={e => this.setState({ passwordFocus: true })}
@@ -410,7 +460,7 @@ class RegisterPage extends React.Component {
                         </InputGroup>
 
 
-                        <FormGroup check>
+                        {/* <FormGroup check>
                           <Label check>
                             <Input type="checkbox" />
                             <span className="form-check-sign" />
@@ -419,7 +469,28 @@ class RegisterPage extends React.Component {
                               <a href="#something">terms and conditions</a>.
                             </div>
                           </Label>
-                        </FormGroup>
+                        </FormGroup> */}
+
+                      {/*   <div className="fb-login-button" data-size="medium" data-button-type="continue_with" data-layout="rounded" data-auto-logout-link="true" data-use-continue-as="false" data-width="" >
+
+                        </div> */}
+
+
+
+                      {/*   <FacebookLogin
+                          appId="1210844962589186"
+                          autoLoad={false}
+                          fields="name,email,picture"
+                          onClick={this.componentClicked}
+                          callback={this.responseFacebook}
+                          data-auto-logout-link="true"
+                        >
+                        </FacebookLogin> */}
+
+
+
+
+
 
                       </CardBody>
                       <CardFooter className="text-center">

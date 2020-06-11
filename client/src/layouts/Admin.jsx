@@ -26,6 +26,7 @@ import AdminNavbar from "components/Navbars/AdminNavbar.jsx";
 import Footer from "components/Footer/Footer.jsx";
 import Sidebar from "components/Sidebar/Sidebar.jsx";
 //import FixedPlugin from "components/FixedPlugin/FixedPlugin.jsx";
+import FeedbackPlugin from '../components/FeedbackPlugin/FeedbackPlugin'
 
 import routes from "routes.js";
 
@@ -87,8 +88,7 @@ class Admin extends React.Component {
     return routes.map((prop, key) => {
       if (prop.collapse) {
         return this.getRoutes(prop.views);
-      }
-      if (prop.layout === "/admin") {
+      } else if (prop.layout === "/admin") {
         return (
           <Route
             path={prop.layout + prop.path}
@@ -128,7 +128,7 @@ class Admin extends React.Component {
         <Sidebar
           {...this.props}
           routes={routes}
-          minimizeSidebar={this.minimizeSidebar}
+          /* minimizeSidebar={this.minimizeSidebar} */
           backgroundColor={this.state.backgroundColor}
         />
         <div className="main-panel" ref={this.mainPanel}>
@@ -147,12 +147,14 @@ class Admin extends React.Component {
         </div>
 
         
-        {/* <FixedPlugin
+       {/*  <FixedPlugin
           handleMiniClick={this.minimizeSidebar}
           sidebarMini={this.state.sidebarMini}
           bgColor={this.state.backgroundColor}
           handleColorClick={this.handleColorClick}
         /> */}
+
+       
       </div>
     );
   }

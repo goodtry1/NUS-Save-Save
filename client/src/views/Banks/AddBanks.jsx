@@ -58,9 +58,10 @@ export class AddBanks extends Component {
     }
 
     componentDidMount = () => {
+       console.log(this.props.location.data)
+       this.setState({ userAccounts : this.props.location.data})
 
-
-        setTimeout(() => {
+       /*  setTimeout(() => {
             axios({
                 method: 'post',
                 url: '/userAccountsId',
@@ -75,9 +76,9 @@ export class AddBanks extends Component {
             }).catch((err) => {
                 console.log(err.message)
             })
-        }, 200);
+        }, 200); */
 
-       
+
 
 
 
@@ -211,7 +212,7 @@ export class AddBanks extends Component {
 
     checkAccountExists(accountId) {
         for (var i = 0; i < this.state.userAccounts.length; i++) {
-            
+
             if (this.state.userAccounts[i].accountTypeId === accountId) {
                 return true
             } else {

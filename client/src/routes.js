@@ -45,6 +45,7 @@ import LockScreenPage from "views/Pages/LockScreenPage.jsx";
 
 import Banks from './views/Banks/Banks'
 import AddBanks from './views/Banks/AddBanks'
+import BankAccountDetails from './views/Banks/BankAccountDetails'
 
 let routes = [
   {
@@ -74,7 +75,17 @@ let routes = [
         mini: "AB",
         /* icon: "now-ui-icons business_badge", */
         component: AddBanks,
-        layout: "/admin"
+        layout: "/admin",
+        invisible: true
+      },
+      {
+        path: "/bankAccountDetails",
+        name: "Bank Account Details",
+        mini: "BA",
+        /* icon: "now-ui-icons business_badge", */
+        component: BankAccountDetails,
+        layout: "/admin",
+        invisible: true
       }
     ]
 

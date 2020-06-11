@@ -36,11 +36,16 @@ class Sidebar extends React.Component {
     super(props);
     this.state = {
       openAvatar: false,
-      ...this.getCollapseStates(props.routes)
+      ...this.getCollapseStates(props.routes),
+      user: ''
     };
     this.sidebar = React.createRef();
   }
   componentDidMount() {
+    var user = localStorage.getItem('user')
+    this.setState({ user: JSON.parse(user) })
+
+
     if (navigator.platform.indexOf("Win") > -1) {
       ps = new PerfectScrollbar(this.sidebar.current, {
         suppressScrollX: true,
@@ -90,7 +95,11 @@ class Sidebar extends React.Component {
   // this function creates the links and collapses that appear in the sidebar (left menu)
   createLinks = routes => {
     return routes.map((prop, key) => {
-      if (prop.collapse) {
+      if (prop.invisible) {
+        return null
+      }
+      
+      else if (prop.collapse) {
         var st = {};
         st[prop["state"]] = !this.state[prop.state];
         return (
@@ -116,14 +125,14 @@ class Sidebar extends React.Component {
                   </p>
                 </>
               ) : (
-                <>
-                  <span className="sidebar-mini-icon">{prop.mini}</span>
-                  <span className="sidebar-normal">
-                    {prop.name}
-                    <b className="caret" />
-                  </span>
-                </>
-              )}
+                  <>
+                    <span className="sidebar-mini-icon">{prop.mini}</span>
+                    <span className="sidebar-normal">
+                      {prop.name}
+                      <b className="caret" />
+                    </span>
+                  </>
+                )}
             </a>
             <Collapse isOpen={this.state[prop.state]}>
               <ul className="nav">{this.createLinks(prop.views)}</ul>
@@ -140,11 +149,11 @@ class Sidebar extends React.Component {
                 <p>{prop.name}</p>
               </>
             ) : (
-              <>
-                <span className="sidebar-mini-icon">{prop.mini}</span>
-                <span className="sidebar-normal">{prop.name}</span>
-              </>
-            )}
+                <>
+                  <span className="sidebar-mini-icon">{prop.mini}</span>
+                  <span className="sidebar-normal">{prop.name}</span>
+                </>
+              )}
           </NavLink>
         </li>
       );
@@ -157,7 +166,7 @@ class Sidebar extends React.Component {
   render() {
     return (
       <>
-        <div className="sidebar" data-color={this.props.backgroundColor}>
+        <div className="sidebar" data-color="blue">
           <div className="logo">
             <a
               href="https://www.creative-tim.com?ref=nudr-sidebar"
@@ -171,7 +180,7 @@ class Sidebar extends React.Component {
             <a
               href="/admin/dashboard"
               className="simple-text logo-normal"
-              /* target="/admin/dashboard" */
+            /* target="/admin/dashboard" */
             >
               Save Save
             </a>
@@ -204,7 +213,7 @@ class Sidebar extends React.Component {
                   }
                 >
                   <span>
-                    Ryan Gosling
+                    {this.state.user.firstName} {this.state.user.lastName}
                     <b className="caret" />
                   </span>
                 </a>
@@ -244,7 +253,7 @@ Sidebar.defaultProps = {
   routes: [],
   showNotification: false,
   backgroundColor: "blue",
-  minimizeSidebar: () => {}
+  minimizeSidebar: () => { }
 };
 
 Sidebar.propTypes = {
