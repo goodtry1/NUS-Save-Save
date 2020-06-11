@@ -38,7 +38,7 @@ import {
     FormGroup,
     Input,
     Button,
-    InputGroup
+    //InputGroup
 } from "reactstrap";
 
 // core components
@@ -91,23 +91,59 @@ class BankAccountDetails extends React.Component {
         singleFile: null,
         bankStatement: '',
         message: '',
-        feedbackDialogOpen: ''
+        feedbackDialogOpen: '',
+        recommendation: ''
     }
 }
 
     componentDidMount = () => {
-       // console.log(this.props.location.data)
+        console.log(this.props.location.data)
 
        if (this.props.location.data) {
+           console.log("Running 1")
             this.setState({ bankAccountDetails : this.props.location.data}, () => {
-            localStorage.setItem("bankAccountDetails", JSON.stringify(this.state.bankAccountDetails))
+                /* (() => { this.retrievePreviousRecommendations() })
+                (() => { localStorage.setItem("bankAccountDetails", JSON.stringify(this.state.bankAccountDetails)) }) */
+                this.retrievePreviousRecommendations()
+                
+            
           })
        } else {
            var bankAccountDetails = localStorage.getItem("bankAccountDetails")
-           this.setState({ bankAccountDetails : JSON.parse(bankAccountDetails)})
+           this.setState({ bankAccountDetails : JSON.parse(bankAccountDetails)}, () => {
+                this.retrievePreviousRecommendations()
+           })
        }
+
+       
         
         
+    }
+
+    retrievePreviousRecommendations = () => {
+        console.log("Sending post request: " + this.state.bankAccountDetails.userId + " " + this.state.bankAccountDetails.accountTypeId)
+        localStorage.setItem("bankAccountDetails", JSON.stringify(this.state.bankAccountDetails))
+
+        axios({
+            method: 'post',
+            url: '/fetchrecommendations',
+            data: {
+                userId: this.state.bankAccountDetails.userId,
+                accountTypeid: this.state.bankAccountDetails.accountTypeId
+            }
+        }).then((response) => {
+            if (response.status === 200) {
+                console.log("Retrieved response")
+                var recommendation = response.data.recommendation[0]
+                var sRecommendation = (recommendation[Object.keys(recommendation)[0]])
+                this.setState({recommendation: sRecommendation.split(',')})
+
+            } else {
+                console.log("An error occured")
+            }
+        }).catch((err) => {
+            console.log(err.message)
+        })
     }
 
     singleFile = React.createRef();
@@ -342,9 +378,30 @@ class BankAccountDetails extends React.Component {
 
                                 </CardHeader>
                                 <CardBody>
-                                   1. Recommendation 1 <br/>
-                                   2. Recommendation 2 <br/>
-                                   3. Recommendation 3 <br/>
+
+                                    
+                                    {this.state.recommendation != null? (
+                                    
+                                       this.state.recommendation ?
+                                       <div>
+                                           {this.state.recommendation.map((recommendation) => <Row>{recommendation}</Row>)}
+                                       </div>  : 
+                                       
+                                       <div>
+                                           <center>
+                                           <button class="btn btn-info btn-sm mb-2" type="button" disabled>
+                                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                            Loading...
+                                            </button>
+                                            </center>
+                                        </div>
+                                   
+                                    ) : (
+                                    <div>
+                                          <center>No recommendations available, please upload your bank statement</center>  
+                                    </div>
+                                    )}
+                                   
                                   
                                 </CardBody>
                                 <CardFooter>

@@ -32,7 +32,7 @@ export class Banks extends Component {
         this.retrieveUserBanks.bind(this)
         this.state = {
             user: '',
-            accounts: [],
+            accounts: '',
             redirectToAddBanks: false
         }
     }
@@ -49,6 +49,7 @@ export class Banks extends Component {
     }
 
     retrieveUserBanks = () => {
+
 
         axios({
             method: 'post',
@@ -85,10 +86,21 @@ export class Banks extends Component {
 
         //this.setState({ redirectToAddBanks: true })
     }
-    render() {
-        /* if (this.state.redirectToAddBanks) {
-            return <Redirect to="/admin/addBanks" />;
-        } */
+
+    renderLoading() {
+        return (
+            <div>
+                <center>
+                    <button class="btn btn-info btn-sm mb-2" type="button" disabled>
+                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                            Loading...
+                                            </button>
+                </center>
+            </div>
+        )
+    }
+
+    renderBanks() {
         return (
             <div>
                 <PanelHeader
@@ -103,23 +115,23 @@ export class Banks extends Component {
 
                                 <CardBody>
                                     <Row >
-                                    <Col xs={2} ></Col>
+                                        <Col xs={2} ></Col>
 
-                                            <Col xs={8} >
-                                               <center><h3>{account.accountTypeName}</h3></center> 
-                                            </Col>
+                                        <Col xs={8} >
+                                            <center><h3>{account.accountTypeName}</h3></center>
+                                        </Col>
 
-                                            <Col xs={2}>
-                                                <Button onClick={(e) => this.redirectToBankAccountDetails(e, account)} color="info" className="btn-round btn-icon">
-                                                    <i className="now-ui-icons ui-1_zoom-bold" />
-                                                </Button>
+                                        <Col xs={2}>
+                                            <Button onClick={(e) => this.redirectToBankAccountDetails(e, account)} color="info" className="btn-round btn-icon">
+                                                <i className="now-ui-icons ui-1_zoom-bold" />
+                                            </Button>
 
-                                                <Button color="danger" className="btn-round btn-icon">
-                                                    <i className="now-ui-icons ui-1_simple-remove" />
-                                                </Button>
-                                            </Col>
+                                            <Button color="danger" className="btn-round btn-icon">
+                                                <i className="now-ui-icons ui-1_simple-remove" />
+                                            </Button>
+                                        </Col>
 
-                                        
+
 
 
 
@@ -151,7 +163,7 @@ export class Banks extends Component {
                                         <i className="now-ui-icons ui-1_simple-add" />
                                     </Button>
 
-                           
+
                                     <h5>Click here to add bank account</h5>
                                 </center>
 
@@ -163,6 +175,18 @@ export class Banks extends Component {
                 </Row>
             </div>
         )
+    }
+
+    render() {
+        /* if (this.state.redirectToAddBanks) {
+            return <Redirect to="/admin/addBanks" />;
+        } */
+        return (
+            <div>
+                {this.state.accounts ? (this.renderBanks()) : (this.renderLoading())}
+            </div>
+        )
+
     }
 }
 

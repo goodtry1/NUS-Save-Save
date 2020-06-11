@@ -157,29 +157,6 @@ app.post('/userBankAccountDetails', function (req, res) {
     });
 })
 
-//get list of user bank accounts
-app.post('/userAccountsId', function (req, res) {
-  userId = req.body.userId;
-
-  sql.connect(sqlConfig, function () {
-    var request = new sql.Request();
-    let qu =
-      `SELECT account.accountTypeId
-      FROM userAccount
-      INNER JOIN account ON userAccount.accountTypeId = account.accountTypeId
-      AND userAccount.userId = '` + userId + `'`;
-    request.query(qu, function (error, results) {
-      if (error) {
-        console.log("error occured");
-        res.status(400).send()
-      }
-      else {
-        res.status(200).send({ "listOfAccountIds": results.recordset })
-      }
-    });
-  });
-})
-
 
 //add Bank Account for a particular user.
 app.post('/addBankAccount', (req, res) =>  {
@@ -322,6 +299,33 @@ app.post('/uploadBankStatement', upload.single('file'), async(req, res) => {
 })
 
 
+//get recommendations for the userid and accounttypeid
+app.post('/fetchrecommendations', (req, res) =>  {
+    userId = req.body.userId;
+    console.log('userId' + userId)
+    accountTypeid = req.body.accountTypeid;
+    console.log('userId' + accountTypeid)    
+    sql.connect(sqlConfig, function() {
+        console.log("into db");
+        var request = new sql.Request();
+        query_str = "DECLARE @ROUTPUT VARCHAR(8000); exec [dbo].[usp_getRecommendation] "+ userId + ", " +accountTypeid+ ", " + "@Routput OUTPUT; SELECT @Routput";
+        console.log(query_str)
+        request.query(query_str, function(err,results){
+            if (err)
+            {
+               console.log("error occured");
+               res.status(400).send()
+               
+            }
+            else 
+            {
+                res.status(200).send({"recommendation":results.recordset})
+            }
+        });
+    });
+})
+
+
 // default render callback
 function render_page(pageData) {
   let render_options = {
@@ -427,4 +431,24 @@ function parseStatement(parsestatement)
 
 
 
+function recommendationEngine(userid,accountTypeid)
+{
 
+
+
+    sql.connect(sqlConfig, function(i) {
+        console.log("into db: " + i);
+        for (i=19;i<24;i++){
+
+            var request = new sql.Request();
+            query_str = "exec [dbo].[usp_OCBCRecommendation] " + userid + ", " +accountTypeid+ ", " + i ;
+            console.log(query_str);
+            request.query(query_str, function(err,rows){
+            if(err) throw err;
+            //console.log(rows);
+            });
+        }
+
+    });
+
+}
