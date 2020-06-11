@@ -42,6 +42,7 @@ export class AddBanks extends Component {
             PDF: '',
             userAccounts: [],
             banks: [],
+            banksLoaded: false,
             selectedBank: '',
             selectedBankId: '',
             accountTypes: [],
@@ -129,7 +130,7 @@ export class AddBanks extends Component {
         console.log("Banks after processing: " + transformedBanks.length)
 
         this.setState({ banks: transformedBanks })
-
+        this.setState({ banksLoaded : true })
 
     }
 
@@ -231,10 +232,32 @@ export class AddBanks extends Component {
         this.refs.notificationAlert.notificationAlert(CustomNotification.notify(place, color, this.state.message));
     }
 
-
-
-
     render() {
+       
+        return (
+            <div>
+                {this.state.banksLoaded ? (this.renderAddBanks()) : (this.renderLoading())}
+            </div>
+        )
+
+    }
+
+    renderLoading() {
+        return (
+            <div>
+                <center>
+                    <button className="btn btn-info btn-sm mb-2" type="button" disabled>
+                        <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                            Loading...
+                                            </button>
+                </center>
+            </div>
+        )
+    }
+
+
+
+    renderAddBanks() {
         return (
             <div>
                 <NotificationAlert ref="notificationAlert" />

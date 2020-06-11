@@ -91,8 +91,8 @@ export class Banks extends Component {
         return (
             <div>
                 <center>
-                    <button class="btn btn-info btn-sm mb-2" type="button" disabled>
-                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                    <button className="btn btn-info btn-sm mb-2" type="button" disabled>
+                        <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
                                             Loading...
                                             </button>
                 </center>
