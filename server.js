@@ -307,7 +307,8 @@ app.post('/fetchrecommendations', (req, res) =>  {
     sql.connect(sqlConfig, function() {
         console.log("into db");
         var request = new sql.Request();
-        query_str = "DECLARE @ROUTPUT VARCHAR(8000); exec [dbo].[usp_getRecommendation] "+ userId + ", " +accountTypeid+ ", " + "@Routput OUTPUT; SELECT @Routput";
+        // query_str = "DECLARE @ROUTPUT VARCHAR(8000); exec [dbo].[usp_getRecommendation] "+ userId + ", " +accountTypeid+ ", " + "@Routput OUTPUT; SELECT @Routput";
+        query_str = "EXEC [dbo].[usp_getRecommendation] " + userId + ", " +accountTypeid
         console.log(query_str)
         request.query(query_str, function(err,results){
             if (err)
@@ -323,6 +324,7 @@ app.post('/fetchrecommendations', (req, res) =>  {
         });
     });
 })
+
 
 
 //add feedback for a particular session Id.
