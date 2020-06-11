@@ -35,7 +35,7 @@ class FeedbackPlugin extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            classes: "dropdown show",
+            classes: "dropdown",
             feedbackDialogOpen: '',
             rating: ''
         };
@@ -47,13 +47,20 @@ class FeedbackPlugin extends Component {
         this.setState({ rating: nextValue });
     }
 
+    componentDidMount = () => {
+        setTimeout(() => {
+            this.setState({ classes: "dropdown show" });
+      }, 10000);
+    }
+
     handleClick() {
         if (this.state.classes === "dropdown") {
             this.setState({ classes: "dropdown show" });
         } else {
             this.setState({ classes: "dropdown" });
-       
         }
+
+       
     }
 
     
@@ -72,9 +79,9 @@ class FeedbackPlugin extends Component {
         return (
             <div className="fixed-plugin">
                 <div className={this.state.classes}>
-                   {/*  <div onClick={this.handleClick}>
+                    <div onClick={this.handleClick}>
                         <i className="fa fa-cog fa-2x" />
-                    </div> */}
+                    </div>
                     <ul className="dropdown-menu show">
                         <li className="header-title">
                             <Row>

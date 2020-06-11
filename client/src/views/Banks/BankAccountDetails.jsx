@@ -121,7 +121,7 @@ class BankAccountDetails extends React.Component {
         for (let i = 0; i < e.target.files.length; i++) {
           console.log("Number of files:" + e.target.files.length)
           fileNames = fileNames + e.target.files[i].name;
-            console.log(fileNames)
+          console.log(fileNames)
 
             if (fileNames.split('.').pop() !== 'pdf') {
                 console.log("Not PDF")
@@ -142,6 +142,8 @@ class BankAccountDetails extends React.Component {
                   break;
             } 
 
+            
+
           if (type === "multipleFile" && i !== e.target.files.length - 1) {
             fileNames = fileNames + ", ";
           }
@@ -153,6 +155,8 @@ class BankAccountDetails extends React.Component {
                 bankStatement : files[0]
               });
         }
+
+        e.target.value = null //clear upload DOM
        
       };
 
@@ -184,6 +188,9 @@ class BankAccountDetails extends React.Component {
             formData.append('file', this.state.bankStatement);
             formData.append('userId', this.state.bankAccountDetails.userId);
             formData.append('accountTypeId', this.state.bankAccountDetails.accountTypeId);
+
+           
+            console.log(formData)
 
             this.setState({bankStatement : ''})
             this.setState({singleFileName : ''})
