@@ -85,13 +85,14 @@ class Dashboard extends React.Component {
 
   componentDidMount = () => {
     var user = localStorage.getItem('user')
-    this.setState({ user: JSON.parse(user) })
-    
+    this.setState({ user: JSON.parse(user) }, () => {
+      console.log("username " + this.state.user)
+    })
+
     setTimeout(() => {
       this.retrieveUserBanks()
     }, 200);
 
-    console.log("username " + this.state.user.firstName);
   }
 
   retrieveUserBanks = () => {
@@ -105,7 +106,7 @@ class Dashboard extends React.Component {
     }).then((response) => {
       if (response.status === 200) {
         this.setState({ accounts: response.data.userBankAccountDetails })
-        console.log(" UserBankAcc Success" )
+        console.log(" UserBankAcc Success")
 
 
       } else {
@@ -177,7 +178,7 @@ class Dashboard extends React.Component {
                         <div className="info">
 
 
-                          <p className="info-title">Member since: {this.state.user.joiningDate}</p>
+                          <p className="info-title">Member since: {this.state.user.joinDate}</p>
                           {/* TODO:... check why cannot check for joiningDate!*/}
                         </div>
                       </div>
@@ -217,25 +218,25 @@ class Dashboard extends React.Component {
                 </CardHeader>
                 <CardBody>
                   <Row>
-                {this.state.accounts.map((account) =>
-                  
-                    <Col key={account.userBankAccountId} xs={12} md={4}>
-                      <Card className="card-chart">
-                        <CardHeader>
-                          <b> {account.accountTypeName} </b>
-                        </CardHeader>
-                        <CardBody>
-                          Date Created: {account.date}
-                          <br/>
-                          Progress:
-                          <br/>
-                          Interest Rates
-                          <br/>
-                        </CardBody>
-                      </Card>
+                    {this.state.accounts.map((account) =>
 
-                    </Col>
-                  )}
+                      <Col key={account.userBankAccountId} xs={12} md={4}>
+                        <Card className="card-chart">
+                          <CardHeader>
+                            <b> {account.accountTypeName} </b>
+                          </CardHeader>
+                          <CardBody>
+                            Date Created: {account.date}
+                            <br />
+                          Progress:
+                          <br />
+                          Interest Rates
+                          <br />
+                          </CardBody>
+                        </Card>
+
+                      </Col>
+                    )}
                   </Row>
                   {/*
                     <Col xs={12} md={4}>
