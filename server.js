@@ -287,14 +287,13 @@ app.post('/uploadBankStatement', upload.single('file'), async(req, res) => {
 	}
 	else 
 	{
+		recommendationEngine(req.body.userId, req.body.accountTypeId)
 		res.status(200).send()
+		
 	}
 	});
 
 	});
-	
-	
-	
 	
 })
 
@@ -325,6 +324,31 @@ app.post('/fetchrecommendations', (req, res) =>  {
     });
 })
 
+
+//add feedback for a particular session Id.
+app.post('/addFeedback', (req, res) =>  {
+
+    sql.connect(sqlConfig, function() {
+        var request = new sql.Request();
+		
+		var dateNow = DATE_FORMATER( new Date(), "yyyy-mm-dd HH:MM:ss" );
+	
+		let qu = `INSERT INTO dbo.[feedback](sessionId, feedbackRating, feedbackComment, timestamp) 
+			   VALUES ('` + req.body.sessionId + `', '`+ req.body.feedbackRating + `', '`+ req.body.feedbackComment + `' , '`+ dateNow + `')`;
+
+		console.log(qu)
+				 
+		request.query(qu, function(err, recordset) {
+		if(err){
+			res.status(400).send()
+		}
+		else 
+		{
+			res.status(200).send()
+		}
+		});
+    });
+})
 
 // default render callback
 function render_page(pageData) {
@@ -431,11 +455,8 @@ function parseStatement(parsestatement)
 
 
 
-function recommendationEngine(userid,accountTypeid)
+function recommendationEngine(userid, accountTypeid)
 {
-
-
-
     sql.connect(sqlConfig, function(i) {
         console.log("into db: " + i);
         for (i=19;i<24;i++){
@@ -452,3 +473,6 @@ function recommendationEngine(userid,accountTypeid)
     });
 
 }
+
+
+
