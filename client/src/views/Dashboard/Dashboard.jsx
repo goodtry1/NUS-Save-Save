@@ -52,6 +52,11 @@ import shirt from "assets/img/balmain.jpg";
 import swim from "assets/img/prada.jpg";
 
 import { table_data } from "variables/general.jsx";
+import { User } from '../../models/User';
+import { Bank } from '../../models/Bank';
+
+//Axios
+import axios from 'axios';
 
 var mapData = {
   AU: 760,
@@ -68,6 +73,51 @@ var mapData = {
 };
 
 class Dashboard extends React.Component {
+  constructor(props) {
+    super(props);
+    this.retrieveUserBanks.bind(this)
+    this.state = {
+      user: '',
+      accounts: [],
+      //redirectToAddBanks: false
+    }
+  }
+
+  componentDidMount = () => {
+    var user = localStorage.getItem('user')
+    this.setState({ user: JSON.parse(user) }, () => {
+      console.log("username " + this.state.user)
+    })
+
+    setTimeout(() => {
+      this.retrieveUserBanks()
+    }, 200);
+
+  }
+
+  retrieveUserBanks = () => {
+
+    axios({
+      method: 'post',
+      url: '/userBankAccountDetails',
+      data: {
+        userId: this.state.user.userId
+      }
+    }).then((response) => {
+      if (response.status === 200) {
+        this.setState({ accounts: response.data.userBankAccountDetails })
+        console.log(" UserBankAcc Success")
+
+
+      } else {
+        console.log("Failed to load user banks")
+      }
+    }).catch((err) => {
+      console.log(err.message)
+    })
+  }
+
+
   createTableData() {
     var tableRows = [];
     for (var i = 0; i < table_data.length; i++) {
@@ -87,6 +137,13 @@ class Dashboard extends React.Component {
     return tableRows;
   }
   render() {
+
+    //User user = localStorage.getItem('user');
+    //var user = JSON.parse(localStorage.getItem('user'));
+    //var b = new User();
+
+
+    //console.log("This is the user --> " + user);
     return (
       <>
 
@@ -112,7 +169,7 @@ class Dashboard extends React.Component {
                         <div className="info">
 
                           <h2 className="info-title">Welcome back,</h2>
-                          <p className="info-title">$user</p>
+                          <p className="info-title">{this.state.user.firstName}</p>
                         </div>
                       </div>
                     </Col>
@@ -121,7 +178,8 @@ class Dashboard extends React.Component {
                         <div className="info">
 
 
-                          <p className="info-title">Member since:</p>
+                          <p className="info-title">Member since: {this.state.user.joinDate}</p>
+                          {/* TODO:... check why cannot check for joiningDate!*/}
                         </div>
                       </div>
                     </Col>
@@ -160,17 +218,27 @@ class Dashboard extends React.Component {
                 </CardHeader>
                 <CardBody>
                   <Row>
-                    <Col xs={12} md={4}>
-                      <Card className="card-chart">
-                        <CardHeader>
-                          A
-                        </CardHeader>
-                        <CardBody>
-                          1231231
-                        </CardBody>
-                      </Card>
+                    {this.state.accounts.map((account) =>
 
-                    </Col>
+                      <Col key={account.userBankAccountId} xs={12} md={4}>
+                        <Card className="card-chart">
+                          <CardHeader>
+                            <b> {account.accountTypeName} </b>
+                          </CardHeader>
+                          <CardBody>
+                            Date Created: {account.date}
+                            <br />
+                          Progress:
+                          <br />
+                          Interest Rates
+                          <br />
+                          </CardBody>
+                        </Card>
+
+                      </Col>
+                    )}
+                  </Row>
+                  {/*
                     <Col xs={12} md={4}>
                       <Card className="card-chart">
                         <CardHeader>
@@ -196,7 +264,7 @@ class Dashboard extends React.Component {
 
 
                   </Row>
-                  {/*
+                  
                   <div className="chart-area">
                     <Line
                       data={dashboardActiveUsersChart.data}
