@@ -96,8 +96,18 @@ class BankAccountDetails extends React.Component {
 }
 
     componentDidMount = () => {
-        console.log(this.props.location.data)
-        this.setState({ bankAccountDetails : this.props.location.data})
+       // console.log(this.props.location.data)
+
+       if (this.props.location.data) {
+            this.setState({ bankAccountDetails : this.props.location.data}, () => {
+            localStorage.setItem("bankAccountDetails", JSON.stringify(this.state.bankAccountDetails))
+          })
+       } else {
+           var bankAccountDetails = localStorage.getItem("bankAccountDetails")
+           this.setState({ bankAccountDetails : JSON.parse(bankAccountDetails)})
+       }
+        
+        
     }
 
     singleFile = React.createRef();

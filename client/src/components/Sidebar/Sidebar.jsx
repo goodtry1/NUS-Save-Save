@@ -166,7 +166,7 @@ class Sidebar extends React.Component {
   render() {
     return (
       <>
-        <div className="sidebar" data-color={this.props.backgroundColor}>
+        <div className="sidebar" data-color="blue">
           <div className="logo">
             <a
               href="https://www.creative-tim.com?ref=nudr-sidebar"
