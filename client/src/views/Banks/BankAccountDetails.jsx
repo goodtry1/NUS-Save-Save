@@ -249,14 +249,15 @@ class BankAccountDetails extends React.Component {
                 if (res.status === 200) {
                     this.setState({message : 'Your bank statement has been uploaded successfully'})
                     this.notify('br', 5)
-                    FeedbackPlugin.askForFeedBack()
+                    
                 } else {
-                    FeedbackPlugin.askForFeedBack()
+                    
                 }
             })
             .catch(err => console.log(err))
         }
     }
+
 
     createTableData() {
         var tableRows = [];
@@ -389,8 +390,8 @@ class BankAccountDetails extends React.Component {
                                        
                                        <div>
                                            <center>
-                                           <button class="btn btn-info btn-sm mb-2" type="button" disabled>
-                                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                           <button className="btn btn-info btn-sm mb-2" type="button" disabled>
+                                            <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
                                             Loading...
                                             </button>
                                             </center>
