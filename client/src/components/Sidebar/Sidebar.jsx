@@ -43,6 +43,11 @@ class Sidebar extends React.Component {
   }
   componentDidMount() {
     var user = localStorage.getItem('user')
+    if (user == null) {
+      this.props.history.push({
+        pathname: '/auth/login-page'
+      })
+    }
     this.setState({ user: JSON.parse(user) })
 
 
@@ -63,6 +68,21 @@ class Sidebar extends React.Component {
       window.clearTimeout(id);
     }
   }
+
+  userLogout = (e) => {
+    //localStorage.removeItem('user');
+    //localStorage.removeItem('isLoggedIn')
+    localStorage.clear();
+    this.setState({ user: null })
+
+    this.props.history.push({
+      pathname: '/auth/login-page'
+    })
+    
+  }
+
+
+
   // this creates the intial state of this component based on the collapse routes
   // that it gets through this.props.routes
   getCollapseStates = routes => {
@@ -235,6 +255,12 @@ class Sidebar extends React.Component {
                       <a href="#pablo" onClick={e => e.preventDefault}>
                         <span className="sidebar-mini-icon">S</span>
                         <span className="sidebar-normal">Settings</span>
+                      </a>
+                    </li>
+                    <li>
+                      <a href="" onClick={e => this.userLogout(e)}>
+                        <span className="sidebar-mini-icon">LO</span>
+                        <span className="sidebar-normal">Logout</span>
                       </a>
                     </li>
                   </ul>
