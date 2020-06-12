@@ -27,18 +27,18 @@ import {
     CardBody,
     CardFooter,
     CardTitle,
-  /*   DropdownToggle,
-    DropdownMenu,
-    DropdownItem,
-    UncontrolledDropdown,
+  //  DropdownToggle,
+  //  DropdownMenu,
+  //  DropdownItem,
+   // UncontrolledDropdown,
     Table,
-    Progress, */
+   // Progress,
     Row,
     Col,
     FormGroup,
     Input,
     Button,
-    InputGroup
+    //InputGroup
 } from "reactstrap";
 
 // core components
@@ -65,6 +65,8 @@ import NotificationAlert from "react-notification-alert";
 //Feedback
 import FeedbackPlugin from '../../components/FeedbackPlugin/FeedbackPlugin'
 
+//Animation
+import  { Spring } from 'react-spring/renderprops'
 
 /* var mapData = {
     AU: 760,
@@ -91,23 +93,60 @@ class BankAccountDetails extends React.Component {
         singleFile: null,
         bankStatement: '',
         message: '',
-        feedbackDialogOpen: ''
+        feedbackDialogOpen: '',
+        recommendation: ''
     }
 }
 
     componentDidMount = () => {
-       // console.log(this.props.location.data)
+        console.log(this.props.location.data)
 
        if (this.props.location.data) {
+           console.log("Running 1")
             this.setState({ bankAccountDetails : this.props.location.data}, () => {
-            localStorage.setItem("bankAccountDetails", JSON.stringify(this.state.bankAccountDetails))
+                /* (() => { this.retrievePreviousRecommendations() })
+                (() => { localStorage.setItem("bankAccountDetails", JSON.stringify(this.state.bankAccountDetails)) }) */
+                this.retrievePreviousRecommendations()
+                
+            
           })
        } else {
            var bankAccountDetails = localStorage.getItem("bankAccountDetails")
-           this.setState({ bankAccountDetails : JSON.parse(bankAccountDetails)})
+           this.setState({ bankAccountDetails : JSON.parse(bankAccountDetails)}, () => {
+                this.retrievePreviousRecommendations()
+           })
        }
+
+       
         
         
+    }
+
+    retrievePreviousRecommendations = () => {
+        console.log("Sending post request: " + this.state.bankAccountDetails.userId + " " + this.state.bankAccountDetails.accountTypeId)
+        localStorage.setItem("bankAccountDetails", JSON.stringify(this.state.bankAccountDetails))
+
+        axios({
+            method: 'post',
+            url: '/fetchrecommendations',
+            data: {
+                userId: this.state.bankAccountDetails.userId,
+                accountTypeid: this.state.bankAccountDetails.accountTypeId
+            }
+        }).then((response) => {
+            if (response.status === 200) {
+                console.log("Retrieved response")
+                var recommendation = response.data.recommendation
+                this.setState({ recommendation })
+               /*  var sRecommendation = (recommendation[Object.keys(recommendation)[0]])
+                this.setState({recommendation: sRecommendation.split(',')}) */
+
+            } else {
+                this.setState({ recommendation : null})
+            }
+        }).catch((err) => {
+            console.log(err.message)
+        })
     }
 
     singleFile = React.createRef();
@@ -213,14 +252,16 @@ class BankAccountDetails extends React.Component {
                 if (res.status === 200) {
                     this.setState({message : 'Your bank statement has been uploaded successfully'})
                     this.notify('br', 5)
-                    FeedbackPlugin.askForFeedBack()
+                    this.setState({recommendation : ''})
+                    this.retrievePreviousRecommendations()
                 } else {
-                    FeedbackPlugin.askForFeedBack()
+                    
                 }
             })
             .catch(err => console.log(err))
         }
     }
+
 
     createTableData() {
         var tableRows = [];
@@ -241,6 +282,12 @@ class BankAccountDetails extends React.Component {
         return tableRows;
 
     }
+
+    
+        
+        
+        
+    
 
  
 
@@ -333,7 +380,7 @@ class BankAccountDetails extends React.Component {
 
                     <Row sm={12}>
                         <Col sm={6} >
-                            <Card className="card-chart">
+                            <Card className="">
                                 <CardHeader>
                                     <h5 className="card-category"></h5>
                                     <CardTitle tag="h2" >Recommendations</CardTitle>
@@ -342,9 +389,95 @@ class BankAccountDetails extends React.Component {
 
                                 </CardHeader>
                                 <CardBody>
-                                   1. Recommendation 1 <br/>
-                                   2. Recommendation 2 <br/>
-                                   3. Recommendation 3 <br/>
+
+                                    
+                                    {this.state.recommendation != null? (
+                                    
+                                       this.state.recommendation ?
+                                       <div>
+
+                                            {this.state.recommendation.map((recommendation) => 
+                                            <Table responsive className="table-shopping">
+
+                                            <Spring
+                                                from={{ opacity : 0, marginTop: 500}}
+                                                to={{ opacity : 1, marginTop : 0}}
+                                            >
+                                                {props => (
+                                                    <div style={props}>
+                                                    
+                                                     <tr key={recommendation.recommendationId} >
+                                                         
+                                                        <td >
+                                                            {recommendation.isRecommCompleted ? 
+                                                            (<Button color="success" className="btn-round btn-icon">
+                                                            <i className="now-ui-icons ui-1_check" />
+                                                            </Button>) 
+                                                            : 
+                                                            (<Button color="" className="btn-round btn-icon" >
+                                                            <i className="now-ui-icons ui-1_simple-remove" />
+                                                            </Button>)
+                                                            }
+                                                        </td>
+                                                        <td >
+                                                            {recommendation.recommendation}
+                                                        </td>
+                                                    </tr>
+                                                    
+                                                    </div>
+                                                )}
+                                                
+
+
+                                            </Spring>
+                                           
+                                            </Table>
+
+
+
+                                           
+                                           
+
+
+
+
+                                           /*  <Row key={recommendation.recommendationId}> 
+                                           <Card className="">
+                                               <CardBody>
+                                                   <Row>
+                                                   <Col md="1">
+                                                    <Button color="success" className="btn-round btn-icon">
+                                                    <i className="now-ui-icons ui-1_check" />
+                                                    </Button> 
+                                                   </Col>
+
+                                                   <Col md="10">
+                                                   {recommendation.recommendation}
+                                                   </Col>
+                                                   </Row>
+                                              
+                                               </CardBody>
+                                           </Card>
+                                           
+                                            </Row>  */
+                                           )}
+                                       </div>  : 
+                                       
+                                       <div>
+                                           <center>
+                                           <button className="btn btn-info btn-sm mb-2" type="button" disabled>
+                                            <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                            Loading...
+                                            </button>
+                                            </center>
+                                        </div>
+                                   
+                                    ) : (
+                                    <div>
+                                          <center>No recommendations available, please upload your bank statement</center>  
+                                    </div>
+                                    )}
+                                   
                                   
                                 </CardBody>
                                 <CardFooter>
@@ -360,7 +493,9 @@ class BankAccountDetails extends React.Component {
                             <Card className="card-chart">
                                 <CardHeader>
                                     <h5 className="card-category"></h5>
-                                    <CardTitle tag="h2"> Upload bank statement </CardTitle>
+                                    
+                                    <CardTitle tag="h4">Upload bank statement</CardTitle>
+                                    
                                    
                   
 
