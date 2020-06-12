@@ -27,12 +27,12 @@ import {
     CardBody,
     CardFooter,
     CardTitle,
-  /*   DropdownToggle,
-    DropdownMenu,
-    DropdownItem,
-    UncontrolledDropdown,
+  //  DropdownToggle,
+  //  DropdownMenu,
+  //  DropdownItem,
+   // UncontrolledDropdown,
     Table,
-    Progress, */
+   // Progress,
     Row,
     Col,
     FormGroup,
@@ -65,6 +65,8 @@ import NotificationAlert from "react-notification-alert";
 //Feedback
 import FeedbackPlugin from '../../components/FeedbackPlugin/FeedbackPlugin'
 
+//Animation
+import  { Spring } from 'react-spring/renderprops'
 
 /* var mapData = {
     AU: 760,
@@ -140,7 +142,7 @@ class BankAccountDetails extends React.Component {
                 this.setState({recommendation: sRecommendation.split(',')}) */
 
             } else {
-                console.log("An error occured")
+                this.setState({ recommendation : null})
             }
         }).catch((err) => {
             console.log(err.message)
@@ -250,7 +252,8 @@ class BankAccountDetails extends React.Component {
                 if (res.status === 200) {
                     this.setState({message : 'Your bank statement has been uploaded successfully'})
                     this.notify('br', 5)
-                    
+                    this.setState({recommendation : ''})
+                    this.retrievePreviousRecommendations()
                 } else {
                     
                 }
@@ -279,6 +282,12 @@ class BankAccountDetails extends React.Component {
         return tableRows;
 
     }
+
+    
+        
+        
+        
+    
 
  
 
@@ -386,9 +395,53 @@ class BankAccountDetails extends React.Component {
                                     
                                        this.state.recommendation ?
                                        <div>
-                                           {this.state.recommendation.map((recommendation) => 
+
+                                            {this.state.recommendation.map((recommendation) => 
+                                            <Table responsive className="table-shopping">
+
+                                            <Spring
+                                                from={{ opacity : 0, marginTop: 500}}
+                                                to={{ opacity : 1, marginTop : 0}}
+                                            >
+                                                {props => (
+                                                    <div style={props}>
+                                                    
+                                                     <tr key={recommendation.recommendationId} >
+                                                         
+                                                        <td >
+                                                            {recommendation.isRecommCompleted ? 
+                                                            (<Button color="success" className="btn-round btn-icon">
+                                                            <i className="now-ui-icons ui-1_check" />
+                                                            </Button>) 
+                                                            : 
+                                                            (<Button color="" className="btn-round btn-icon" >
+                                                            <i className="now-ui-icons ui-1_simple-remove" />
+                                                            </Button>)
+                                                            }
+                                                        </td>
+                                                        <td >
+                                                            {recommendation.recommendation}
+                                                        </td>
+                                                    </tr>
+                                                    
+                                                    </div>
+                                                )}
+                                                
+
+
+                                            </Spring>
                                            
-                                           <Row key={recommendation.recommendationId}>
+                                            </Table>
+
+
+
+                                           
+                                           
+
+
+
+
+                                           /*  <Row key={recommendation.recommendationId}> 
                                            <Card className="">
                                                <CardBody>
                                                    <Row>
@@ -406,7 +459,8 @@ class BankAccountDetails extends React.Component {
                                                </CardBody>
                                            </Card>
                                            
-                                           </Row>)}
+                                            </Row>  */
+                                           )}
                                        </div>  : 
                                        
                                        <div>
@@ -439,7 +493,9 @@ class BankAccountDetails extends React.Component {
                             <Card className="card-chart">
                                 <CardHeader>
                                     <h5 className="card-category"></h5>
-                                    <CardTitle tag="h2"> Upload bank statement </CardTitle>
+                                    
+                                    <CardTitle tag="h4">Upload bank statement</CardTitle>
+                                    
                                    
                   
 

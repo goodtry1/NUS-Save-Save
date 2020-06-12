@@ -31,6 +31,7 @@
     "react-router-redux": "^4.0.8",
     "react-scripts": "3.0.1",
     "react-select": "3.0.4",
+    "react-spring": "^8.0.27",
     "react-star-rating-component": "^1.4.1",
     "react-stars": "^2.2.5",
     "react-table": "6.10.0",
