@@ -98,8 +98,12 @@ class BankAccountDetails extends React.Component {
     }
 }
 
+    askforFeedback = () => {
+        this.refs.feedbackPlugin.askforFeedback()
+    }
+
     componentDidMount = () => {
-        console.log(this.props.location.data)
+       
 
        if (this.props.location.data) {
            console.log("Running 1")
@@ -140,6 +144,7 @@ class BankAccountDetails extends React.Component {
                 this.setState({ recommendation })
                /*  var sRecommendation = (recommendation[Object.keys(recommendation)[0]])
                 this.setState({recommendation: sRecommendation.split(',')}) */
+                this.askforFeedback()
 
             } else {
                 this.setState({ recommendation : null})
@@ -544,7 +549,7 @@ class BankAccountDetails extends React.Component {
                    
                    
                 </div>
-                <FeedbackPlugin></FeedbackPlugin>
+                <FeedbackPlugin ref="feedbackPlugin"></FeedbackPlugin>
             </>
         );
     }

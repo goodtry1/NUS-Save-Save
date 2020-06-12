@@ -48,9 +48,9 @@ class FeedbackPlugin extends Component {
     }
 
     componentDidMount = () => {
-        setTimeout(() => {
+        /* setTimeout(() => {
             this.setState({ classes: "dropdown show" });
-      }, 10000);
+      }, 10000); */
     }
 
     handleClick() {
@@ -61,6 +61,10 @@ class FeedbackPlugin extends Component {
         }
 
        
+    }
+
+    askforFeedback() {
+        this.setState({ classes: "dropdown show" });
     }
 
     
