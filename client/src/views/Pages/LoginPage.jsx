@@ -141,19 +141,13 @@ class LoginPage extends React.Component {
     if (emailRex.test(email) && this.state.password.length > 0) {
 
     } else if (emailRex.test(email) && this.state.password.length <= 0) {
-      this.setState({ message: 'Please enter your password' }, () => {
-        this.notify('tc', 4)
-      })
+      this.setState({ message: 'Please enter your password' })
       throw new Error()
     } else if (!emailRex.test(email) && this.state.password.length > 0) {
-      this.setState({ message: 'Please enter a correct email format' }, () => {
-        this.notify('tc', 4)
-      })
+      this.setState({ message: 'Please enter a correct email format' })
       throw new Error()
     } else if (!emailRex.test(email) && this.state.password.length <= 0) {
-      this.setState({ message: 'Please enter a correct email format and password' }, () => {
-        this.notify('tc', 4)
-      })
+      this.setState({ message: 'Please enter a correct email format and password' })
       throw new Error()
 
     }
@@ -167,11 +161,9 @@ class LoginPage extends React.Component {
       this.loginViaServer()
 
     } catch (err) {
-      /* setTimeout(() => {
+      setTimeout(() => {
         this.notify('tc', 4)
-      }, 200); */
-
-      //this.notify('tc', 4)
+      }, 200);
     }
 
 
@@ -218,9 +210,16 @@ class LoginPage extends React.Component {
         console.log(this.state.message)
         this.notify("tc", 3)
       }).then((data) => {
-
-
-        var user = new User(data.userDetails.userId, data.userDetails.email, data.userDetails.firstName, data.userDetails.lastName, data.userDetails.joiningDate)
+  
+        var d = new Date(data.userDetails.joiningDate)
+        console.log(d.toString());
+        var c = new Intl.DateTimeFormat("en-GB", {
+          year: "numeric",
+          month: "long",
+          day: "2-digit"
+        }).format(d);
+        
+        var user = new User(data.userDetails.userId, data.userDetails.email, data.userDetails.firstName, data.userDetails.lastName, c)
         
         localStorage.setItem('isLoggedIn', true)
         localStorage.setItem('user', JSON.stringify(user))
