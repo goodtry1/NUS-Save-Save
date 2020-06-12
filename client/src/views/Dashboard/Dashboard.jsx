@@ -16,30 +16,31 @@
 */
 import React from "react";
 // react plugin used to create charts
-import { Line } from "react-chartjs-2";
+// import { Line } from "react-chartjs-2";
 // react plugin for creating vector maps
-import { VectorMap } from "react-jvectormap";
+// import { VectorMap } from "react-jvectormap";
 
 // reactstrap components
 import {
+  Button,
   Card,
   CardHeader,
   CardBody,
   CardFooter,
   CardTitle,
-  DropdownToggle,
-  DropdownMenu,
-  DropdownItem,
-  UncontrolledDropdown,
-  Table,
-  Progress,
+  //DropdownToggle,
+  //DropdownMenu,
+  //DropdownItem,
+  //UncontrolledDropdown,
+  //Table,
+  //Progress,
   Row,
   Col
 } from "reactstrap";
 
 // core components
 import PanelHeader from "components/PanelHeader/PanelHeader.jsx";
-
+/*
 import {
   dashboardPanelChart,
   dashboardActiveUsersChart,
@@ -50,6 +51,7 @@ import {
 import jacket from "assets/img/saint-laurent.jpg";
 import shirt from "assets/img/balmain.jpg";
 import swim from "assets/img/prada.jpg";
+*/
 
 import { table_data } from "variables/general.jsx";
 import { User } from '../../models/User';
@@ -78,7 +80,7 @@ class Dashboard extends React.Component {
     this.retrieveUserBanks.bind(this)
     this.state = {
       user: '',
-      accounts: [],
+      accounts: []
       //redirectToAddBanks: false
     }
   }
@@ -87,7 +89,10 @@ class Dashboard extends React.Component {
     var user = localStorage.getItem('user')
     this.setState({ user: JSON.parse(user) }, () => {
       console.log("username " + this.state.user)
+
+      //console.log("username date" + this.state.user.joinDate.toLocaleDateString())
     })
+
 
     setTimeout(() => {
       this.retrieveUserBanks()
@@ -114,6 +119,13 @@ class Dashboard extends React.Component {
       }
     }).catch((err) => {
       console.log(err.message)
+    })
+  }
+
+  redirectToBankAccountDetails = (e, account) => {
+    this.props.history.push({
+      pathname: '/admin/BankAccountDetails',
+      data: account // your data array of objects
     })
   }
 
@@ -228,10 +240,14 @@ class Dashboard extends React.Component {
                           <CardBody>
                             Date Created: {account.date}
                             <br />
-                          Progress:
-                          <br />
-                          Interest Rates
-                          <br />
+                          Progress:  <b> To be updated.. PLACEHOLDER </b>
+                            <br />
+                          Interest Rates  <b> To be updated.. PLACEHOLDER </b>
+                            <br />
+
+                            <Button color="primary" className="btn-round float-right" onClick={(e) => this.redirectToBankAccountDetails(e, account)}>
+                              View more
+                            </Button>
                           </CardBody>
                         </Card>
 
