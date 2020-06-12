@@ -134,9 +134,10 @@ class BankAccountDetails extends React.Component {
         }).then((response) => {
             if (response.status === 200) {
                 console.log("Retrieved response")
-                var recommendation = response.data.recommendation[0]
-                var sRecommendation = (recommendation[Object.keys(recommendation)[0]])
-                this.setState({recommendation: sRecommendation.split(',')})
+                var recommendation = response.data.recommendation
+                this.setState({ recommendation })
+               /*  var sRecommendation = (recommendation[Object.keys(recommendation)[0]])
+                this.setState({recommendation: sRecommendation.split(',')}) */
 
             } else {
                 console.log("An error occured")
@@ -370,7 +371,7 @@ class BankAccountDetails extends React.Component {
 
                     <Row sm={12}>
                         <Col sm={6} >
-                            <Card className="card-chart">
+                            <Card className="">
                                 <CardHeader>
                                     <h5 className="card-category"></h5>
                                     <CardTitle tag="h2" >Recommendations</CardTitle>
@@ -385,7 +386,27 @@ class BankAccountDetails extends React.Component {
                                     
                                        this.state.recommendation ?
                                        <div>
-                                           {this.state.recommendation.map((recommendation) => <Row>{recommendation}</Row>)}
+                                           {this.state.recommendation.map((recommendation) => 
+                                           
+                                           <Row key={recommendation.recommendationId}>
+                                           <Card className="">
+                                               <CardBody>
+                                                   <Row>
+                                                   <Col md="1">
+                                                    <Button color="success" className="btn-round btn-icon">
+                                                    <i className="now-ui-icons ui-1_check" />
+                                                    </Button> 
+                                                   </Col>
+
+                                                   <Col md="10">
+                                                   {recommendation.recommendation}
+                                                   </Col>
+                                                   </Row>
+                                              
+                                               </CardBody>
+                                           </Card>
+                                           
+                                           </Row>)}
                                        </div>  : 
                                        
                                        <div>
