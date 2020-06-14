@@ -94,7 +94,8 @@ class BankAccountDetails extends React.Component {
         bankStatement: '',
         message: '',
         feedbackDialogOpen: '',
-        recommendation: ''
+        recommendation: '',
+        sessionId: ''
     }
 }
 
@@ -142,6 +143,7 @@ class BankAccountDetails extends React.Component {
                 console.log("Retrieved response")
                 var recommendation = response.data.recommendation
                 this.setState({ recommendation })
+                this.setState({ sessionId : recommendation[0].parsedRecordId})
                /*  var sRecommendation = (recommendation[Object.keys(recommendation)[0]])
                 this.setState({recommendation: sRecommendation.split(',')}) */
                 this.askforFeedback()
@@ -549,7 +551,9 @@ class BankAccountDetails extends React.Component {
                    
                    
                 </div>
-                <FeedbackPlugin ref="feedbackPlugin"></FeedbackPlugin>
+                <FeedbackPlugin ref="feedbackPlugin" sessionId = {this.state.sessionId}>
+
+                </FeedbackPlugin>
             </>
         );
     }
