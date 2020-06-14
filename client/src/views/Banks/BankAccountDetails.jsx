@@ -59,6 +59,7 @@ import { table_data } from "variables/general.jsx";
 
 import axios from 'axios'
 
+//Notification
 import CustomNotification from '../../Notifications/CustomNotification'
 import NotificationAlert from "react-notification-alert";
 
@@ -67,6 +68,9 @@ import FeedbackPlugin from '../../components/FeedbackPlugin/FeedbackPlugin'
 
 //Animation
 import  { Spring } from 'react-spring/renderprops'
+
+//moment
+import Moment from 'react-moment';
 
 /* var mapData = {
     AU: 760,
@@ -339,7 +343,7 @@ class BankAccountDetails extends React.Component {
                                                 <div className="info">
 
                                                     <p className="">You are viewing</p>
-                                                    <h2 className="info-title">{this.state.bankAccountDetails.accountTypeName}</h2>
+                                                    <h5 className="info-title">{this.state.bankAccountDetails.accountTypeName}</h5>
                                                 </div>
                                             </div>
                                         </Col>
@@ -348,7 +352,8 @@ class BankAccountDetails extends React.Component {
                                                 <div className="info">
 
 
-                                                   <p className="">Created since: {this.state.bankAccountDetails.date}</p>
+                                                   <p className="">Created since: </p>
+                                                   <h5><Moment format="DD/MM/YYYY" parse="YYYY-MM-DD">{this.state.bankAccountDetails.date}</Moment></h5>
                                                 </div>
                                             </div>
                                         </Col>
@@ -488,10 +493,13 @@ class BankAccountDetails extends React.Component {
                                   
                                 </CardBody>
                                 <CardFooter>
-                                    <div className="stats">
+                                    {this.state.recommendation ? (
+                                        <div className="stats">
                                         <i className="now-ui-icons arrows-1_refresh-69" />
-                                        Generated on: placeholder for recommendation date
-                                    </div>
+                                        Generated on: <Moment format="DD/MM/YYYY" parse="YYYY-MM-DD">{this.state.recommendation[0].timeStamp}</Moment>
+                                        </div>
+                                    ) : (<div></div>)}
+                                    
                                 </CardFooter>
                             </Card>
                         </Col>
@@ -539,7 +547,7 @@ class BankAccountDetails extends React.Component {
                                 </CardBody>
                                 <CardFooter>
                                     <div className="stats">
-                                        <i className="now-ui-icons arrows-1_refresh-69" />
+                                        <i className="now-ui-icons emoticons_satisfied" />
                                         We do not keep a copy of your bank statements
                                     </div>
                                 </CardFooter>
