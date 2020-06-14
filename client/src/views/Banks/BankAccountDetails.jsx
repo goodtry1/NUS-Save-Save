@@ -550,9 +550,13 @@ class BankAccountDetails extends React.Component {
                    
                    
                 </div>
-                <FeedbackPlugin ref="feedbackPlugin" sessionId = {this.state.sessionId}>
 
-                </FeedbackPlugin>
+                {this.state.recommendation != null && this.state.recommendation? (
+                    <FeedbackPlugin ref="feedbackPlugin" sessionId = {this.state.sessionId}>
+
+                    </FeedbackPlugin>
+                ) : (<div></div>)}
+                
             </>
         );
     }
