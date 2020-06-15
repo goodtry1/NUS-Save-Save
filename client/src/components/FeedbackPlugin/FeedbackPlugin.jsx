@@ -31,15 +31,28 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import ReactStars from 'react-stars'
 
+//Axios
+import axios from 'axios'
+
+//Sweet alert
+import SweetAlert from "react-bootstrap-sweetalert";
+
 class FeedbackPlugin extends Component {
     constructor(props) {
         super(props);
         this.state = {
             classes: "dropdown",
             feedbackDialogOpen: '',
-            rating: ''
+            rating: '',
+            feedbackString: '',
+            alert: null,
+            show: false
         };
-        this.handleClick = this.handleClick.bind(this);
+        this.hideAlert = this.hideAlert.bind(this);
+       
+       
+        
+        
         
     }
 
@@ -47,13 +60,20 @@ class FeedbackPlugin extends Component {
         this.setState({ rating: nextValue });
     }
 
-    componentDidMount = () => {
-        setTimeout(() => {
-            this.setState({ classes: "dropdown show" });
-      }, 10000);
+    onFeedbackStringChange = (event) => {
+
+        this.setState({
+            [event.target.name]: event.target.value,
+          });
     }
 
-    handleClick() {
+    componentDidMount = () => {
+        /* setTimeout(() => {
+            this.setState({ classes: "dropdown show" });
+      }, 10000); */
+    }
+
+    handleClick = () => {
         if (this.state.classes === "dropdown") {
             this.setState({ classes: "dropdown show" });
         } else {
@@ -61,6 +81,10 @@ class FeedbackPlugin extends Component {
         }
 
        
+    }
+
+    askforFeedback() {
+        this.setState({ classes: "dropdown show" });
     }
 
     
@@ -74,10 +98,91 @@ class FeedbackPlugin extends Component {
         this.setState({ feedbackDialogOpen: false })
     }
 
+   
+
+    submitFeedback = () => {
+        var rating = this.state.rating
+        var feedbackString = this.state.feedbackString
+
+        this.setState({
+            rating: '',
+            feedbackString: ''
+        })
+
+        console.log(rating + " " + feedbackString)
+        
+        axios({
+            method: 'post',
+            url: '/addFeedback',
+            data: {
+                sessionId: this.props.sessionId,
+                feedbackRating: rating,
+                feedbackComment: feedbackString
+            }
+        }).then((response) => {
+            console.log(response)
+            if (response.status === 200) {
+                this.handleClose()
+                this.successAlert()
+                
+            } else {
+                
+            }
+        }).catch((err) => {
+            console.log(err.message)
+        }).finally( () => {
+            this.setState({ classes: "dropdown" })
+        })
+    }
+
+    successAlert = () => {
+        this.setState({
+          alert: (
+            <SweetAlert
+              success
+              style={{ display: "block", marginTop: "-100px" }}
+              title="Feedback Submitted!"
+              onConfirm={() => this.hideAlert()}
+              onCancel={() => this.hideAlert()}
+              confirmBtnBsStyle="info"
+            >
+              Thank you for your feedback
+            </SweetAlert>
+          )
+        });
+      }
+
+      failureAlert() {
+        this.setState({
+          alert: (
+            <SweetAlert
+              danger
+              style={{ display: "block", marginTop: "-100px" }}
+              title="An error has occured"
+              onConfirm={() => this.hideAlert()}
+              onCancel={() => this.hideAlert()}
+              confirmBtnBsStyle="info"
+            >
+              Please try again later
+            </SweetAlert>
+          )
+        });
+      }
+
+      hideAlert() {
+        this.setState({
+          alert: null
+        });
+      }
+
+    
+
     
     render() {
         return (
+            
             <div className="fixed-plugin">
+                {this.state.alert}
                 <div className={this.state.classes}>
                     <div onClick={this.handleClick}>
                         <i className="fa fa-cog fa-2x" />
@@ -101,9 +206,12 @@ class FeedbackPlugin extends Component {
                         </li>
                         <li className="adjustments-line"></li>
                         <li className="adjustments-line">
+                             
                             <center> <Button variant="outlined" color="primary" onClick={this.handleClickOpen}>
                                 Leave your feedback
                             </Button></center>
+
+                            
 
                             <Dialog open={this.state.feedbackDialogOpen} onClose={this.handleClose} aria-labelledby="form-dialog-title" fullWidth>
                                 <DialogTitle id="form-dialog-title">Leave your feedback</DialogTitle>
@@ -130,17 +238,19 @@ class FeedbackPlugin extends Component {
                                     <TextField
                                         autoFocus
                                         margin="dense"
-                                        id="name"
+                                        id="feedbackString"
+                                        name="feedbackString"
                                         label="Additional comments"
                                         type="text"
                                         fullWidth
+                                        onChange={this.onFeedbackStringChange}
                                     />
                                 </DialogContent>
                                 <DialogActions>
                                     <Button onClick={this.handleClose} color="primary">
                                         Cancel
                         </Button>
-                                    <Button onClick={this.handleClose} color="primary">
+                                    <Button onClick={this.submitFeedback} color="primary">
                                         Submit
                         </Button>
                                 </DialogActions>
