@@ -78,7 +78,13 @@ class Sidebar extends React.Component {
     this.props.history.push({
       pathname: '/auth/login-page'
     })
-    
+
+  }
+
+  viewMyProfile = (e) => {
+    this.props.history.push({
+      pathname: '/admin/myProfile'
+    })
   }
 
 
@@ -118,7 +124,7 @@ class Sidebar extends React.Component {
       if (prop.invisible) {
         return null
       }
-      
+
       else if (prop.collapse) {
         var st = {};
         st[prop["state"]] = !this.state[prop.state];
@@ -240,17 +246,17 @@ class Sidebar extends React.Component {
                 <Collapse isOpen={this.state.openAvatar}>
                   <ul className="nav">
                     <li>
-                      <a href="#pablo" onClick={e => e.preventDefault}>
+                      <a onClick={e => this.viewMyProfile(e)}>
                         <span className="sidebar-mini-icon">MP</span>
                         <span className="sidebar-normal">My Profile</span>
                       </a>
                     </li>
-                    <li>
+                    {/* <li>
                       <a href="#pablo" onClick={e => e.preventDefault}>
                         <span className="sidebar-mini-icon">EP</span>
                         <span className="sidebar-normal">Edit Profile</span>
                       </a>
-                    </li>
+                    </li> */}
                     <li>
                       <a href="#pablo" onClick={e => e.preventDefault}>
                         <span className="sidebar-mini-icon">S</span>
@@ -258,7 +264,7 @@ class Sidebar extends React.Component {
                       </a>
                     </li>
                     <li>
-                      <a href="" onClick={e => this.userLogout(e)}>
+                      <a  onClick={e => this.userLogout(e)}>
                         <span className="sidebar-mini-icon">LO</span>
                         <span className="sidebar-normal">Logout</span>
                       </a>
