@@ -141,7 +141,7 @@ class FeedbackPlugin extends Component {
             <SweetAlert
               success
               style={{ display: "block", marginTop: "-100px" }}
-              title="Feedback Submitted!"
+              title="Feedback Submitted"
               onConfirm={() => this.hideAlert()}
               onCancel={() => this.hideAlert()}
               confirmBtnBsStyle="info"
