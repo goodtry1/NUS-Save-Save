@@ -43,7 +43,20 @@ import bgImage from "assets/img/bg16.jpg";
 import NotificationAlert from "react-notification-alert";
 
 //FaceBook
-import FacebookLogin from 'react-facebook-login'
+//import FacebookLogin from 'react-facebook-login'
+
+//Dialog
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
+
+//Registration Wizard
+import RegistrationWizard from '../Pages/Registration Stepper/RegistrationWizard'
+
+//Slide up transition
+import Slide from '@material-ui/core/Slide';
 
 class RegisterPage extends React.Component {
   constructor(props) {
@@ -57,8 +70,11 @@ class RegisterPage extends React.Component {
       firstNameState: '',
       lastNameState: '',
       lastName: '',
+      number: '',
+      numberState: '',
       message: '',
       notificationColor: '',
+      openDialog: false
     };
   }
   componentDidMount() {
@@ -168,6 +184,21 @@ class RegisterPage extends React.Component {
     }
   }
 
+  numberChange(e) {
+    this.setState({
+      number: e.target.value
+    });
+    if (e.target.value.length > 0) {
+      this.setState({
+        numberState: " has-success"
+      });
+    } else {
+      this.setState({
+        numberState: " has-danger"
+      });
+    }
+  }
+
   isValidated() {
     if (this.state.firstNameState !== " has-success") {
       this.setState({
@@ -193,12 +224,19 @@ class RegisterPage extends React.Component {
       });
     }
 
+    if (this.state.numberState !== " has-success") {
+      this.setState({
+        numberState: " has-danger"
+      });
+    }
+
 
     if (
       this.state.firstNameState !== " has-success" ||
       this.state.lastNameState !== " has-success" ||
       this.state.emailState !== " has-success" ||
-      this.state.passwordState !== " has-success"
+      this.state.passwordState !== " has-success" ||
+      this.state.numberState !== " has-success"
     ) {
       this.setState({
         /* firstNameState: " has-danger",
@@ -222,7 +260,8 @@ class RegisterPage extends React.Component {
 
   handleSubmit = (event) => {
     if (this.isValidated()) {
-      this.registerViaServer()
+      //this.registerViaServer()
+      this.openDialog()
     }
 
     event.preventDefault();
@@ -279,16 +318,23 @@ class RegisterPage extends React.Component {
       })
   }
 
-  componentClicked = () => {
+  /* componentClicked = () => {
     console.log("Facebook login clicked")
   }
 
   responseFacebook = (response) => {
     console.log(response)
+  } */
+
+
+  //Dialog
+  openDialog = () => {
+    this.setState({ openDialog: true })
   }
 
-
-
+  closeDialog = () => {
+    this.setState({ openDialog: false })
+  }
 
 
 
@@ -459,6 +505,29 @@ class RegisterPage extends React.Component {
                           />
                         </InputGroup>
 
+                        <InputGroup
+                          className={
+                            "form-control-lg" +
+                            (this.state.numberState ? this.state.numberState : "") +
+                            (this.state.numberFocus ? " input-group-focus" : "")
+                          }
+                        >
+                          <InputGroupAddon addonType="prepend">
+                            <InputGroupText>
+                              <i className="now-ui-icons tech_mobile" />
+                            </InputGroupText>
+                          </InputGroupAddon>
+                          <Input
+                            defaultValue={this.state.number}
+                            type="text"
+                            placeholder="Phone number (required)"
+                            name="number"
+                            onFocus={e => this.setState({ numberFocus: true })}
+                            onBlur={e => this.setState({ numberFocus: false })}
+                            onChange={e => this.numberChange(e)}
+                          />
+                        </InputGroup>
+
 
                         {/* <FormGroup check>
                           <Label check>
@@ -471,13 +540,13 @@ class RegisterPage extends React.Component {
                           </Label>
                         </FormGroup> */}
 
-                      {/*   <div className="fb-login-button" data-size="medium" data-button-type="continue_with" data-layout="rounded" data-auto-logout-link="true" data-use-continue-as="false" data-width="" >
+                        {/*   <div className="fb-login-button" data-size="medium" data-button-type="continue_with" data-layout="rounded" data-auto-logout-link="true" data-use-continue-as="false" data-width="" >
 
                         </div> */}
 
 
 
-                      {/*   <FacebookLogin
+                        {/*   <FacebookLogin
                           appId="1210844962589186"
                           autoLoad={false}
                           fields="name,email,picture"
@@ -514,9 +583,31 @@ class RegisterPage extends React.Component {
           className="full-page-background"
           style={{ backgroundImage: "url(" + bgImage + ")" }}
         />
+
+        
+
+        <Dialog fullScreen  open={this.state.openDialog} onClose={this.closeDialog} aria-labelledby="form-dialog-title" scroll={'body'} TransitionComponent={Transition}>
+          <DialogContent >
+            <RegistrationWizard ></RegistrationWizard>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={this.closeDialog} color="primary">
+              Cancel
+          </Button>
+            {/* <Button onClick={this.closeDialog} color="primary">
+              Subscribe
+          </Button> */}
+          </DialogActions>
+        </Dialog>
       </>
     );
   }
 }
 
+const Transition = React.forwardRef(function Transition(props, ref) {
+  return <Slide direction="up" ref={ref} {...props} />;
+});
+
 export default RegisterPage;
+
+
