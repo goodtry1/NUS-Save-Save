@@ -19,20 +19,25 @@ import PanelHeader from "components/PanelHeader/PanelHeader.jsx";
 //Axios
 import axios from 'axios';
 
+import { User } from '../../models/User'
+
 export class MyProfile extends Component {
     constructor(props) {
         super(props);
         //this.retrieveUserBanks.bind(this)
         this.state = {
             user: '',
-            updatedUser: ''
+            updatedContactNo: '',
+            updatedEmail: '',
+            updatedFirstName:'',
+            updatedLastName:''
         }
     }
 
     componentDidMount = () => {
         var user = localStorage.getItem('user')
         this.setState({ user: JSON.parse(user) })
-
+        this.setState({ updatedUser : JSON.parse(user)})
         //setTimeout(() => {
         //    this.retrieveUserBanks()
         //}, 200);
@@ -40,9 +45,20 @@ export class MyProfile extends Component {
 
     }
 
-    handleFirstName = (e) => {
+    handleUpdate = (e) => {
         console.log("updatedFirstName called :D ");
-        console.log(e.target.value);
+        console.log("key =>" + e.target.name + " value =>" + e.target.value);
+
+        this.setState({[e.target.name] : e.target.value})
+        //TODO: Include a dropdown/Checkbox to indicate preference of 2FA!
+    }
+
+    handleUpdateButton = (e) => {
+        var updatedUser = new User(this.state.user.userId, this.state.updatedEmail, this.state.updatedFirstName,
+            this.state.updatedLastName, this.state.user.joinDate, this.state.updatedContactNo);
+        
+        console.log(JSON.stringify(updatedUser));
+        //TODO: handle update API
     }
 
     render() {
@@ -76,9 +92,10 @@ export class MyProfile extends Component {
                                                     <label>Contact Number</label>
                                                     <Input
                                                         defaultValue={this.state.user.contactNo}
-                                                        name="contactNo"
+                                                        name="updatedContactNo"
                                                         placeholder="Contact Number"
                                                         type="text"
+                                                        onChange={this.handleUpdate}
                                                     />
                                                 </FormGroup>
                                             </Col>
@@ -89,8 +106,10 @@ export class MyProfile extends Component {
                         </label>
                                                     <Input
                                                         placeholder="Email"
+                                                        name="updatedEmail"
                                                         type="email"
                                                         defaultValue={this.state.user.email}
+                                                        onChange={this.handleUpdate}
                                                     />
                                                 </FormGroup>
                                             </Col>
@@ -102,8 +121,9 @@ export class MyProfile extends Component {
                                                     <Input
                                                         defaultValue={this.state.user.firstName}
                                                         placeholder="First Name"
+                                                        name="updatedFirstName"
                                                         type="text"
-                                                        onChange={this.handleFirstName}
+                                                        onChange={this.handleUpdate}
                                                     />
                                                 </FormGroup>
                                             </Col>
@@ -112,8 +132,10 @@ export class MyProfile extends Component {
                                                     <label>Last Name</label>
                                                     <Input
                                                         defaultValue={this.state.user.lastName}
+                                                        name="updatedLastName"
                                                         placeholder="Last Name"
                                                         type="text"
+                                                        onChange={this.handleUpdate}
                                                     />
                                                 </FormGroup>
                                             </Col>
@@ -177,7 +199,7 @@ export class MyProfile extends Component {
                                         </Row>
                                         */}
 
-                                        <Button color="primary" className="btn-round float-right" onClick={(e) => this.updateProfile(e)} >
+                                        <Button color="primary" className="btn-round float-right" onClick={(e) => this.handleUpdateButton(e)} >
                                             Update my Profile
                             </Button>
                                     </Form>
