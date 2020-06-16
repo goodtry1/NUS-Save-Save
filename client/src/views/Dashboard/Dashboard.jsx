@@ -90,7 +90,7 @@ class Dashboard extends React.Component {
     //console.log("this is user " + user)
     //console.log("this is ussser from session " + localStorage.getItem('user'))
     this.setState({ user: JSON.parse(user) }, () => {
-      console.log("username " + this.state.user)
+      console.log("username " + JSON.stringify(this.state.user))
 
       //console.log("username date" + this.state.user.joinDate.toLocaleDateString())
     })

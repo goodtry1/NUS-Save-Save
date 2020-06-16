@@ -25,8 +25,7 @@ export class MyProfile extends Component {
         //this.retrieveUserBanks.bind(this)
         this.state = {
             user: '',
-            accounts: '',
-            redirectToAddBanks: false
+            updatedUser: ''
         }
     }
 
@@ -39,6 +38,11 @@ export class MyProfile extends Component {
         //}, 200);
 
 
+    }
+
+    handleFirstName = (e) => {
+        console.log("updatedFirstName called :D ");
+        console.log(e.target.value);
     }
 
     render() {
@@ -58,9 +62,9 @@ export class MyProfile extends Component {
                                         <Row>
                                             <Col className="pr-1" md="5">
                                                 <FormGroup>
-                                                    <label>Company (disabled)</label>
+                                                    <label>Joined Date (disabled)</label>
                                                     <Input
-                                                        defaultValue="Creative Code Inc."
+                                                        defaultValue={this.state.user.joinDate}
                                                         disabled
                                                         placeholder="Company"
                                                         type="text"
@@ -69,10 +73,11 @@ export class MyProfile extends Component {
                                             </Col>
                                             <Col className="px-1" md="3">
                                                 <FormGroup>
-                                                    <label>Username</label>
+                                                    <label>Contact Number</label>
                                                     <Input
-                                                        defaultValue="michael23"
-                                                        placeholder="Username"
+                                                        defaultValue={this.state.user.contactNo}
+                                                        name="contactNo"
+                                                        placeholder="Contact Number"
                                                         type="text"
                                                     />
                                                 </FormGroup>
@@ -82,7 +87,11 @@ export class MyProfile extends Component {
                                                     <label htmlFor="exampleInputEmail1">
                                                         Email address
                         </label>
-                                                    <Input placeholder="Email" type="email" />
+                                                    <Input
+                                                        placeholder="Email"
+                                                        type="email"
+                                                        defaultValue={this.state.user.email}
+                                                    />
                                                 </FormGroup>
                                             </Col>
                                         </Row>
@@ -91,9 +100,10 @@ export class MyProfile extends Component {
                                                 <FormGroup>
                                                     <label>First Name</label>
                                                     <Input
-                                                        defaultValue="Mike"
-                                                        placeholder="Company"
+                                                        defaultValue={this.state.user.firstName}
+                                                        placeholder="First Name"
                                                         type="text"
+                                                        onChange={this.handleFirstName}
                                                     />
                                                 </FormGroup>
                                             </Col>
@@ -101,13 +111,15 @@ export class MyProfile extends Component {
                                                 <FormGroup>
                                                     <label>Last Name</label>
                                                     <Input
-                                                        defaultValue="Andrew"
+                                                        defaultValue={this.state.user.lastName}
                                                         placeholder="Last Name"
                                                         type="text"
                                                     />
                                                 </FormGroup>
                                             </Col>
                                         </Row>
+
+                                        {/* 
                                         <Row>
                                             <Col md="12">
                                                 <FormGroup>
@@ -163,6 +175,11 @@ export class MyProfile extends Component {
                                                 </FormGroup>
                                             </Col>
                                         </Row>
+                                        */}
+
+                                        <Button color="primary" className="btn-round float-right" onClick={(e) => this.updateProfile(e)} >
+                                            Update my Profile
+                            </Button>
                                     </Form>
                                 </CardBody>
                             </Card>
@@ -180,14 +197,14 @@ export class MyProfile extends Component {
                                                 className="avatar border-gray"
                                                 src={require("assets/img/mike.jpg")}
                                             />
-                                            <h5 className="title">Mike Andrew</h5>
+                                            <h5 className="title">{this.state.user.firstName + " " + this.state.user.lastName}</h5>
                                         </a>
-                                        <p className="description">michael24</p>
+                                        <p className="description">{this.state.user.email}</p>
                                     </div>
                                     <p className="description text-center">
-                                        {'"'}Lamborghini Mercy <br />
-                  Your chick she so thirsty <br />
-                  I'm in that two seat Lambo{'"'}
+                                        {this.state.user.contactNo} <br />
+                                        {this.state.user.joinDate}
+
                                     </p>
                                 </CardBody>
                                 <hr />

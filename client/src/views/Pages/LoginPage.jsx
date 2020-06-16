@@ -219,7 +219,8 @@ class LoginPage extends React.Component {
           day: "2-digit"
         }).format(d);
         
-        var user = new User(data.userDetails.userId, data.userDetails.email, data.userDetails.firstName, data.userDetails.lastName, c)
+        //console.log("pasrsed from BE" + JSON.stringify(data.userDetails));
+        var user = new User(data.userDetails.userId, data.userDetails.email, data.userDetails.firstName, data.userDetails.lastName, c, data.userDetails.contactNumber, data.userDetails.twoFactorAuth)
         
         localStorage.setItem('isLoggedIn', true)
         localStorage.setItem('user', JSON.stringify(user))

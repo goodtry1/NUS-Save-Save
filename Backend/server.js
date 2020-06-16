@@ -51,8 +51,8 @@ app.post('/signUp', async (req, res) => {
 		
 		var joiningDate = DATE_FORMATER( new Date(), "yyyy-mm-dd HH:MM:ss" );
 
-		let qu = `INSERT INTO dbo.[User](email, password, firstName, lastName, joiningDate) 
-				   VALUES ('` + req.body.email+ `', '`+ req.body.password + `', '`+ req.body.firstName + `', '`+ req.body.lastName + `' , '`+ joiningDate + `')`;
+		let qu = `INSERT INTO dbo.[User](email, password, firstName, lastName, joiningDate, contactNumber) 
+				   VALUES ('` + req.body.email+ `', '`+ req.body.password + `', '`+ req.body.firstName + `', '`+ req.body.lastName + `' , '`+ joiningDate + `' , '`+ req.body.contactNumber + `')`;
 
 		request.query(qu, function(error, recordset) {
 			if(error)
@@ -184,6 +184,59 @@ app.post('/addBankAccount', (req, res) =>  {
 })
 
 
+//Edit profile for a particular user.
+app.post('/editProfile', (req, res) =>  {
+
+    sql.connect(sqlConfig, function() {
+        var request = new sql.Request();
+
+		let qu = `UPDATE dbo.[User] 
+				SET email = '` +req.body.email+ `', firstName = '` +req.body.firstName+ `', lastName = '` +req.body.lastName+ `', contactNumber = '` +req.body.contactNumber+ `',twoFactorAuth = ` +req.body.twoFactorAuth+ `
+				WHERE userId = '` + req.body.userId + `'`;
+				  
+		request.query(qu, function(err, recordset) {
+		if(err){
+			res.status(400).send()
+		}
+		else 
+		{
+			res.status(200).send()
+		}
+		});
+    });
+})
+
+//change password for a particular user.
+app.post('/changePassword', async (req, res) =>  {
+	pass = await retrievePassword(req.body.userId)
+	const comparision = (pass == req.body.oldPassword)
+	if(comparision)
+	{
+		console.log("passwords matches")
+		sql.connect(sqlConfig, function() {
+			var request = new sql.Request();
+			let qu = `UPDATE dbo.[User] 
+			  SET password = '` + req.body.newPassword+ `'
+			  WHERE userId = '` + req.body.userId + `'`;
+			  
+			request.query(qu, function(err, recordset) {
+			if(err){
+				res.status(400).send()
+			}
+			else 
+			{
+				res.status(200).send()
+			}
+			});
+		});
+	}
+	else
+	{
+	  console.log("old password does not match")
+	  res.status(206).send()
+	}
+})
+
 
 //get account type based on bank id
 app.post('/fetchAccountType', (req, res) =>  {
@@ -243,6 +296,41 @@ function retrieveUserId(email)
 			  resolve(results.recordset[0].userId);
 		  }
 		  else 
+		  {
+			  console.log("user not present")
+			  resolve(0);
+		  }
+		}
+	  
+	});
+	});
+	});
+}
+
+
+function retrievePassword(userId)
+{
+	return new promise(function(resolve, reject) {
+	console.log("enter retrieve password function");
+	sql.connect(sqlConfig, function() {
+	var request = new sql.Request();
+	let qu = `SELECT password FROM dbo.[User]
+          WHERE userId= '` + userId + `'`;
+		  
+    request.query(qu, function (error, results, fields) {
+		if (error)
+		{
+		   console.log("error occured");
+		   resolve(0);
+		}
+		else
+		{
+		  if(results.recordset && results.recordset.length >0)
+		  {
+			  console.log("success");
+			  resolve(results.recordset[0].password);
+		  }
+		  else
 		  {
 			  console.log("user not present")
 			  resolve(0);
