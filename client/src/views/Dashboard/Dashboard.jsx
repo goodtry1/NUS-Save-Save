@@ -87,6 +87,8 @@ class Dashboard extends React.Component {
 
   componentDidMount = () => {
     var user = localStorage.getItem('user')
+    //console.log("this is user " + user)
+    //console.log("this is ussser from session " + localStorage.getItem('user'))
     this.setState({ user: JSON.parse(user) }, () => {
       console.log("username " + this.state.user)
 

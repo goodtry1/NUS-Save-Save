@@ -46,6 +46,7 @@ import LockScreenPage from "views/Pages/LockScreenPage.jsx";
 import Banks from './views/Banks/Banks'
 import AddBanks from './views/Banks/AddBanks'
 import BankAccountDetails from './views/Banks/BankAccountDetails'
+import MyProfile from './views/UserProfile/MyProfile'
 
 let routes = [
   {
@@ -89,6 +90,23 @@ let routes = [
       }
     ]
 
+  },
+  {
+    collapse: true,
+    path: "/profile",
+    name: "Profile",
+    state: "openProfile",
+    icon: "now-ui-icons business_bank",
+    invisible: false,
+    views: [
+      {
+        path: "/myProfile",
+        name: "My Profile",
+        mini: "MP",
+        component: MyProfile,
+        layout: "/admin"
+      }
+    ]
   },
   {
     collapse: true,
