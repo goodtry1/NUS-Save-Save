@@ -39,13 +39,22 @@ class Step1 extends React.Component {
       message: ''
     };
 
+    this.componentDidMount = () => {
+      console.log(this.props.otp)
+    }
+
   }
 
   codeChange = (e) => {
     this.setState({ code: e.target.value })
+
+    if (this.state.code === this.props.otp) {
+      this.setState({ codeCorrect : true})
+    }
   }
 
   isValidated() {
+  
     if (!this.state.code || !this.state.codeCorrect) {
       this.setState({ message: "Invalid code" })
       this.setState({ codeState : " has-danger"})
@@ -57,6 +66,8 @@ class Step1 extends React.Component {
   }
 
   render() {
+
+    
     return (
       <>
         <h5 className="info-text">

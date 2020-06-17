@@ -58,6 +58,9 @@ import RegistrationWizard from '../Pages/Registration Stepper/RegistrationWizard
 //Slide up transition
 import Slide from '@material-ui/core/Slide';
 
+//Axios
+import axios from 'axios'
+
 class RegisterPage extends React.Component {
   constructor(props) {
     super(props);
@@ -74,7 +77,8 @@ class RegisterPage extends React.Component {
       numberState: '',
       message: '',
       notificationColor: '',
-      openDialog: false
+      openDialog: false,
+      code: ''
     };
   }
   componentDidMount() {
@@ -261,7 +265,35 @@ class RegisterPage extends React.Component {
   handleSubmit = (event) => {
     if (this.isValidated()) {
       //this.registerViaServer()
-      this.openDialog()
+
+      axios({
+        method: 'post',
+        url: '/twoFactorAuthenticate',
+        data: {
+          "email": this.state.email,
+          "action": "signUp"
+        }
+      }).then((response) => {
+        if (response.status === 200) {
+          console.log("Retrieved response")
+          console.log(response.data)
+
+         // localStorage.setItem('code', response.data.otp)
+
+          this.setState({ code : response.data.otp}, () => { this.openDialog() })
+
+        } else if (response.status === 206) {
+          this.setState({message : 'An account has already been registered with this email'}, 
+          () => { this.notify('br', 4)})
+        }
+      }).catch((err) => {
+        console.log(err.message)
+      })
+
+
+
+
+
     }
 
     event.preventDefault();
@@ -584,11 +616,11 @@ class RegisterPage extends React.Component {
           style={{ backgroundImage: "url(" + bgImage + ")" }}
         />
 
-        
 
-        <Dialog fullScreen  open={this.state.openDialog} onClose={this.closeDialog} aria-labelledby="form-dialog-title" scroll={'body'} TransitionComponent={Transition}>
+
+        <Dialog fullScreen open={this.state.openDialog} onClose={this.closeDialog} aria-labelledby="form-dialog-title" scroll={'body'} TransitionComponent={Transition}>
           <DialogContent >
-            <RegistrationWizard ></RegistrationWizard>
+            <RegistrationWizard otp={this.state.code}></RegistrationWizard>
           </DialogContent>
           <DialogActions>
             <Button onClick={this.closeDialog} color="primary">
