@@ -72,6 +72,8 @@ import  { Spring } from 'react-spring/renderprops'
 //moment
 import Moment from 'react-moment';
 
+import ProgressBar from 'react-bootstrap/ProgressBar'
+
 /* var mapData = {
     AU: 760,
     BR: 550,
@@ -99,7 +101,8 @@ class BankAccountDetails extends React.Component {
         message: '',
         feedbackDialogOpen: '',
         recommendation: '',
-        sessionId: ''
+        sessionId: '',
+        progressBar: ''
     }
 }
 
@@ -150,6 +153,24 @@ class BankAccountDetails extends React.Component {
                 if (recommendation.length > 0) {
                     this.setState({ recommendation })
                     this.setState({ sessionId : recommendation[0].parsedRecordId})
+
+                    var maxInterest = 0
+                    var currentInterest = 0
+
+                    for (var i = 0; i < recommendation.length; i++) {
+                        maxInterest += recommendation[i].interestEarned
+                        maxInterest += recommendation[i].interestToBeEarned
+                        currentInterest += recommendation[i].interestEarned
+
+                        var currentProgress = (currentInterest / maxInterest) * 100
+
+                        console.log("current progress:" + currentProgress)
+                        this.setState({ progressBar : currentProgress})
+                    }
+
+                    
+
+
                    /*  var sRecommendation = (recommendation[Object.keys(recommendation)[0]])
                     this.setState({recommendation: sRecommendation.split(',')}) */
                     this.askforFeedback()
@@ -389,7 +410,8 @@ class BankAccountDetails extends React.Component {
                                     
                                 </CardHeader>
                                 <CardBody>
-                                    <h6>Place holder for progress bar</h6>
+                                    <ProgressBar animated now={this.state.progressBar} label={this.state.progressBar} />
+                                    {/* <h6>Place holder for progress bar</h6> */}
                                 </CardBody>
                             </Card>
                         </Col>

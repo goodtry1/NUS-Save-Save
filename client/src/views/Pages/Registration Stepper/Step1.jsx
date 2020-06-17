@@ -48,7 +48,7 @@ class Step1 extends React.Component {
   codeChange = (e) => {
     this.setState({ code: e.target.value })
 
-    if (this.state.code === this.props.otp) {
+    if (e.target.value === this.props.otp) {
       this.setState({ codeCorrect : true})
     }
   }

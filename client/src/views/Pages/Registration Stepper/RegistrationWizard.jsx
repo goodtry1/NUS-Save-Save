@@ -59,11 +59,11 @@ class Wizard extends Component {
             otp: this.props.otp
           }
         },
-        {
+        /* {
           stepName: "Preferences",
           stepIcon: "now-ui-icons business_bank",
           component: Step2
-        },
+        }, */
       
       ]
     }
