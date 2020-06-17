@@ -51,17 +51,21 @@ var transporter = nodemailer.createTransport({
   }
 });
 
-// add new user
-app.post('/twoFactorAuthSignUp', async (req, res) => {
-	let newUser = req.body;
-	console.log('body' + req.body.email);
+// two factor authentication for signup
+app.post('/twoFactorAuthenticate', async (req, res) => {
+	
+	let action  = req.body.action;
 	const userId =  await retrieveUserId(req.body.email); 
 	console.log('userId' +userId)
-	
-	if(userId != 0)
+	if(action == "signUp" && userId != 0)
 	{
-		console.log('user already exist')
-		res.status(206).send()
+			console.log('user already exist')
+			res.status(206).send()
+	}
+	else if (action == "signIn" && userId == 0)
+	{	
+			console.log('user does not exist')
+			res.status(206).send()
 	}
 	else
 	{
@@ -92,6 +96,7 @@ app.post('/twoFactorAuthSignUp', async (req, res) => {
 		
 	}	
 })
+
 
 //add new user
 app.post('/signUp', async (req, res) => {
