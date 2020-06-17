@@ -10,6 +10,8 @@ const bodyParser = require('body-parser');
 var multer = require('multer');
 var promise = require('promise');
 const DATE_FORMATER = require( 'dateformat' );
+var nodemailer = require('nodemailer');
+var randomize = require('randomatic');
 
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -40,34 +42,100 @@ var server = app.listen(5001, function () {
 });
 
 
-// add new user
+//two factor authentication email configuration
+var transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: 'savesave462@gmail.com',
+    pass: 'SaveSave123$'
+  }
+});
+
+// two factor authentication for signup
+app.post('/twoFactorAuthenticate', async (req, res) => {
+	
+	let action  = req.body.action;
+	const userId =  await retrieveUserId(req.body.email); 
+	console.log('userId' +userId)
+	if(action == "signUp" && userId != 0)
+	{
+			console.log('user already exist')
+			res.status(206).send()
+	}
+	else if (action == "signIn" && userId == 0)
+	{	
+			console.log('user does not exist')
+			res.status(206).send()
+	}
+	else
+	{
+		var otp = randomize('0', 6)
+		var otpDate = DATE_FORMATER( new Date(), "yyyy-mm-dd HH:MM:ss" );
+		var mailOptions = {
+		  from: 'savesave462@gmail.com',
+		  to: req.body.email,
+		  subject: 'Save Save - One Time Password',
+		  text: `Dear User,
+		  	        
+	Your Login OTP is ${otp}.
+	This OTP is generated at ${otpDate}.
+	The OTP is confidential and for security reasons, DO NOT share the OTP with anyone.`
+		}
+	
+		transporter.sendMail(mailOptions, function(error, info){
+			if (error)
+			{
+				console.log('error')
+				res.status(400).send()
+			} 
+			else 
+			{
+				res.status(200).send({"otp" : otp})
+			}
+		});
+		
+	}	
+})
+
+
+//add new user
 app.post('/signUp', async (req, res) => {
 	let newUser = req.body;
 	console.log('body' + req.body.email);
-	const userId =  await retrieveUserId(req.body.email); //ToDo : if this value is 0, send an error message stating the user already present.
+	const userId =  await retrieveUserId(req.body.email); 
+	console.log('userId' +userId)
 	
-	sql.connect(sqlConfig, function() {
-		var request = new sql.Request();
-		
-		var joiningDate = DATE_FORMATER( new Date(), "yyyy-mm-dd HH:MM:ss" );
+	if(userId != 0)
+	{
+		console.log('user already exist')
+		res.status(206).send()
+	}
+	else
+	{		
+		sql.connect(sqlConfig, function() {
+			var request = new sql.Request();
+			
+			var joiningDate = DATE_FORMATER( new Date(), "yyyy-mm-dd HH:MM:ss" );
 
-		let qu = `INSERT INTO dbo.[User](email, password, firstName, lastName, joiningDate) 
-				   VALUES ('` + req.body.email+ `', '`+ req.body.password + `', '`+ req.body.firstName + `', '`+ req.body.lastName + `' , '`+ joiningDate + `')`;
+			let qu = `INSERT INTO dbo.[User](email, password, firstName, lastName, joiningDate, contactNumber) 
+					   VALUES ('` + req.body.email+ `', '`+ req.body.password + `', '`+ req.body.firstName + `', '`+ req.body.lastName + `' , '`+ joiningDate + `' , '`+ req.body.contactNumber + `')`;
 
-		request.query(qu, function(error, recordset) {
-			if(error)
-			{
-				console.log("error occured");
-			    res.status(400).send()
-				
-			}
-			else
-			{
-				res.status(200).send()
-			}		
+			request.query(qu, function(error, recordset) {
+				if(error)
+				{
+					console.log("error occured");
+					res.status(400).send()
+					
+				}
+				else
+				{
+					res.status(200).send()
+				}		
+			});
 		});
-	});
+	}	
 })
+
 
 // signin
 app.post('/signin', (req, res) => {
@@ -184,6 +252,59 @@ app.post('/addBankAccount', (req, res) =>  {
 })
 
 
+//Edit profile for a particular user.
+app.post('/editProfile', (req, res) =>  {
+
+    sql.connect(sqlConfig, function() {
+        var request = new sql.Request();
+
+		let qu = `UPDATE dbo.[User] 
+				SET email = '` +req.body.email+ `', firstName = '` +req.body.firstName+ `', lastName = '` +req.body.lastName+ `', contactNumber = '` +req.body.contactNumber+ `',twoFactorAuth = ` +req.body.twoFactorAuth+ `
+				WHERE userId = '` + req.body.userId + `'`;
+				  
+		request.query(qu, function(err, recordset) {
+		if(err){
+			res.status(400).send()
+		}
+		else 
+		{
+			res.status(200).send()
+		}
+		});
+    });
+})
+
+//change password for a particular user.
+app.post('/changePassword', async (req, res) =>  {
+	pass = await retrievePassword(req.body.userId)
+	const comparision = (pass == req.body.oldPassword)
+	if(comparision)
+	{
+		console.log("passwords matches")
+		sql.connect(sqlConfig, function() {
+			var request = new sql.Request();
+			let qu = `UPDATE dbo.[User] 
+			  SET password = '` + req.body.newPassword+ `'
+			  WHERE userId = '` + req.body.userId + `'`;
+			  
+			request.query(qu, function(err, recordset) {
+			if(err){
+				res.status(400).send()
+			}
+			else 
+			{
+				res.status(200).send()
+			}
+			});
+		});
+	}
+	else
+	{
+	  console.log("old password does not match")
+	  res.status(206).send()
+	}
+})
+
 
 //get account type based on bank id
 app.post('/fetchAccountType', (req, res) =>  {
@@ -243,6 +364,41 @@ function retrieveUserId(email)
 			  resolve(results.recordset[0].userId);
 		  }
 		  else 
+		  {
+			  console.log("user not present")
+			  resolve(0);
+		  }
+		}
+	  
+	});
+	});
+	});
+}
+
+
+function retrievePassword(userId)
+{
+	return new promise(function(resolve, reject) {
+	console.log("enter retrieve password function");
+	sql.connect(sqlConfig, function() {
+	var request = new sql.Request();
+	let qu = `SELECT password FROM dbo.[User]
+          WHERE userId= '` + userId + `'`;
+		  
+    request.query(qu, function (error, results, fields) {
+		if (error)
+		{
+		   console.log("error occured");
+		   resolve(0);
+		}
+		else
+		{
+		  if(results.recordset && results.recordset.length >0)
+		  {
+			  console.log("success");
+			  resolve(results.recordset[0].password);
+		  }
+		  else
 		  {
 			  console.log("user not present")
 			  resolve(0);
