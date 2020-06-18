@@ -16,8 +16,20 @@ import {
 // core components
 import PanelHeader from "components/PanelHeader/PanelHeader.jsx";
 
+import CustomNotification from '../../Notifications/CustomNotification'
+import NotificationAlert from "react-notification-alert";
+
+import Switch from "react-bootstrap-switch";
+
 //Axios
 import axios from 'axios';
+
+//Animation
+import { Spring } from 'react-spring/renderprops'
+
+
+
+import { User } from '../../models/User'
 
 export class MyProfile extends Component {
     constructor(props) {
@@ -25,152 +37,209 @@ export class MyProfile extends Component {
         //this.retrieveUserBanks.bind(this)
         this.state = {
             user: '',
-            accounts: '',
-            redirectToAddBanks: false
+            updatedUser: '',
+            hideEdit: '',
+            hideChangePw: '',
+            oldPw: '',
+            newPw: '',
+            retypeNewPw: '',
+            notifyMsg: ''
         }
     }
 
     componentDidMount = () => {
         var user = localStorage.getItem('user')
         this.setState({ user: JSON.parse(user) })
-
-        //setTimeout(() => {
-        //    this.retrieveUserBanks()
-        //}, 200);
-
+        this.setState({ updatedUser: JSON.parse(user) })
+        this.setState({ hideEdit: true })
+        this.setState({ hideChangePw: true })
 
     }
+
+    notify(place, color) {
+        this.refs.notificationAlert.notificationAlert(CustomNotification.notify(place, color, this.state.notifyMsg));
+    }
+
+    toggleEdit = (e) => {
+        var toggleEdit = this.state.hideEdit
+        this.setState({ hideEdit: !toggleEdit })
+
+        var toggleChangePw = this.state.hideChangePw
+        if (toggleChangePw === false) { //means changePw window is opened
+            this.setState({ hideChangePw: !toggleChangePw })
+        }
+
+    }
+
+    toggleChangePw = (e) => {
+        var toggleChangePw = this.state.hideChangePw
+        this.setState({ hideChangePw: !toggleChangePw })
+
+        var toggleEdit = this.state.hideEdit
+        if (toggleEdit === false) { //means editProfile window is opened
+            this.setState({ hideEdit: !toggleEdit })
+        }
+    }
+
+    toggleTwoFa = (e) => {
+        var tempUpdatedUser = this.state.updatedUser
+        console.log("updating 2fa, current is -> " + tempUpdatedUser.twoFAAuth)
+        tempUpdatedUser.twoFAAuth = !(tempUpdatedUser.twoFAAuth)
+        console.log("now !  " + tempUpdatedUser["twoFAAuth"])
+
+        this.setState({ updatedUser: tempUpdatedUser })
+    }
+
+    handleUpdate = (e) => {
+        //console.log("key =>" + e.target.name + " value =>" + e.target.value);
+
+        var tempUpdatedUser = this.state.updatedUser
+        var field = e.target.name
+        var fieldValue = e.target.value
+
+        tempUpdatedUser[field] = fieldValue
+
+        this.setState({ updatedUser: tempUpdatedUser })
+    }
+
+    handlePwUpdate = (e) => {
+        var key = e.target.name
+        var value = e.target.value
+
+        this.setState({ [e.target.name]: e.target.value })
+        console.log(key + "__" + value)
+    }
+
+    handleUpdateButton = (e) => {
+
+        console.log("update button called")
+        var updatedUser = this.state.updatedUser;
+        console.log(JSON.stringify(updatedUser));
+
+        axios({
+            method: 'post',
+            url: '/editProfile',
+            data: {
+                userId: this.state.updatedUser.userId,
+                email: this.state.updatedUser.email,
+                firstName: this.state.updatedUser.firstName,
+                lastName: this.state.updatedUser.lastName,
+                contactNumber: this.state.updatedUser.contactNo,
+                twoFactorAuth: this.state.updatedUser.twoFAAuth
+            }
+        }).then((response) => {
+            if (response.status === 200) {
+                //this.setState({ accounts: response.data.userBankAccountDetails })
+                console.log(" Update Success!")
+                //var tempUser = updatedUser;
+                var tempUser = new User(updatedUser.userId, updatedUser.email, updatedUser.firstName, updatedUser.lastName, updatedUser.joinDate, updatedUser.contactNo, updatedUser.twoFAAuth);
+
+                this.setState({
+                    user: tempUser,
+                    notifyMsg: "Edit Successful!"
+                }, () => {
+                    this.notify('br', 2)
+                    this.toggleEdit()
+                })
+                localStorage.setItem('user', JSON.stringify(tempUser))
+                
+
+
+            } else {
+                console.log("Failed to Update proper")
+                this.setState({ notifyMsg: "Failed to update properly, please check your fields" } , () => {
+                    this.notify('br', 3)
+                })
+                
+            }
+        }).catch((err) => {
+            console.log(err.message)
+            this.setState({ notifyMsg: "Unknown Error. Please contact admin!" }, () => {
+                this.notify('br', 3)
+            })
+            
+        })
+
+    }
+
+    handlePwUpdateButton = (e) => {
+        console.log("ChangePw button called")
+        if ((this.state.oldPw == '') || (this.state.newPw == '') || (this.state.retypeNewPw == '')) {
+            console.log("Error! One of the fields is empty.");
+            this.setState({ notifyMsg: "Error! One of the fields is empty. " }, () => {
+                this.notify('br', 3)
+            })
+
+        } else {
+            if (this.state.newPw != this.state.retypeNewPw) {
+                console.log("Error! New passwords do not match.")
+                this.setState({ notifyMsg: "Error! New passwords do not match. " }, () => {
+                    this.notify('br', 3)
+                })
+
+            } else {
+                console.log("Check correct.")
+                axios({
+                    method: 'post',
+                    url: '/changePassword',
+                    data: {
+                        userId: this.state.updatedUser.userId,
+                        oldPassword: this.state.oldPw,
+                        newPassword: this.state.newPw
+                    }
+                }).then((response) => {
+                    if (response.status === 200) {
+                        console.log(" Password changed Success!")
+
+                        this.setState({ oldPw: '' })
+                        this.setState({ newPw: '' })
+                        this.setState({ retypeNewPw: '' })
+
+                        this.setState({ notifyMsg: "Success! Password changed successfully." }, () => {
+                            this.notify('br', 2)
+
+                            this.toggleChangePw();
+                        })
+                        
+
+
+
+                    } else if (response.status == 206) {
+                        console.log("Password do not match. Try again!")
+                        this.setState({ notifyMsg: "Error! Your old password do not match. Please try again!" }, () => {
+                            this.notify('br', 3)
+                        })
+                        
+                    }
+                }).catch((err) => {
+                    console.log(err.message)
+                    this.setState({ notifyMsg: "Unknown Error. Please contact admin!" }, () => {
+                        this.notify('br', 3)
+                    })
+                    
+                })
+            }
+        }
+
+    }
+
+
+
 
     render() {
         return (
 
             <>
+                <NotificationAlert ref="notificationAlert" />
                 <PanelHeader size="sm" />
                 <div className="content">
                     <Row>
-                        <Col md="8">
-                            <Card>
-                                <CardHeader>
-                                    <h5 className="title">Edit Profile</h5>
-                                </CardHeader>
-                                <CardBody>
-                                    <Form>
-                                        <Row>
-                                            <Col className="pr-1" md="5">
-                                                <FormGroup>
-                                                    <label>Company (disabled)</label>
-                                                    <Input
-                                                        defaultValue="Creative Code Inc."
-                                                        disabled
-                                                        placeholder="Company"
-                                                        type="text"
-                                                    />
-                                                </FormGroup>
-                                            </Col>
-                                            <Col className="px-1" md="3">
-                                                <FormGroup>
-                                                    <label>Username</label>
-                                                    <Input
-                                                        defaultValue="michael23"
-                                                        placeholder="Username"
-                                                        type="text"
-                                                    />
-                                                </FormGroup>
-                                            </Col>
-                                            <Col className="pl-1" md="4">
-                                                <FormGroup>
-                                                    <label htmlFor="exampleInputEmail1">
-                                                        Email address
-                        </label>
-                                                    <Input placeholder="Email" type="email" />
-                                                </FormGroup>
-                                            </Col>
-                                        </Row>
-                                        <Row>
-                                            <Col className="pr-1" md="6">
-                                                <FormGroup>
-                                                    <label>First Name</label>
-                                                    <Input
-                                                        defaultValue="Mike"
-                                                        placeholder="Company"
-                                                        type="text"
-                                                    />
-                                                </FormGroup>
-                                            </Col>
-                                            <Col className="pl-1" md="6">
-                                                <FormGroup>
-                                                    <label>Last Name</label>
-                                                    <Input
-                                                        defaultValue="Andrew"
-                                                        placeholder="Last Name"
-                                                        type="text"
-                                                    />
-                                                </FormGroup>
-                                            </Col>
-                                        </Row>
-                                        <Row>
-                                            <Col md="12">
-                                                <FormGroup>
-                                                    <label>Address</label>
-                                                    <Input
-                                                        defaultValue="Bld Mihail Kogalniceanu, nr. 8 Bl 1, Sc 1, Ap 09"
-                                                        placeholder="Home Address"
-                                                        type="text"
-                                                    />
-                                                </FormGroup>
-                                            </Col>
-                                        </Row>
-                                        <Row>
-                                            <Col className="pr-1" md="4">
-                                                <FormGroup>
-                                                    <label>City</label>
-                                                    <Input
-                                                        defaultValue="Mike"
-                                                        placeholder="City"
-                                                        type="text"
-                                                    />
-                                                </FormGroup>
-                                            </Col>
-                                            <Col className="px-1" md="4">
-                                                <FormGroup>
-                                                    <label>Country</label>
-                                                    <Input
-                                                        defaultValue="Andrew"
-                                                        placeholder="Country"
-                                                        type="text"
-                                                    />
-                                                </FormGroup>
-                                            </Col>
-                                            <Col className="pl-1" md="4">
-                                                <FormGroup>
-                                                    <label>Postal Code</label>
-                                                    <Input placeholder="ZIP Code" type="number" />
-                                                </FormGroup>
-                                            </Col>
-                                        </Row>
-                                        <Row>
-                                            <Col md="12">
-                                                <FormGroup>
-                                                    <label>About Me</label>
-                                                    <Input
-                                                        cols="80"
-                                                        defaultValue="Lamborghini Mercy, Your chick she so thirsty, I'm in
-                          that two seat Lambo."
-                                                        placeholder="Here can be your description"
-                                                        rows="4"
-                                                        type="textarea"
-                                                    />
-                                                </FormGroup>
-                                            </Col>
-                                        </Row>
-                                    </Form>
-                                </CardBody>
-                            </Card>
-                        </Col>
-                        <Col md="4">
+
+                        <Col md="8" className="ml-auto mr-auto" >
                             <Card className="card-user">
                                 <div className="image">
                                     <img alt="..." src={require("assets/img/bg5.jpg")} />
+
                                 </div>
                                 <CardBody>
                                     <div className="author">
@@ -180,17 +249,19 @@ export class MyProfile extends Component {
                                                 className="avatar border-gray"
                                                 src={require("assets/img/mike.jpg")}
                                             />
-                                            <h5 className="title">Mike Andrew</h5>
+                                            <h5 className="title">{this.state.user.firstName + " " + this.state.user.lastName}</h5>
                                         </a>
-                                        <p className="description">michael24</p>
+
+                                        <p className="description">{this.state.user.email}</p>
                                     </div>
                                     <p className="description text-center">
-                                        {'"'}Lamborghini Mercy <br />
-                  Your chick she so thirsty <br />
-                  I'm in that two seat Lambo{'"'}
+                                        {this.state.user.contactNo} <br />
+                                        {this.state.user.joinDate}
+
                                     </p>
                                 </CardBody>
                                 <hr />
+
                                 <div className="button-container">
                                     <Button
                                         className="btn-icon btn-round"
@@ -219,10 +290,216 @@ export class MyProfile extends Component {
                                     >
                                         <i className="fab fa-google-plus-square" />
                                     </Button>
+                                    <br />
+                                    *Note... Further version will include a profile picture for each users*
+                                </div>
+                                <div className="button-container">
+                                    <Button color="primary" className="btn-round" onClick={(e) => this.toggleEdit(e)} >
+                                        Edit Profile
+                                    </Button>
+
+                                    <Button color="primary" className="btn-round" onClick={(e) => this.toggleChangePw(e)} >
+                                        Change Password
+                                    </Button>
                                 </div>
                             </Card>
                         </Col>
                     </Row>
+                    {this.state.hideEdit != true ? (
+                        <Row>
+                            <Spring
+                                from={{ opacity: 0, marginTop: 500 }}
+                                to={{ opacity: 1, marginTop: 0 }}
+                            >
+                                {props => (
+                                    <Col md="8" className="ml-auto mr-auto" style={props}>
+                                        <Card>
+                                            <CardHeader>
+                                                <h5 className="title">Edit Profile</h5>
+                                            </CardHeader>
+                                            <CardBody>
+                                                <Form>
+                                                    <Row>
+                                                        <Col className="pr-1" md="6">
+                                                            <FormGroup>
+                                                                <label>Joined Date (disabled)</label>
+                                                                <Input
+                                                                    defaultValue={this.state.updatedUser.joinDate}
+                                                                    disabled
+                                                                    placeholder="Company"
+                                                                    type="text"
+                                                                />
+                                                            </FormGroup>
+                                                        </Col>
+
+                                                        <Col className="pl-1" md="6">
+                                                            <FormGroup>
+                                                                <label htmlFor="exampleInputEmail1">
+                                                                    Email address
+                        </label>
+                                                                <Input
+                                                                    placeholder="Email"
+                                                                    name="email"
+                                                                    disabled
+                                                                    type="email"
+                                                                    defaultValue={this.state.updatedUser.email}
+                                                                    onChange={this.handleUpdate}
+                                                                />
+                                                            </FormGroup>
+                                                        </Col>
+                                                    </Row>
+                                                    <Row>
+                                                        <Col md="12">
+                                                            <FormGroup>
+                                                                <label>First Name</label>
+                                                                <Input
+                                                                    defaultValue={this.state.updatedUser.firstName}
+                                                                    placeholder="First Name"
+                                                                    name="firstName"
+                                                                    type="text"
+                                                                    onChange={this.handleUpdate}
+                                                                />
+                                                            </FormGroup>
+
+                                                        </Col>
+
+                                                    </Row>
+                                                    <Row>
+                                                        <Col md="12">
+                                                            <FormGroup>
+                                                                <label>Last Name</label>
+                                                                <Input
+                                                                    defaultValue={this.state.updatedUser.lastName}
+                                                                    name="lastName"
+                                                                    placeholder="Last Name"
+                                                                    type="text"
+                                                                    onChange={this.handleUpdate}
+                                                                />
+                                                            </FormGroup>
+                                                        </Col>
+                                                    </Row>
+                                                    <Row>
+                                                        <Col md="12">
+                                                            <FormGroup>
+                                                                <label>Contact Number</label>
+                                                                <Input
+                                                                    defaultValue={this.state.updatedUser.contactNo}
+                                                                    name="contactNo"
+                                                                    placeholder="Contact Number"
+                                                                    type="text"
+                                                                    onChange={this.handleUpdate}
+                                                                />
+                                                            </FormGroup>
+
+                                                        </Col>
+                                                    </Row>
+                                                    <Row>
+                                                        <Col md="12">
+                                                            <p className="category">2 Factor Authentication (2FA)</p>
+                                                            <Switch
+                                                                name="twoFAAuth"
+                                                                onColor={"green"}
+                                                                offColor={"red"}
+                                                                onText={<i className="now-ui-icons ui-1_check" />}
+                                                                offText={
+                                                                    <i className="now-ui-icons ui-1_simple-remove color" />
+                                                                }
+                                                                value={this.state.updatedUser.twoFAAuth}
+                                                                onChange={this.toggleTwoFa}
+                                                            />
+                                                        </Col>
+                                                    </Row>
+
+                                                    <Button color="primary" className="btn-round float-right" onClick={(e) => this.handleUpdateButton(e)} >
+                                                        Update my Profile
+                                        </Button>
+                                                </Form>
+                                            </CardBody>
+                                        </Card>
+                                    </Col>
+                                )}
+                            </Spring>
+                        </Row>
+                    ) : (
+                            <div />
+                        )}
+                    {this.state.hideChangePw != true ? (
+                        <Row>
+                            <Spring
+                                from={{ opacity: 0, marginTop: 500 }}
+                                to={{ opacity: 1, marginTop: 0 }}
+                            >
+                                {props => (
+                                    <Col md="8" className="ml-auto mr-auto" style={props}>
+                                        <Card>
+                                            <CardHeader>
+                                                <h5 className="title">Change Password</h5>
+                                            </CardHeader>
+                                            <CardBody>
+                                                <Form>
+                                                    <Row>
+                                                        <Col md="12">
+                                                            <FormGroup>
+                                                                <label>Old Password</label>
+                                                                <Input
+                                                                    defaultValue={""}
+                                                                    placeholder="Old Password"
+                                                                    required={true}
+                                                                    name="oldPw"
+                                                                    type="text"
+                                                                    onChange={this.handlePwUpdate}
+                                                                />
+                                                            </FormGroup>
+
+                                                        </Col>
+
+                                                    </Row>
+                                                    <Row>
+                                                        <Col md="12">
+                                                            <FormGroup>
+                                                                <label>New Password</label>
+                                                                <Input
+                                                                    defaultValue={""}
+                                                                    name="newPw"
+                                                                    required={true}
+                                                                    placeholder="New Password"
+                                                                    type="text"
+                                                                    onChange={this.handlePwUpdate}
+                                                                />
+                                                            </FormGroup>
+                                                        </Col>
+                                                    </Row>
+                                                    <Row>
+                                                        <Col md="12">
+                                                            <FormGroup>
+                                                                <label>Retype New Password</label>
+                                                                <Input
+                                                                    defaultValue={""}
+                                                                    name="retypeNewPw"
+                                                                    required={true}
+                                                                    placeholder="Retype New Password"
+                                                                    type="text"
+                                                                    onChange={this.handlePwUpdate}
+                                                                />
+                                                            </FormGroup>
+
+                                                        </Col>
+                                                    </Row>
+
+
+                                                    <Button color="primary" className="btn-round float-right" onClick={(e) => this.handlePwUpdateButton(e)} >
+                                                        Change password
+                                </Button>
+                                                </Form>
+                                            </CardBody>
+                                        </Card>
+                                    </Col>
+                                )}
+                            </Spring>
+                        </Row>
+                    ) : (
+                            <div />
+                        )}
                 </div>
             </>
 
