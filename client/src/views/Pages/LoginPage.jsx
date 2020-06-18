@@ -53,6 +53,9 @@ import CustomNotification from '../../Notifications/CustomNotification'
 //Axios
 import axios from 'axios'
 
+//Animation
+import { Spring } from 'react-spring/renderprops'
+
 class LoginPage extends React.Component {
   constructor(props) {
     super(props);
@@ -291,50 +294,59 @@ class LoginPage extends React.Component {
   renderOTP() {
     return (
       <div>
-        <Form onSubmit={this.submitOTP}>
-          <CardBody>
-            <InputGroup
-              className={
-                "no-border form-control-lg " +
-                (this.state.otpFocus ? "input-group-focus" : "")
-              }
-            >
-              <InputGroupAddon addonType="prepend">
-                <InputGroupText>
-                  <i className="now-ui-icons ui-1_email-85" />
-                </InputGroupText>
-              </InputGroupAddon>
-              <Input
-                id="otpInput"
-                name="otpInput"
-                type="text"
-                placeholder="6 digit OTP"
-                onFocus={e => this.setState({ otpFocus: true })}
-                onBlur={e => this.setState({ otpFocus: false })}
-                onChange={this.handleUserInput}
-                value={this.state.otpInput}
-              />
-            </InputGroup>
-          </CardBody>
-          <CardFooter>
-            <Button
-              type="submit"
-              block
-              color="primary"
-              size="lg"
-              className="mb-3 btn-round"
-              onSubmit={this.submitOTP}
-            >
-              Submit
+        <Spring
+          from={{ opacity: 0, marginTop: 500 }}
+          to={{ opacity: 1, marginTop: 0 }}
+        >
+          {props => (
+            <div style={props}>
+              <Form onSubmit={this.submitOTP}>
+                <CardBody>
+                  <InputGroup
+                    className={
+                      "no-border form-control-lg " +
+                      (this.state.otpFocus ? "input-group-focus" : "")
+                    }
+                  >
+                    <InputGroupAddon addonType="prepend">
+                      <InputGroupText>
+                        <i className="now-ui-icons ui-1_email-85" />
+                      </InputGroupText>
+                    </InputGroupAddon>
+                    <Input
+                      id="otpInput"
+                      name="otpInput"
+                      type="text"
+                      placeholder="6 digit OTP"
+                      onFocus={e => this.setState({ otpFocus: true })}
+                      onBlur={e => this.setState({ otpFocus: false })}
+                      onChange={this.handleUserInput}
+                      value={this.state.otpInput}
+                    />
+                  </InputGroup>
+                </CardBody>
+                <CardFooter>
+                  <Button
+                    type="submit"
+                    block
+                    color="primary"
+                    size="lg"
+                    className="mb-3 btn-round"
+                    onSubmit={this.submitOTP}
+                  >
+                    Submit
                              </Button>
-            <div className="pull-left">
+                  <div className="pull-left">
 
-            </div>
-            <div className="pull-right">
+                  </div>
+                  <div className="pull-right">
 
+                  </div>
+                </CardFooter>
+              </Form>
             </div>
-          </CardFooter>
-        </Form>
+          )}
+        </Spring>
       </div>
     )
   }
