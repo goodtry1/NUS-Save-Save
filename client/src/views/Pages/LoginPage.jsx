@@ -56,6 +56,18 @@ import axios from 'axios'
 //Animation
 import { Spring } from 'react-spring/renderprops'
 
+//Backdrop
+import { Backdrop } from '@material-ui/core';
+import CircularProgress from '@material-ui/core/CircularProgress';
+import { makeStyles } from '@material-ui/core/styles';
+
+const useStyles = makeStyles((theme) => ({
+  backdrop: {
+    zIndex: theme.zIndex.drawer + 1,
+    color: '#fff',
+  },
+}));
+
 class LoginPage extends React.Component {
   constructor(props) {
     super(props);
@@ -69,7 +81,8 @@ class LoginPage extends React.Component {
       twoFA: false,
       otp: '',
       otpInput: '',
-      user: ''
+      user: '',
+      background: false
     };
   }
 
@@ -232,7 +245,7 @@ class LoginPage extends React.Component {
             day: "2-digit"
           }).format(d);
 
-          var user = new User(user.userId, user.email, user.firstName, user.lastName, c)
+          var user = new User(user.userId, user.email, user.firstName, user.lastName, user.joiningDate, user.contactNumber, user.twoFactorAuth)
 
           localStorage.setItem('isLoggedIn', true)
           localStorage.setItem('user', JSON.stringify(user))
@@ -275,7 +288,7 @@ class LoginPage extends React.Component {
             month: "long",
             day: "2-digit"
           }).format(d);
-          var user = new User(user.userId, user.email, user.firstName, user.lastName, c)
+          var user = new User(user.userId, user.email, user.firstName, user.lastName, user.joiningDate, user.contactNumber, user.twoFactorAuth)
           localStorage.setItem('isLoggedIn', true)
           localStorage.setItem('user', JSON.stringify(user))
 
@@ -351,13 +364,29 @@ class LoginPage extends React.Component {
     )
   }
 
+  renderLoading() {
+    return (
+      <div> class="spinner-border" role="status">
+       <span class="sr-only">Loading...</span>
+      </div>
+    )
+  }
+
   render() {
 
     if (this.state.redirect) {
       return <Redirect to="/Admin" />;
     }
+
+   
     return (
       <>
+        <Backdrop className={this.useStyles} open={true}>
+        <CircularProgress color="inherit" />
+        </Backdrop>
+
+
+
         <NotificationAlert ref="notificationAlert" />
         <div className="content">
           <div className="login-page">
@@ -377,14 +406,16 @@ class LoginPage extends React.Component {
                   ) : (
                       <div>
                         <Form onSubmit={this.handleSubmit}>
-
                           <CardBody>
-                            <InputGroup
+
+                          {this.state.renderLoading ? (<div></div>) :(<div><InputGroup
                               className={
                                 "no-border form-control-lg " +
                                 (this.state.emailFocus ? "input-group-focus" : "")
                               }
                             >
+                             
+
                               <InputGroupAddon addonType="prepend">
                                 <InputGroupText>
                                   <i className="now-ui-icons ui-1_email-85" />
@@ -422,7 +453,9 @@ class LoginPage extends React.Component {
                                 onChange={this.handleUserInput}
                                 value={this.state.password}
                               />
-                            </InputGroup>
+                            </InputGroup></div>)}
+
+                            
                           </CardBody>
                           <CardFooter>
                             <Button
@@ -434,7 +467,9 @@ class LoginPage extends React.Component {
 
                             >
                               Login
-                             </Button>
+                             
+                            </Button> 
+                         
                             <div className="pull-left">
                               <h6>
                                 {/* <a href="/auth/register-page" className="link footer-link">
