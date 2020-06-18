@@ -71,6 +71,7 @@ import  { Spring } from 'react-spring/renderprops'
 
 //moment
 import Moment from 'react-moment';
+import 'moment-timezone';
 
 import ProgressBar from 'react-bootstrap/ProgressBar'
 
@@ -508,7 +509,7 @@ class BankAccountDetails extends React.Component {
                                         <div>
                                              <div className="stats">
                                         <i className="now-ui-icons arrows-1_refresh-69" />
-                                        Generated on: <Moment format="DD/MM/YYYY" parse="YYYY-MM-DD">{this.state.recommendation[0].timeStamp}</Moment>
+                                        Generated on: <Moment format="DD/MM/YYYY HH:MM" parse="YYYY-MM-DD" utc='8'>{this.state.recommendation[0].timeStamp}</Moment>
                                         </div>
 
                                         </div> : 
