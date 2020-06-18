@@ -78,6 +78,7 @@ class RegisterPage extends React.Component {
       message: '',
       notificationColor: '',
       openDialog: false,
+      dialogFinish: false,
       code: ''
     };
   }
@@ -278,13 +279,13 @@ class RegisterPage extends React.Component {
           console.log("Retrieved response")
           console.log(response.data)
 
-         // localStorage.setItem('code', response.data.otp)
+          // localStorage.setItem('code', response.data.otp)
 
-          this.setState({ code : response.data.otp}, () => { this.openDialog() })
+          this.setState({ code: response.data.otp }, () => { this.openDialog() })
 
         } else if (response.status === 206) {
-          this.setState({message : 'An account has already been registered with this email'}, 
-          () => { this.notify('br', 4)})
+          this.setState({ message: 'An account has already been registered with this email' },
+            () => { this.notify('br', 4) })
         }
       }).catch((err) => {
         console.log(err.message)
@@ -300,7 +301,7 @@ class RegisterPage extends React.Component {
   }
 
   registerViaServer = () => {
-    this.setState({ email: '', password: '', firstName: '', lastName: '' })
+
 
 
     let values = {
@@ -309,6 +310,10 @@ class RegisterPage extends React.Component {
       firstName: this.state.firstName,
       lastName: this.state.lastName
     };
+
+    console.log("Clearing values now")
+
+
 
     console.log("values:", values);
 
@@ -347,6 +352,19 @@ class RegisterPage extends React.Component {
       .catch(err => {
         console.log(err)
 
+      }).then(() => {
+        this.setState({
+          email: '',
+          emailState: '',
+          password: '',
+          passwordState: '',
+          firstName: '',
+          firstNameState: '',
+          lastName: '',
+          lastNameState: '',
+          number: '',
+          numberState: ''
+        })
       })
   }
 
@@ -368,7 +386,13 @@ class RegisterPage extends React.Component {
     this.setState({ openDialog: false })
   }
 
+  completedDialog = () => {
+    this.setState({
+      dialogFinish: true,
+      openDialog: false
+    }, () => { this.registerViaServer() })
 
+  }
 
 
 
@@ -459,6 +483,7 @@ class RegisterPage extends React.Component {
                           </InputGroupAddon>
                           <Input
                             defaultValue={this.state.email}
+                            value={this.state.email}
                             type="text"
                             placeholder="Email (required)"
                             name="email"
@@ -482,6 +507,7 @@ class RegisterPage extends React.Component {
                           </InputGroupAddon>
                           <Input
                             defaultValue={this.state.firstName}
+                            value={this.state.firstName}
                             type="text"
                             placeholder="First Name (required)"
                             name="firstName"
@@ -505,6 +531,7 @@ class RegisterPage extends React.Component {
                           </InputGroupAddon>
                           <Input
                             defaultValue={this.state.lastName}
+                            value={this.state.lastName}
                             type="text"
                             placeholder="Last Name (required)"
                             name="lastName"
@@ -528,6 +555,7 @@ class RegisterPage extends React.Component {
                           </InputGroupAddon>
                           <Input
                             defaultValue={this.state.password}
+                            value={this.state.password}
                             type="password"
                             placeholder="Password (required)"
                             name="password"
@@ -551,6 +579,7 @@ class RegisterPage extends React.Component {
                           </InputGroupAddon>
                           <Input
                             defaultValue={this.state.number}
+                            value={this.state.number}
                             type="text"
                             placeholder="Phone number (required)"
                             name="number"
@@ -620,7 +649,7 @@ class RegisterPage extends React.Component {
 
         <Dialog fullScreen open={this.state.openDialog} onClose={this.closeDialog} aria-labelledby="form-dialog-title" scroll={'body'} TransitionComponent={Transition}>
           <DialogContent >
-            <RegistrationWizard otp={this.state.code}></RegistrationWizard>
+            <RegistrationWizard completedDialog={this.completedDialog} otp={this.state.code}></RegistrationWizard>
           </DialogContent>
           <DialogActions>
             <Button onClick={this.closeDialog} color="primary">

@@ -102,7 +102,8 @@ class BankAccountDetails extends React.Component {
         feedbackDialogOpen: '',
         recommendation: '',
         sessionId: '',
-        progressBar: ''
+        currentProgress: '',
+        maxProgress: ''
     }
 }
 
@@ -162,10 +163,11 @@ class BankAccountDetails extends React.Component {
                         maxInterest += recommendation[i].interestToBeEarned
                         currentInterest += recommendation[i].interestEarned
 
-                        var currentProgress = (currentInterest / maxInterest) * 100
-
-                        console.log("current progress:" + currentProgress)
-                        this.setState({ progressBar : currentProgress})
+                       
+                        
+                        
+                        this.setState({ currentProgress :(Math.round(currentInterest * 100)/100).toFixed(2)})
+                        this.setState({ maxProgress : (Math.round(maxInterest * 100)/100).toFixed(2)})
                     }
 
                     
@@ -410,7 +412,7 @@ class BankAccountDetails extends React.Component {
                                     
                                 </CardHeader>
                                 <CardBody>
-                                    <ProgressBar animated now={this.state.progressBar} label={this.state.progressBar} />
+                                    <ProgressBar animated now={this.state.currentProgress} max={this.state.maxProgress} label={'S$' + this.state.currentProgress + " / S$" + this.state.maxProgress} />
                                     {/* <h6>Place holder for progress bar</h6> */}
                                 </CardBody>
                             </Card>

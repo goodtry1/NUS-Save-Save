@@ -93,6 +93,7 @@ class Wizard extends Component {
               finishButtonClasses="btn-wd"
               nextButtonClasses="btn-wd"
               previousButtonClasses="btn-wd"
+              finishButtonClick={this.props.completedDialog}
             />
           </Col>
         </div>

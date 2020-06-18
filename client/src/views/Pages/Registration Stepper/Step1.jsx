@@ -76,7 +76,7 @@ class Step1 extends React.Component {
         </h5>
         <Row className="justify-content-center">
 
-          <Col md="3">
+          <Col sm="4">
             <InputGroup
               className={
                 "form-control-lg" +
