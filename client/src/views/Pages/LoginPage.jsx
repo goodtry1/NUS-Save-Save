@@ -82,7 +82,8 @@ class LoginPage extends React.Component {
       otp: '',
       otpInput: '',
       user: '',
-      background: false
+      background: false,
+      renderLoading: false
     };
   }
 
@@ -178,22 +179,29 @@ class LoginPage extends React.Component {
 
   handleSubmit = (event) => {
     event.preventDefault();
-
-    try {
-      this.testLogin()
-      this.loginViaServer()
-
-    } catch (err) {
-      setTimeout(() => {
-        this.notify('tc', 4)
-      }, 200);
-    }
+    this.setState({renderLoading : true},
+      () => {
+        try {
+          this.testLogin()
+          this.loginViaServer()
+    
+        } catch (err) {
+          this.setState({renderLoading : false},
+            () => {
+              setTimeout(() => {
+                this.notify('tc', 4)
+              }, 200);
+            })
+         
+        }
+      })
+    
 
 
   }
 
   loginViaServer = () => {
-
+    
 
     axios({
       method: 'post',
@@ -255,10 +263,10 @@ class LoginPage extends React.Component {
 
 
       } else if (response.status === 206 || response.status === 204) {
-        this.setState({ message: "Invalid login credentials" }, () => { this.notify("tc", 3) })
+        this.setState({ message: "Invalid login credentials", renderLoading: false }, () => { this.notify("tc", 3) })
 
       } else if (response.status === 404 || response.status === 500) {
-        this.setState({ message: "An error has occured, check your internet settings" }, () => { this.notify("tc", 3) })
+        this.setState({ message: "An error has occured, check your internet settings", renderLoading: false }, () => { this.notify("tc", 3) })
       } else {
 
       }
@@ -366,9 +374,14 @@ class LoginPage extends React.Component {
 
   renderLoading() {
     return (
-      <div> class="spinner-border" role="status">
-       <span class="sr-only">Loading...</span>
-      </div>
+      
+     <div>
+       <center>
+       <div class="spinner-border text-light" role="status">
+  <span class="sr-only">Loading...</span>
+</div>
+      </center>
+     </div>
     )
   }
 
@@ -408,7 +421,7 @@ class LoginPage extends React.Component {
                         <Form onSubmit={this.handleSubmit}>
                           <CardBody>
 
-                          {this.state.renderLoading ? (<div></div>) :(<div><InputGroup
+                          {this.state.renderLoading ? (this.renderLoading()) :(<div><InputGroup
                               className={
                                 "no-border form-control-lg " +
                                 (this.state.emailFocus ? "input-group-focus" : "")
