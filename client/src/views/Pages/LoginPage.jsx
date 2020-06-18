@@ -65,7 +65,8 @@ class LoginPage extends React.Component {
       show: false,
       twoFA: false,
       otp: '',
-      otpInput: ''
+      otpInput: '',
+      user: ''
     };
   }
 
@@ -186,10 +187,7 @@ class LoginPage extends React.Component {
         "password": this.state.password
       }
     }).then((response) => {
-      this.setState({
-        email: '',
-        password: ''
-      })
+
 
 
       if (response.status === 200) {
@@ -198,7 +196,7 @@ class LoginPage extends React.Component {
         console.log(user.twoFactorAuth)
 
         if (user.twoFactorAuth) {
-          this.setState({ twoFA: true })
+          this.setState({ twoFA: true, user })
 
           axios({
             method: 'post',
@@ -209,11 +207,13 @@ class LoginPage extends React.Component {
             }
           }).then((response) => {
             if (response.status === 200) {
+
+
               this.setState({
                 otp: response.data.otp,
               }, () => { console.log(this.state.otp) })
 
-              console.log("twoFA set to true")
+              console.log("twoFA set to true: " + response.data.otp)
             }
           })
 
@@ -246,20 +246,44 @@ class LoginPage extends React.Component {
       } else {
 
       }
+    }).then(() => {
+      this.setState({
+        email: '',
+        password: ''
+      })
     }).catch((err) => {
       console.log(err.message)
     })
 
   }
 
-  submitOTP = () => {
+  submitOTP = (event) => {
+    event.preventDefault();
+
     if (this.state.otpInput === this.state.otp) {
-      this.setState({ message: "Login Successful! Redirecting you now" })
-      this.notify("tc", 5)
-      this.redirect()
+      this.setState({ message: "Login Successful! Redirecting you now" },
+        () => {
+
+          var user = this.state.user
+          var d = new Date(user.joiningDate)
+          console.log(d.toString());
+          var c = new Intl.DateTimeFormat("en-GB", {
+            year: "numeric",
+            month: "long",
+            day: "2-digit"
+          }).format(d);
+          var user = new User(user.userId, user.email, user.firstName, user.lastName, c)
+          localStorage.setItem('isLoggedIn', true)
+          localStorage.setItem('user', JSON.stringify(user))
+
+          this.notify("tc", 5)
+          console.log("Redirecting")
+          this.redirect()
+
+        })
+
     } else {
-      this.setState({ message: "Login Successful! Redirecting you now" })
-      this.notify("tc", 5)
+      this.setState({ message: "Invalid OTP", otpInput: '' }, () => { this.notify("tc", 4) })
     }
   }
 
@@ -267,48 +291,50 @@ class LoginPage extends React.Component {
   renderOTP() {
     return (
       <div>
-        <CardBody>
-          <InputGroup
-            className={
-              "no-border form-control-lg " +
-              (this.state.otpFocus ? "input-group-focus" : "")
-            }
-          >
-            <InputGroupAddon addonType="prepend">
-              <InputGroupText>
-                <i className="now-ui-icons ui-1_email-85" />
-              </InputGroupText>
-            </InputGroupAddon>
-            <Input
-              id="otpInput"
-              name="otpInput"
-              type="text"
-              placeholder="6 digit OTP"
-              onFocus={e => this.setState({ otpFocus: true })}
-              onBlur={e => this.setState({ otpFocus: false })}
-              onChange={this.handleUserInput}
-              value={this.state.otpInput}
-            />
-          </InputGroup>
-        </CardBody>
-        <CardFooter>
-          <Button
-            type="submit"
-            block
-            color="primary"
-            size="lg"
-            className="mb-3 btn-round"
-            onSubmit={this.submitOTP}
-          >
-            Submit
+        <Form onSubmit={this.submitOTP}>
+          <CardBody>
+            <InputGroup
+              className={
+                "no-border form-control-lg " +
+                (this.state.otpFocus ? "input-group-focus" : "")
+              }
+            >
+              <InputGroupAddon addonType="prepend">
+                <InputGroupText>
+                  <i className="now-ui-icons ui-1_email-85" />
+                </InputGroupText>
+              </InputGroupAddon>
+              <Input
+                id="otpInput"
+                name="otpInput"
+                type="text"
+                placeholder="6 digit OTP"
+                onFocus={e => this.setState({ otpFocus: true })}
+                onBlur={e => this.setState({ otpFocus: false })}
+                onChange={this.handleUserInput}
+                value={this.state.otpInput}
+              />
+            </InputGroup>
+          </CardBody>
+          <CardFooter>
+            <Button
+              type="submit"
+              block
+              color="primary"
+              size="lg"
+              className="mb-3 btn-round"
+              onSubmit={this.submitOTP}
+            >
+              Submit
                              </Button>
-          <div className="pull-left">
+            <div className="pull-left">
 
-          </div>
-          <div className="pull-right">
+            </div>
+            <div className="pull-right">
 
-          </div>
-        </CardFooter>
+            </div>
+          </CardFooter>
+        </Form>
       </div>
     )
   }
@@ -325,23 +351,21 @@ class LoginPage extends React.Component {
           <div className="login-page">
             <Container>
               <Col xs={12} md={8} lg={4} className="ml-auto mr-auto">
-                <Form onSubmit={this.handleSubmit}>
-                  <Card className="card-login card-plain">
-                    <CardHeader>
-                      <div className="logo-container">
-                        <img src={nowLogo} alt="now-logo" />
-                      </div>
-                    </CardHeader>
+                <Card className="card-login card-plain">
+                  <CardHeader>
+                    <div className="logo-container">
+                      <img src={nowLogo} alt="now-logo" />
+                    </div>
+                  </CardHeader>
+                  {this.state.twoFA ? (
 
 
+                    this.renderOTP()
 
-                    {this.state.twoFA ? (
+                  ) : (
+                      <div>
+                        <Form onSubmit={this.handleSubmit}>
 
-
-                      this.renderOTP()
-
-                    ) : (
-                        <div>
                           <CardBody>
                             <InputGroup
                               className={
@@ -414,14 +438,15 @@ class LoginPage extends React.Component {
                               </h6>
                             </div>
                           </CardFooter>
-                        </div>
+                        </Form>
+                      </div>
 
-                      )}
+                    )}
 
 
+                </Card>
 
-                  </Card>
-                </Form>
+
               </Col>
             </Container>
           </div>
@@ -438,20 +463,20 @@ class LoginPage extends React.Component {
 /* //getState from Redux
 function mapStateToProps(state) {
   return {
-    isLoggedIn: state.isLoggedIn
+            isLoggedIn: state.isLoggedIn
   }
 }
 
 //dispatch action to Redux
 function mapDispatchToProps(dispatch) {
   return {
-    doLogin: () => {
-      dispatch(
-        {
-          type: 'SIGN_IN'
-        }
-      )
-    }
+            doLogin: () => {
+            dispatch(
+              {
+                type: 'SIGN_IN'
+              }
+            )
+          }
   }
 } */
 
