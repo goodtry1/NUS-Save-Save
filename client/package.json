@@ -6,7 +6,7 @@
   "dependencies": {
     "@material-ui/core": "^4.10.1",
     "axios": "^0.19.2",
-    "bootstrap": "4.3.1",
+    "bootstrap": "^4.3.1",
     "chart.js": "2.8.0",
     "classnames": "2.2.6",
     "moment": "^2.24.0",
@@ -16,6 +16,7 @@
     "perfect-scrollbar": "1.4.0",
     "react": "16.8.6",
     "react-big-calendar": "0.21.0",
+    "react-bootstrap": "^1.0.1",
     "react-bootstrap-sweetalert": "4.4.1",
     "react-bootstrap-switch": "15.5.3",
     "react-bootstrap-wizard": "0.0.7",

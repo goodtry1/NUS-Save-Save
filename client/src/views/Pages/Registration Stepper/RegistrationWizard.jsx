@@ -27,37 +27,73 @@ import PanelHeader from "components/PanelHeader/PanelHeader.jsx";
 import Step1 from "../../Pages/Registration Stepper/Step1";
 import Step2 from "../../Pages/Registration Stepper/Step2";
 
-var steps = [
+/* var steps = [
   {
     stepName: "Verification",
     stepIcon: "now-ui-icons ui-1_email-85",
-    component: Step1
+    component: Step1,
+    stepProps: {
+      otp: 1111
+    }
   },
   {
     stepName: "Preferences",
     stepIcon: "now-ui-icons business_bank",
     component: Step2
   },
- 
-];
+
+]; */
+
+
 
 class Wizard extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      steps : [
+        {
+          stepName: "Verification",
+          stepIcon: "now-ui-icons ui-1_email-85",
+          component: Step1,
+          stepProps: {
+            otp: this.props.otp
+          }
+        },
+        /* {
+          stepName: "Preferences",
+          stepIcon: "now-ui-icons business_bank",
+          component: Step2
+        }, */
+      
+      ]
+    }
+
+    this.componentDidMount = () => {
+      console.log(this.props.otp)
+    }
+  }
+
+
+
   render() {
+
+
     return (
       <>
         <div className="" >
           <Col xs={12} md={10} className="mr-auto ml-auto">
             <ReactWizard
-              steps={steps}
+              steps={this.state.steps}
               navSteps
               validate
               title=""
               description="We're almost there, let us verify your email address and get to know your banking preferences"
               headerTextCenter
-              color="black"
+              color="blue"
               finishButtonClasses="btn-wd"
               nextButtonClasses="btn-wd"
               previousButtonClasses="btn-wd"
+              finishButtonClick={this.props.completedDialog}
             />
           </Col>
         </div>
