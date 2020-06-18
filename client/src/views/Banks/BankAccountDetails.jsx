@@ -136,6 +136,9 @@ class BankAccountDetails extends React.Component {
     }
 
     retrievePreviousRecommendations = () => {
+        this.setState({ currentProgress : 0 })
+        this.setState({ maxProgress : 0 })
+
         console.log("Sending post request: " + this.state.bankAccountDetails.userId + " " + this.state.bankAccountDetails.accountTypeId)
         localStorage.setItem("bankAccountDetails", JSON.stringify(this.state.bankAccountDetails))
 
@@ -169,6 +172,8 @@ class BankAccountDetails extends React.Component {
                         this.setState({ currentProgress :(Math.round(currentInterest * 100)/100).toFixed(2)})
                         this.setState({ maxProgress : (Math.round(maxInterest * 100)/100).toFixed(2)})
                     }
+
+                    console.log(currentInterest + "/" + maxInterest)
 
                     
 
