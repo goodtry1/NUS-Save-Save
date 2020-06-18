@@ -70,8 +70,9 @@ import FeedbackPlugin from '../../components/FeedbackPlugin/FeedbackPlugin'
 import  { Spring } from 'react-spring/renderprops'
 
 //moment
-import Moment from 'react-moment';
-import 'moment-timezone';
+
+import moment from "moment";
+import "moment-timezone"
 
 import ProgressBar from 'react-bootstrap/ProgressBar'
 
@@ -388,7 +389,7 @@ class BankAccountDetails extends React.Component {
 
 
                                                    <p className="">Created since: </p>
-                                                   <h5><Moment format="DD/MM/YYYY" parse="YYYY-MM-DD">{this.state.bankAccountDetails.date}</Moment></h5>
+                                                   <h5><moment format="DD/MM/YYYY" parse="YYYY-MM-DD">{this.state.bankAccountDetails.date}</moment></h5>
                                                 </div>
                                             </div>
                                         </Col>
@@ -509,7 +510,15 @@ class BankAccountDetails extends React.Component {
                                         <div>
                                              <div className="stats">
                                         <i className="now-ui-icons arrows-1_refresh-69" />
-                                        Generated on: <Moment format="DD/MM/YYYY HH:MM" parse="YYYY-MM-DD" utc='8'>{this.state.recommendation[0].timeStamp}</Moment>
+
+                                        
+                                        {moment(this.state.recommendation[0].timeStamp)
+                                        .tz("Singapore")
+                                        .format('YYYY-MM-DD HH:mm:ss')}
+                                        
+                                     
+                                        {/* Generated on: <Moment format="DD/MM/YYYY HH:MM" parse="YYYY-MM-DD">{this.state.recommendation[0].timeStamp}</Moment> */}
+
                                         </div>
 
                                         </div> : 
