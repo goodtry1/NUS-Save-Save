@@ -191,11 +191,13 @@ app.post('/editProfile', (req, res) =>  {
         var request = new sql.Request();
 
 		let qu = `UPDATE dbo.[User] 
-				SET email = '` +req.body.email+ `', firstName = '` +req.body.firstName+ `', lastName = '` +req.body.lastName+ `', contactNumber = '` +req.body.contactNumber+ `',twoFactorAuth = ` +req.body.twoFactorAuth+ `
+				SET email = '` +req.body.email+ `', firstName = '` +req.body.firstName+ `', lastName = '` +req.body.lastName+ `', contactNumber = '` +req.body.contactNumber+ `',twoFactorAuth = '` +req.body.twoFactorAuth+ `'
 				WHERE userId = '` + req.body.userId + `'`;
-				  
+		
+		console.log(req.body.userId + "___"+req.body.email + "___" + req.body.firstName + " __ " + req.body.lastName + "___" + req.body.contactNumber + "___" + req.body.twoFactorAuth + "___EOF")		
 		request.query(qu, function(err, recordset) {
 		if(err){
+			console.log(err)
 			res.status(400).send()
 		}
 		else 

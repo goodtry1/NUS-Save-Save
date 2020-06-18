@@ -180,6 +180,8 @@ class ExtendedForms extends React.Component {
                           <p className="category">Plain</p>
                           <Switch
                             onText=""
+                            onColor="green"
+                            offColor="red"
                             offText=""
                             defaultValue={false}
                           />{" "}
