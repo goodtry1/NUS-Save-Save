@@ -64,7 +64,8 @@ class LoginPage extends React.Component {
       alert: null,
       show: false,
       twoFA: false,
-      otp: ''
+      otp: '',
+      otpInput: ''
     };
   }
 
@@ -194,9 +195,10 @@ class LoginPage extends React.Component {
       if (response.status === 200) {
 
         var user = response.data.userDetails
+        console.log(user.twoFactorAuth)
 
         if (user.twoFactorAuth) {
-          this.setState({ otp : true})
+          this.setState({ twoFA: true })
 
           axios({
             method: 'post',
@@ -207,8 +209,11 @@ class LoginPage extends React.Component {
             }
           }).then((response) => {
             if (response.status === 200) {
-              this.setState({ otp : response.data.otp}, () => { console.log(this.state.otp) })
-              
+              this.setState({
+                otp: response.data.otp,
+              }, () => { console.log(this.state.otp) })
+
+              console.log("twoFA set to true")
             }
           })
 
@@ -235,7 +240,7 @@ class LoginPage extends React.Component {
 
       } else if (response.status === 206 || response.status === 204) {
         this.setState({ message: "Invalid login credentials" }, () => { this.notify("tc", 3) })
-        
+
       } else if (response.status === 404 || response.status === 500) {
         this.setState({ message: "An error has occured, check your internet settings" }, () => { this.notify("tc", 3) })
       } else {
@@ -245,86 +250,65 @@ class LoginPage extends React.Component {
       console.log(err.message)
     })
 
+  }
 
-
-    /*   fetch("/signin", {
-        method: "POST",
-        body: JSON.stringify(values),
-        headers: new Headers({
-          "Content-Type": "application/json",
-        }),
-      })
-        .then((response) => {
-          console.log("response status:" + response.status)
-  
-  
-          if (response.status === 200) {
-            console.log("Log in successful")
-            this.setState({ message: "Login Successful! Redirecting you now" })
-            this.notify("tc", 5)
-            return response.json();
-          } else if (response.status === 204) {
-            console.log("Log in unsuccessful")
-            //this.setState({ message: "Invalid login credentials" })
-            //this.notify("tc", 3)
-            throw new Error("Invalid login credentials")
-          } else if (response.status === 400) {
-            throw new Error("An unknown error has occured")
-          } else if (response.status === 404 || response.status === 500) {
-            throw new Error("An error has occured, check your internet settings")
-          }
-  
-        }).catch(err => {
-          console.log("Error has occured")
-          this.setState({ message: err.message })
-          console.log(this.state.message)
-          this.notify("tc", 3)
-        }).then((data) => {
-  
-          var d = new Date(data.userDetails.joiningDate)
-          console.log(d.toString());
-          var c = new Intl.DateTimeFormat("en-GB", {
-            year: "numeric",
-            month: "long",
-            day: "2-digit"
-          }).format(d);
-  
-          var user = new User(data.userDetails.userId, data.userDetails.email, data.userDetails.firstName, data.userDetails.lastName, c)
-  
-          localStorage.setItem('isLoggedIn', true)
-          localStorage.setItem('user', JSON.stringify(user))
-  
-          this.redirect()
-        }).catch((err) => {
-  
-        }) */
+  submitOTP = () => {
+    if (this.state.otpInput === this.state.otp) {
+      this.setState({ message: "Login Successful! Redirecting you now" })
+      this.notify("tc", 5)
+      this.redirect()
+    } else {
+      this.setState({ message: "Login Successful! Redirecting you now" })
+      this.notify("tc", 5)
+    }
   }
 
 
   renderOTP() {
     return (
       <div>
-        <InputGroup
-          className={
-            "no-border form-control-lg " +
-            (this.state.otpFocus ? "input-group-focus" : "")
-          }
-        >
-          <InputGroupAddon addonType="prepend">
-            <InputGroupText>
-              <i className="now-ui-icons ui-1_email-85" />
-            </InputGroupText>
-          </InputGroupAddon>
-          <Input
-            id="email"
-            name="otp"
-            type="text"
-            placeholder="6 digit OTP"
-            onFocus={e => this.setState({ otpFocus: true })}
-            onBlur={e => this.setState({ otpFocus: false })}
-            onChange={this.handleUserInput}
-          />
-        </InputGroup>
+        <CardBody>
+          <InputGroup
+            className={
+              "no-border form-control-lg " +
+              (this.state.otpFocus ? "input-group-focus" : "")
+            }
+          >
+            <InputGroupAddon addonType="prepend">
+              <InputGroupText>
+                <i className="now-ui-icons ui-1_email-85" />
+              </InputGroupText>
+            </InputGroupAddon>
+            <Input
+              id="otpInput"
+              name="otpInput"
+              type="text"
+              placeholder="6 digit OTP"
+              onFocus={e => this.setState({ otpFocus: true })}
+              onBlur={e => this.setState({ otpFocus: false })}
+              onChange={this.handleUserInput}
+              value={this.state.otpInput}
+            />
+          </InputGroup>
+        </CardBody>
+        <CardFooter>
+          <Button
+            type="submit"
+            block
+            color="primary"
+            size="lg"
+            className="mb-3 btn-round"
+            onSubmit={this.submitOTP}
+          >
+            Submit
+                             </Button>
+          <div className="pull-left">
+
+          </div>
+          <div className="pull-right">
+
+          </div>
+        </CardFooter>
       </div>
     )
   }
@@ -348,80 +332,94 @@ class LoginPage extends React.Component {
                         <img src={nowLogo} alt="now-logo" />
                       </div>
                     </CardHeader>
-                    <CardBody>
 
 
 
-                      <InputGroup
-                        className={
-                          "no-border form-control-lg " +
-                          (this.state.emailFocus ? "input-group-focus" : "")
-                        }
-                      >
-                        <InputGroupAddon addonType="prepend">
-                          <InputGroupText>
-                            <i className="now-ui-icons ui-1_email-85" />
-                          </InputGroupText>
-                        </InputGroupAddon>
-                        <Input
-                          id="email"
-                          name="email"
-                          type="text"
-                          placeholder="Email"
-                          onFocus={e => this.setState({ emailFocus: true })}
-                          onBlur={e => this.setState({ emailFocus: false })}
-                          onChange={this.handleUserInput}
-                          value={this.state.email}
-                        />
-                      </InputGroup>
-                      <InputGroup
-                        className={
-                          "no-border form-control-lg " +
-                          (this.state.passwordFocus ? "input-group-focus" : "")
-                        }
-                      >
-                        <InputGroupAddon addonType="prepend">
-                          <InputGroupText>
-                            <i className="now-ui-icons objects_key-25" />
-                          </InputGroupText>
-                        </InputGroupAddon>
-                        <Input
-                          id="password"
-                          name="password"
-                          type="password"
-                          placeholder="Password"
-                          onFocus={e => this.setState({ passwordFocus: true })}
-                          onBlur={e => this.setState({ passwordFocus: false })}
-                          onChange={this.handleUserInput}
-                          value={this.state.password}
-                        />
-                      </InputGroup>
-                    </CardBody>
-                    <CardFooter>
-                      <Button
-                        type="submit"
-                        block
-                        color="primary"
-                        size="lg"
-                        className="mb-3 btn-round"
-                      >
-                        Login
-                      </Button>
-                      <div className="pull-left">
-                        <h6>
-                          {/* <a href="/auth/register-page" className="link footer-link">
+                    {this.state.twoFA ? (
+
+
+                      this.renderOTP()
+
+                    ) : (
+                        <div>
+                          <CardBody>
+                            <InputGroup
+                              className={
+                                "no-border form-control-lg " +
+                                (this.state.emailFocus ? "input-group-focus" : "")
+                              }
+                            >
+                              <InputGroupAddon addonType="prepend">
+                                <InputGroupText>
+                                  <i className="now-ui-icons ui-1_email-85" />
+                                </InputGroupText>
+                              </InputGroupAddon>
+                              <Input
+                                id="email"
+                                name="email"
+                                type="text"
+                                placeholder="Email"
+                                onFocus={e => this.setState({ emailFocus: true })}
+                                onBlur={e => this.setState({ emailFocus: false })}
+                                onChange={this.handleUserInput}
+                                value={this.state.email}
+                              />
+                            </InputGroup>
+                            <InputGroup
+                              className={
+                                "no-border form-control-lg " +
+                                (this.state.passwordFocus ? "input-group-focus" : "")
+                              }
+                            >
+                              <InputGroupAddon addonType="prepend">
+                                <InputGroupText>
+                                  <i className="now-ui-icons objects_key-25" />
+                                </InputGroupText>
+                              </InputGroupAddon>
+                              <Input
+                                id="password"
+                                name="password"
+                                type="password"
+                                placeholder="Password"
+                                onFocus={e => this.setState({ passwordFocus: true })}
+                                onBlur={e => this.setState({ passwordFocus: false })}
+                                onChange={this.handleUserInput}
+                                value={this.state.password}
+                              />
+                            </InputGroup>
+                          </CardBody>
+                          <CardFooter>
+                            <Button
+                              type="submit"
+                              block
+                              color="primary"
+                              size="lg"
+                              className="mb-3 btn-round"
+
+                            >
+                              Login
+                             </Button>
+                            <div className="pull-left">
+                              <h6>
+                                {/* <a href="/auth/register-page" className="link footer-link">
                             Create Account
                           </a> */}
-                        </h6>
-                      </div>
-                      <div className="pull-right">
-                        <h6>
-                          {/* <a href="#pablo" className="link footer-link">
+                              </h6>
+                            </div>
+                            <div className="pull-right">
+                              <h6>
+                                {/* <a href="#pablo" className="link footer-link">
                             Need Help?
                           </a> */}
-                        </h6>
-                      </div>
-                    </CardFooter>
+                              </h6>
+                            </div>
+                          </CardFooter>
+                        </div>
+
+                      )}
+
+
+
                   </Card>
                 </Form>
               </Col>

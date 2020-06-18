@@ -482,7 +482,7 @@ class RegisterPage extends React.Component {
                             </InputGroupText>
                           </InputGroupAddon>
                           <Input
-                            defaultValue={this.state.email}
+                           /*  defaultValue={this.state.email} */
                             value={this.state.email}
                             type="text"
                             placeholder="Email (required)"
@@ -506,7 +506,7 @@ class RegisterPage extends React.Component {
                             </InputGroupText>
                           </InputGroupAddon>
                           <Input
-                            defaultValue={this.state.firstName}
+                            /* defaultValue={this.state.firstName} */
                             value={this.state.firstName}
                             type="text"
                             placeholder="First Name (required)"
@@ -530,7 +530,7 @@ class RegisterPage extends React.Component {
                             </InputGroupText>
                           </InputGroupAddon>
                           <Input
-                            defaultValue={this.state.lastName}
+                            /* Value={this.state.lastNamedefault} */
                             value={this.state.lastName}
                             type="text"
                             placeholder="Last Name (required)"
@@ -554,7 +554,7 @@ class RegisterPage extends React.Component {
                             </InputGroupText>
                           </InputGroupAddon>
                           <Input
-                            defaultValue={this.state.password}
+                            /* defaultValue={this.state.password} */
                             value={this.state.password}
                             type="password"
                             placeholder="Password (required)"
@@ -578,7 +578,7 @@ class RegisterPage extends React.Component {
                             </InputGroupText>
                           </InputGroupAddon>
                           <Input
-                            defaultValue={this.state.number}
+                            /* defaultValue={this.state.number} */
                             value={this.state.number}
                             type="text"
                             placeholder="Phone number (required)"
