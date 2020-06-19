@@ -374,14 +374,21 @@ class LoginPage extends React.Component {
 
   renderLoading() {
     return (
+
+      <div>
+        <Button color="primary"  disabled size="lg" className="mb-3 btn-round" block>
+              <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+        Loading...
+        </Button>
+      </div>
       
-     <div>
+     /* <div>
        <center>
        <div class="spinner-border text-light" role="status">
   <span class="sr-only">Loading...</span>
 </div>
       </center>
-     </div>
+     </div> */
     )
   }
 
@@ -421,7 +428,7 @@ class LoginPage extends React.Component {
                         <Form onSubmit={this.handleSubmit}>
                           <CardBody>
 
-                          {this.state.renderLoading ? (this.renderLoading()) :(<div><InputGroup
+                         <InputGroup
                               className={
                                 "no-border form-control-lg " +
                                 (this.state.emailFocus ? "input-group-focus" : "")
@@ -466,11 +473,14 @@ class LoginPage extends React.Component {
                                 onChange={this.handleUserInput}
                                 value={this.state.password}
                               />
-                            </InputGroup></div>)}
+                            </InputGroup>
 
                             
                           </CardBody>
                           <CardFooter>
+
+                          {this.state.renderLoading ? (this.renderLoading()) :(<div>
+
                             <Button
                               type="submit"
                               block
@@ -482,6 +492,7 @@ class LoginPage extends React.Component {
                               Login
                              
                             </Button> 
+                            </div>)}
                          
                             <div className="pull-left">
                               <h6>

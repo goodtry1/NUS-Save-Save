@@ -403,9 +403,10 @@ class RegisterPage extends React.Component {
         
       <div>
         <center>
-        <div class="spinner-border text-default" role="status">
-        <span class="sr-only">Loading...</span>
-        </div>
+        <Button color="primary"  disabled size="lg" className="mb-3 btn-round" block>
+              <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+        Loading...
+        </Button>
         </center>
       </div>
       )
@@ -645,7 +646,8 @@ class RegisterPage extends React.Component {
                           <Button
                             color="primary"
                             size="lg"
-                            className="btn-round"
+                            block
+                            className="mb-3 btn-round"
                           //href="#pablo"
                           >
                             Register
