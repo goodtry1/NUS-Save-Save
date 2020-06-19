@@ -43,7 +43,9 @@ export class MyProfile extends Component {
             oldPw: '',
             newPw: '',
             retypeNewPw: '',
-            notifyMsg: ''
+            notifyMsg: '',
+            updateLoading: '',
+            changePwLoading: ''
         }
     }
 
@@ -53,6 +55,8 @@ export class MyProfile extends Component {
         this.setState({ updatedUser: JSON.parse(user) })
         this.setState({ hideEdit: true })
         this.setState({ hideChangePw: true })
+        this.setState({ updateLoading: false })
+        this.setState({ changePwLoading: false })
 
     }
 
@@ -115,6 +119,7 @@ export class MyProfile extends Component {
         console.log("update button called")
         var updatedUser = this.state.updatedUser;
         console.log(JSON.stringify(updatedUser));
+        this.setState({ updateLoading: true })
 
         axios({
             method: 'post',
@@ -136,44 +141,59 @@ export class MyProfile extends Component {
 
                 this.setState({
                     user: tempUser,
-                    notifyMsg: "Edit Successful!"
+                    notifyMsg: "Edit Successful!",
+                    updateLoading: false
                 }, () => {
                     this.notify('br', 2)
                     this.toggleEdit()
                 })
                 localStorage.setItem('user', JSON.stringify(tempUser))
-                
+
 
 
             } else {
                 console.log("Failed to Update proper")
-                this.setState({ notifyMsg: "Failed to update properly, please check your fields" } , () => {
+                this.setState({
+                    notifyMsg: "Failed to update properly, please check your fields",
+                    updateLoading: false
+                }, () => {
                     this.notify('br', 3)
                 })
-                
+
             }
         }).catch((err) => {
             console.log(err.message)
-            this.setState({ notifyMsg: "Unknown Error. Please contact admin!" }, () => {
+            this.setState({
+                notifyMsg: "Unknown Error. Please contact admin!",
+                updateLoading: false
+            }, () => {
                 this.notify('br', 3)
             })
-            
+
         })
 
     }
 
     handlePwUpdateButton = (e) => {
         console.log("ChangePw button called")
+        this.setState({ changePwLoading: true })
+
         if ((this.state.oldPw == '') || (this.state.newPw == '') || (this.state.retypeNewPw == '')) {
             console.log("Error! One of the fields is empty.");
-            this.setState({ notifyMsg: "Error! One of the fields is empty. " }, () => {
+            this.setState({ 
+                notifyMsg: "Error! One of the fields is empty. ",
+                changePwLoading: false
+            }, () => {
                 this.notify('br', 3)
             })
 
         } else {
             if (this.state.newPw != this.state.retypeNewPw) {
                 console.log("Error! New passwords do not match.")
-                this.setState({ notifyMsg: "Error! New passwords do not match. " }, () => {
+                this.setState({ 
+                    notifyMsg: "Error! New passwords do not match. ",
+                    changePwLoading: false
+                 }, () => {
                     this.notify('br', 3)
                 })
 
@@ -195,28 +215,37 @@ export class MyProfile extends Component {
                         this.setState({ newPw: '' })
                         this.setState({ retypeNewPw: '' })
 
-                        this.setState({ notifyMsg: "Success! Password changed successfully." }, () => {
+                        this.setState({ 
+                            notifyMsg: "Success! Password changed successfully.",
+                            changePwLoading: false
+                         }, () => {
                             this.notify('br', 2)
 
                             this.toggleChangePw();
                         })
-                        
+
 
 
 
                     } else if (response.status == 206) {
                         console.log("Password do not match. Try again!")
-                        this.setState({ notifyMsg: "Error! Your old password do not match. Please try again!" }, () => {
+                        this.setState({ 
+                            notifyMsg: "Error! Your old password do not match. Please try again!",
+                            changePwLoading: false
+                         }, () => {
                             this.notify('br', 3)
                         })
-                        
+
                     }
                 }).catch((err) => {
                     console.log(err.message)
-                    this.setState({ notifyMsg: "Unknown Error. Please contact admin!" }, () => {
+                    this.setState({ 
+                        notifyMsg: "Unknown Error. Please contact admin!",
+                        changePwLoading: false
+                     }, () => {
                         this.notify('br', 3)
                     })
-                    
+
                 })
             }
         }
@@ -409,10 +438,22 @@ export class MyProfile extends Component {
                                                             />
                                                         </Col>
                                                     </Row>
+                                                    {this.state.updateLoading != true ? (
 
-                                                    <Button color="primary" className="btn-round float-right" onClick={(e) => this.handleUpdateButton(e)} >
-                                                        Update my Profile
-                                        </Button>
+                                                        <Button color="primary" className="btn-round float-right" onClick={(e) => this.handleUpdateButton(e)} >
+                                                            Update my Profile
+                                                        </Button>
+                                                    )
+                                                        : (
+                                                            <div>
+
+                                                                <Button color="primary" className="btn-round float-right" disabled >
+                                                                    <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                            Loading...
+                                            </Button>
+
+                                                            </div>
+                                                        )}
                                                 </Form>
                                             </CardBody>
                                         </Card>
@@ -486,10 +527,24 @@ export class MyProfile extends Component {
                                                         </Col>
                                                     </Row>
 
+                                                    {this.state.changePwLoading != true ? (
+                                                        <Button color="primary" className="btn-round float-right" onClick={(e) => this.handlePwUpdateButton(e)} >
+                                                            Change password
+                                                        </Button>
+                                                    )
+                                                        : (
+                                                            <div>
+                                                                <Button color="primary" className="btn-round float-right" disabled >
+                                                                    <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+Loading...
+</Button>
+                                                            </div>
+                                                        )}
 
-                                                    <Button color="primary" className="btn-round float-right" onClick={(e) => this.handlePwUpdateButton(e)} >
-                                                        Change password
-                                </Button>
+
+
+
+
                                                 </Form>
                                             </CardBody>
                                         </Card>
