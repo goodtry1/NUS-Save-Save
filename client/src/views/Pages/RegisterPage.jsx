@@ -79,7 +79,8 @@ class RegisterPage extends React.Component {
       notificationColor: '',
       openDialog: false,
       dialogFinish: false,
-      code: ''
+      code: '',
+      renderLoading: false
     };
   }
   componentDidMount() {
@@ -264,6 +265,8 @@ class RegisterPage extends React.Component {
 
 
   handleSubmit = (event) => {
+    this.setState({renderLoading : true})
+
     if (this.isValidated()) {
       //this.registerViaServer()
 
@@ -275,6 +278,7 @@ class RegisterPage extends React.Component {
           "action": "signUp"
         }
       }).then((response) => {
+        this.setState({ renderLoading: false})
         if (response.status === 200) {
           console.log("Retrieved response")
           console.log(response.data)
@@ -284,7 +288,7 @@ class RegisterPage extends React.Component {
           this.setState({ code: response.data.otp }, () => { this.openDialog() })
 
         } else if (response.status === 206) {
-          this.setState({ message: 'An account has already been registered with this email' },
+          this.setState({ message: 'An account has already been registered with this email', renderLoading: false },
             () => { this.notify('br', 4) })
         }
       }).catch((err) => {
@@ -394,7 +398,18 @@ class RegisterPage extends React.Component {
 
   }
 
-
+  renderLoading() {
+      return (
+        
+      <div>
+        <center>
+        <div class="spinner-border text-default" role="status">
+        <span class="sr-only">Loading...</span>
+        </div>
+        </center>
+      </div>
+      )
+    }
 
 
   render() {
@@ -624,14 +639,18 @@ class RegisterPage extends React.Component {
 
                       </CardBody>
                       <CardFooter className="text-center">
-                        <Button
-                          color="primary"
-                          size="lg"
-                          className="btn-round"
-                        //href="#pablo"
-                        >
-                          Register
-                      </Button>
+                        {this.state.renderLoading? 
+                        (this.renderLoading()
+                          ) : (
+                          <Button
+                            color="primary"
+                            size="lg"
+                            className="btn-round"
+                          //href="#pablo"
+                          >
+                            Register
+                          </Button>)}
+                        
                       </CardFooter>
                     </Card>
                   </Form>
