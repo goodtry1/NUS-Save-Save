@@ -100,6 +100,16 @@ class BankAccountDetails extends React.Component {
         singleFileName: "",
         singleFile: null,
         bankStatement: '',
+
+        ccSelect: null,
+        ccFileName: "",
+        ccFile: null,
+        ccStatement: '',
+
+
+
+
+
         message: '',
         feedbackDialogOpen: '',
         recommendation: '',
@@ -197,6 +207,7 @@ class BankAccountDetails extends React.Component {
     }
 
     singleFile = React.createRef();
+    ccStatement = React.createRef();
 
     notify(place, color) {
         this.refs.notificationAlert.notificationAlert(CustomNotification.notify(place, color, this.state.message));
@@ -204,10 +215,14 @@ class BankAccountDetails extends React.Component {
 
     handleFileInput = (e, type) => {
         this[type].current.click(e);
-       
     };
 
-    addFile = (e, type) => {
+
+    addFile = (e, type, id) => {
+
+
+        console.log(id + " " + type)
+       
         let fileNames = "";
         let files = e.target.files;
         
@@ -231,10 +246,7 @@ class BankAccountDetails extends React.Component {
                 }, () => {this.notify('br', 4) })
                 PDFtype = false;
 
-                /* setTimeout(() => {
-                    this.notify('br', 4)
-                  }, 200); */
-
+              
                   break;
             } 
 
@@ -246,10 +258,17 @@ class BankAccountDetails extends React.Component {
         }
 
         if (PDFtype) {
-            this.setState({
-                [type + "Name"]: fileNames,
-                bankStatement : files[0]
-              });
+            if (id === "bankStatement") {
+                this.setState({
+                    [type + "Name"]: fileNames,
+                    bankStatement : files[0]
+                  });
+            } else if (id === "ccStatement") {
+                this.setState({
+                    ccFileName: fileNames,
+                    ccStatement : files[0]
+                  });
+            }
         }
 
         e.target.value = null //clear upload DOM
@@ -284,12 +303,14 @@ class BankAccountDetails extends React.Component {
             formData.append('file', this.state.bankStatement);
             formData.append('userId', this.state.bankAccountDetails.userId);
             formData.append('accountTypeId', this.state.bankAccountDetails.accountTypeId);
-
+            formData.append('creditCard', this.state.ccStatement)
            
             console.log(formData)
 
             this.setState({bankStatement : ''})
             this.setState({singleFileName : ''})
+            this.setState({ccStatement: ''})
+            this.setState({ccFileName: ''})
 
             axios.post('/uploadBankStatement', formData)
             .then(res => {
@@ -543,32 +564,66 @@ class BankAccountDetails extends React.Component {
                                 <CardHeader>
                                     <h5 className="card-category"></h5>
                                     
-                                    <CardTitle tag="h4">Upload bank statement</CardTitle>
+                                    <CardTitle tag="h4">Upload financial statements</CardTitle>
                                     
                                    
                   
 
                                 </CardHeader>
                                 <CardBody>
-                                <FormGroup className="form-file-upload form-file-simple">
-                                    <Input
-                                    type="text"
-                                    className="inputFileVisible"
-                                    placeholder="We accept PDF versions only..."
-                                    onClick={e => this.handleFileInput(e, "singleFile")}
-                                    defaultValue={this.state.singleFileName}
-                                    />
-                                    <input
-                                    type="file"
-                                    accept='.pdf'
-                                    className="inputFileHidden"
-                                    style={{ zIndex: -1 }}
-                                    ref={this.singleFile}
-                                    onChange={e => this.addFile(e, "singleFile")}
-                                    />
-                                    
+                                    <Row>
+                                            <Col sm='12'>
+                                                <h5>Bank statement</h5>
+                                                <FormGroup className="form-file-upload form-file-simple">
+                                                    <Input
+                                                    type="text"
+                                                    className="inputFileVisible"
+                                                    placeholder="Click me to upload"
+                                                    onClick={e => this.handleFileInput(e, "singleFile")}
+                                                    defaultValue={this.state.singleFileName}
+                                                    
+                                                    />
+                                                    <input
+                                                    type="file"
+                                                    accept='.pdf'
+                                                    className="inputFileHidden"
+                                                    style={{ zIndex: -1 }}
+                                                    ref={this.singleFile}
+                                                    onChange={e => this.addFile(e, "singleFile", "bankStatement")}
+                                                    />
+                                                </FormGroup>
+                                            </Col>
 
-                                </FormGroup>
+                                            <Col sm='12'>
+                                                <h5>Credit card statement</h5>
+                                                <FormGroup className="form-file-upload form-file-simple">
+                                                    <Input
+                                                    type="text"
+                                                    className="inputFileVisible"
+                                                    placeholder="We do not keep a copy of your statements"
+                                                    onClick={e => this.handleFileInput(e, "ccStatement")}
+                                                    defaultValue={this.state.ccFileName}
+                                                    />
+                                                    <input
+                                                    type="file"
+                                                    accept='.pdf'
+                                                    className="inputFileHidden"
+                                                    style={{ zIndex: -1 }}
+                                                    ref={this.ccStatement}
+                                                    onChange={e => this.addFile(e, "ccStatement", "ccStatement")}
+                                                    />
+                                                    
+
+                                                </FormGroup>
+                                            
+                                            </Col>
+
+
+                                    </Row>
+                                
+                              
+
+                               
 
                                 <div>
                                     {this.state.bankStatement ? 
@@ -582,7 +637,7 @@ class BankAccountDetails extends React.Component {
                                 <CardFooter>
                                     <div className="stats">
                                         <i className="now-ui-icons emoticons_satisfied" />
-                                        We do not keep a copy of your bank statements
+                                        We only accept PDF versions
                                     </div>
                                 </CardFooter>
                             </Card>
