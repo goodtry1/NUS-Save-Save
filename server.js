@@ -14,13 +14,14 @@ var nodemailer = require('nodemailer');
 var randomize = require('randomatic');
 
 var storage = multer.diskStorage({
-  destination: function (req, file, cb) {
+  destination: function (req, files, cb) {
     cb(null, 'uploads')
   },
-  filename: function (req, file, cb) {
-    cb(null, file.originalname)
+  filename: function (req, files, cb) {
+    cb(null, files.originalname)
   }
 })
+
 
 var upload = multer({ storage: storage })
 
@@ -410,10 +411,15 @@ function retrievePassword(userId)
 	});
 }
 
-//upload bank account statement client passes userId and accountTypeId
-app.post('/uploadBankStatement', upload.single('file'), async(req, res) => {
 
-	let dataBuffer = fs.readFileSync('./uploads/' + req.file.originalname);
+//config for upload multiple files
+let uploadConfig = upload.fields([{name: 'bankStatement', maxCount: 1}, {name: 'creditCard', maxCount: 1}]);
+
+//upload bank account statement client passes userId and accountTypeId
+app.post('/uploadBankStatement', uploadConfig, async(req, res) => {
+
+	let dataBuffer = fs.readFileSync('./uploads/' + req.files['bankStatement'][0].originalname);
+	
 	const options = {
 	pagerender: render_page,
 	version: 'v1.10.100'
