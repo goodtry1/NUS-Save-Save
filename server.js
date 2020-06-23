@@ -497,8 +497,8 @@ app.post('/addFeedback', (req, res) =>  {
 		
 		var dateNow = DATE_FORMATER( new Date(), "yyyy-mm-dd HH:MM:ss" );
 	
-		let qu = `INSERT INTO dbo.[feedback](sessionId, feedbackRating, feedbackComment, timestamp) 
-			   VALUES ('` + req.body.sessionId + `', '`+ req.body.feedbackRating + `', '`+ req.body.feedbackComment + `' , '`+ dateNow + `')`;
+		let qu = `INSERT INTO dbo.[feedback](recommendationId, feedbackRating, feedbackComment, timestamp) 
+			   VALUES ('` + req.body.recommendationId + `', '`+ req.body.feedbackRating + `', '`+ req.body.feedbackComment + `' , '`+ dateNow + `')`;
 
 		console.log(qu)
 				 
