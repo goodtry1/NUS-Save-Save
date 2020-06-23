@@ -14,13 +14,14 @@ var nodemailer = require('nodemailer');
 var randomize = require('randomatic');
 
 var storage = multer.diskStorage({
-  destination: function (req, file, cb) {
+  destination: function (req, files, cb) {
     cb(null, 'uploads')
   },
-  filename: function (req, file, cb) {
-    cb(null, file.originalname)
+  filename: function (req, files, cb) {
+    cb(null, files.originalname)
   }
 })
+
 
 var upload = multer({ storage: storage })
 
@@ -96,6 +97,7 @@ app.post('/twoFactorAuthenticate', async (req, res) => {
 		
 	}	
 })
+
 
 //add new user
 app.post('/signUp', async (req, res) => {
@@ -258,13 +260,11 @@ app.post('/editProfile', (req, res) =>  {
         var request = new sql.Request();
 
 		let qu = `UPDATE dbo.[User] 
-				SET email = '` +req.body.email+ `', firstName = '` +req.body.firstName+ `', lastName = '` +req.body.lastName+ `', contactNumber = '` +req.body.contactNumber+ `',twoFactorAuth = '` +req.body.twoFactorAuth+ `'
+				SET email = '` +req.body.email+ `', firstName = '` +req.body.firstName+ `', lastName = '` +req.body.lastName+ `', contactNumber = '` +req.body.contactNumber+ `',twoFactorAuth = ` +req.body.twoFactorAuth+ `
 				WHERE userId = '` + req.body.userId + `'`;
-		
-		console.log(req.body.userId + "___"+req.body.email + "___" + req.body.firstName + " __ " + req.body.lastName + "___" + req.body.contactNumber + "___" + req.body.twoFactorAuth + "___EOF")		
+				  
 		request.query(qu, function(err, recordset) {
 		if(err){
-			console.log(err)
 			res.status(400).send()
 		}
 		else 
@@ -411,10 +411,15 @@ function retrievePassword(userId)
 	});
 }
 
-//upload bank account statement client passes userId and accountTypeId
-app.post('/uploadBankStatement', upload.single('file'), async(req, res) => {
 
-	let dataBuffer = fs.readFileSync('./uploads/' + req.file.originalname);
+//config for upload multiple files
+let uploadConfig = upload.fields([{name: 'bankStatement', maxCount: 1}, {name: 'creditCard', maxCount: 1}]);
+
+//upload bank account statement client passes userId and accountTypeId
+app.post('/uploadBankStatement', uploadConfig, async(req, res) => {
+
+	let dataBuffer = fs.readFileSync('./uploads/' + req.files['bankStatement'][0].originalname);
+	
 	const options = {
 	pagerender: render_page,
 	version: 'v1.10.100'
@@ -492,8 +497,8 @@ app.post('/addFeedback', (req, res) =>  {
 		
 		var dateNow = DATE_FORMATER( new Date(), "yyyy-mm-dd HH:MM:ss" );
 	
-		let qu = `INSERT INTO dbo.[feedback](sessionId, feedbackRating, feedbackComment, timestamp) 
-			   VALUES ('` + req.body.sessionId + `', '`+ req.body.feedbackRating + `', '`+ req.body.feedbackComment + `' , '`+ dateNow + `')`;
+		let qu = `INSERT INTO dbo.[feedback](recommendationId, feedbackRating, feedbackComment, timestamp) 
+			   VALUES ('` + req.body.recommendationId + `', '`+ req.body.feedbackRating + `', '`+ req.body.feedbackComment + `' , '`+ dateNow + `')`;
 
 		console.log(qu)
 				 
