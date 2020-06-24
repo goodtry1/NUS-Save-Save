@@ -46,7 +46,8 @@ class FeedbackPlugin extends Component {
             alert: null,
             show: false,
             recommendation: '',
-            totalRecommendationNum: 0
+            totalRecommendationNum: 0,
+            submitButtonLoad: false
         };
         this.hideAlert = this.hideAlert.bind(this);
        
@@ -125,14 +126,25 @@ class FeedbackPlugin extends Component {
 
     submitFeedback = () => {
 
+        this.setState({ submitButtonLoad : true})
+
         var recommendations = this.state.recommendation
 
-        var numFeedbackSubmitted
+        var numFeedbackSubmitted = 0;
 
         for (var i = 0; i < recommendations.length; i++) {
             var rating = recommendations[i].rating
             var feedback = recommendations[i].feedback
             var recommendationId = recommendations[i].recommendationId
+            numFeedbackSubmitted ++
+
+            if (rating === undefined) {
+                rating = ""
+            }
+
+            if (feedback === undefined) {
+                feedback = ""
+            }
 
             axios({
                 method: 'post',
@@ -143,9 +155,7 @@ class FeedbackPlugin extends Component {
                     feedbackComment: feedback
                 }
             }).then((response) => {
-                console.log(response)
-
-                numFeedbackSubmitted ++
+                
 
                 if (response.status === 200) {
                     
@@ -154,14 +164,17 @@ class FeedbackPlugin extends Component {
                 } else {
                     
                 }
-            }).catch((err) => {
-                console.log(err.message)
-            }).finally( () => {
+
                 if (numFeedbackSubmitted == this.state.totalRecommendationNum) {
+                    this.setState({ submitButtonLoad : false})
                     this.handleClose()
                     this.successAlert()
                     this.setState({ classes: "dropdown" })
                 }
+            }).catch((err) => {
+                console.log(err.message)
+            }).finally( () => {
+                
                 
             })
 
@@ -221,7 +234,16 @@ class FeedbackPlugin extends Component {
       }
 
     
-
+    renderLoading() {
+        return (
+    
+          <div>
+            <Button color="primary"  disabled size="lg" className="mb-3 btn-round" block>
+                  <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            Loading...
+            </Button>
+          </div>
+        )}
     
     render() {
         return (
@@ -317,9 +339,18 @@ class FeedbackPlugin extends Component {
                                     <Button onClick={this.handleClose} color="primary">
                                         Cancel
                         </Button>
-                                    <Button onClick={this.submitFeedback} color="primary">
-                                        Submit
-                        </Button>
+
+                                            {this.state.submitButtonLoad? (
+                                                this.renderLoading()
+                                                ) : (
+                                                <Button onClick={this.submitFeedback} color="primary">
+                                                    Submit
+                                                 </Button>
+                                                )}
+
+
+
+                                    
                                 </DialogActions>
                             </Dialog>
                         </li>
