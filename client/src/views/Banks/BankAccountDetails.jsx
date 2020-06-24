@@ -707,7 +707,7 @@ class BankAccountDetails extends React.Component {
                                                 
                                                 <Col xs="3">
                                                     <Button onClick={this.clearCCStatement} color="danger" className="btn-round btn-icon" style={{display: 'block,', margin: 'auto'}}>
-                                                    <i className="now-ui-icons ui-1_simple-remove" />
+                                                    <i className="fa fa-times" />
                                                     </Button>
                                                 </Col>
                                                 </div>
