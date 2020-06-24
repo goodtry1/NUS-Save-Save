@@ -127,7 +127,6 @@ class BankAccountDetails extends React.Component {
        
 
        if (this.props.location.data) {
-           console.log("Running 1")
             this.setState({ bankAccountDetails : this.props.location.data}, () => {
                 /* (() => { this.retrievePreviousRecommendations() })
                 (() => { localStorage.setItem("bankAccountDetails", JSON.stringify(this.state.bankAccountDetails)) }) */
@@ -151,7 +150,6 @@ class BankAccountDetails extends React.Component {
         this.setState({ currentProgress : 0 })
         this.setState({ maxProgress : 0 })
 
-        console.log("Sending post request: " + this.state.bankAccountDetails.userId + " " + this.state.bankAccountDetails.accountTypeId)
         localStorage.setItem("bankAccountDetails", JSON.stringify(this.state.bankAccountDetails))
 
         axios({
@@ -163,7 +161,6 @@ class BankAccountDetails extends React.Component {
             }
         }).then((response) => {
             if (response.status === 200) {
-                console.log("Retrieved response")
                 var recommendation = response.data.recommendation
 
                 if (recommendation.length > 0) {
@@ -185,7 +182,6 @@ class BankAccountDetails extends React.Component {
                         this.setState({ maxProgress : (Math.round(maxInterest * 100)/100).toFixed(2)})
                     }
 
-                    console.log(currentInterest + "/" + maxInterest)
 
                     
 
@@ -202,7 +198,7 @@ class BankAccountDetails extends React.Component {
                 
             }
         }).catch((err) => {
-            console.log(err.message)
+
         })
     }
 
@@ -219,9 +215,6 @@ class BankAccountDetails extends React.Component {
 
 
     addFile = (e, type, id) => {
-
-
-        console.log(id + " " + type)
        
         let fileNames = "";
         let files = e.target.files;
@@ -230,12 +223,9 @@ class BankAccountDetails extends React.Component {
         var PDFtype = true;
 
         for (let i = 0; i < e.target.files.length; i++) {
-          console.log("Number of files:" + e.target.files.length)
           fileNames = fileNames + e.target.files[i].name;
-          console.log(fileNames)
 
             if (fileNames.split('.').pop() !== 'pdf') {
-                console.log("Not PDF")
                 e.target.value = null;
                 this.setState({
                     message : 'The file you\'ve uploaded is not a PDF file',
@@ -286,7 +276,6 @@ class BankAccountDetails extends React.Component {
 
     uploadBankStatement = () => {
         if (!this.state.bankStatement) {
-            console.log("Bank Statement empty")
             /* this.setState(
                 {
                     message : 'You have not uploaded a bank statement'
@@ -300,7 +289,7 @@ class BankAccountDetails extends React.Component {
             
         } else {
             const formData = new FormData();
-            formData.append('file', this.state.bankStatement);
+            formData.append('bankStatement', this.state.bankStatement);
             formData.append('userId', this.state.bankAccountDetails.userId);
             formData.append('accountTypeId', this.state.bankAccountDetails.accountTypeId);
             formData.append('creditCard', this.state.ccStatement)
