@@ -116,7 +116,8 @@ class BankAccountDetails extends React.Component {
         recommendation: '',
         sessionId: '',
         currentProgress: '',
-        maxProgress: ''
+        maxProgress: '',
+        percentage: 0
     }
 }
 
@@ -181,6 +182,8 @@ class BankAccountDetails extends React.Component {
                         
                         this.setState({ currentProgress :(Math.round(currentInterest * 100)/100).toFixed(2)})
                         this.setState({ maxProgress : (Math.round(maxInterest * 100)/100).toFixed(2)})
+
+                        this.setState({ percentage: (Math.round(currentInterest/maxInterest * 100)).toFixed(0) })
                     }
 
 
@@ -435,11 +438,11 @@ class BankAccountDetails extends React.Component {
                         <Col md={12}>
                             <Card className="card-chart">
                                 <CardHeader>
-                                    Your progress towards the max tier
+                                    {"Your progress towards the max tier: " + 'S$' + this.state.currentProgress + " / S$" + this.state.maxProgress}
                                     
                                 </CardHeader>
                                 <CardBody>
-                                    <ProgressBar animated now={this.state.currentProgress} max={this.state.maxProgress} label={'S$' + this.state.currentProgress + " / S$" + this.state.maxProgress} />
+                                    <ProgressBar animated now={this.state.percentage} max={100} label={this.state.percentage + '%'} />
                                     {/* <h6>Place holder for progress bar</h6> */}
                                 </CardBody>
                             </Card>
