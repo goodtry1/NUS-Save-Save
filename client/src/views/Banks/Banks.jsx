@@ -104,8 +104,16 @@ export class Banks extends Component {
         return (
             <div>
                 <PanelHeader
-                    size="sm"
-                    content={<div style={{ textAlign: 'center' }}><h5 style={{ color: 'white' }}>My Bank Accounts</h5></div>}
+                    
+                    content={
+                        <div className="header text-center">
+                          <h2 className="title">My Bank Accounts</h2>
+                          <p className="category">
+                              Here's a list of bank accounts you have currently registered with Save Save
+                          </p>
+                        </div>
+                    }
+                    
                 />
 
                 {this.state.accounts.map((account) =>

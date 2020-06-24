@@ -231,14 +231,39 @@ class BankAccountDetails extends React.Component {
 
             if (fileNames.split('.').pop() !== 'pdf') {
                 e.target.value = null;
-                this.setState({
+                PDFtype = false;
+
+                
+                    if (id === "bankStatement") {
+                        this.setState(
+                            {
+                                message : 'The file you\'ve uploaded is not a PDF file',
+                                bankStatement : '',
+                                singleFileName : ''
+                            }, () => {this.notify('br', 4) }
+                        )
+                    } else if (id === "ccStatement") {
+                        this.setState(
+                            {
+                                message : 'The file you\'ve uploaded is not a PDF file',
+                                ccStatement : '',
+                                ccFileName : ''
+                            }, () => {this.notify('br', 4) }
+                        )
+                    }
+                
+
+
+
+
+                /* this.setState({
                     message : 'The file you\'ve uploaded is not a PDF file',
                     [type + "Name"]: '',
                     bankStatement : '',
                     fileNames: '',
                     singleFile: null
                 }, () => {this.notify('br', 4) })
-                PDFtype = false;
+                PDFtype = false; */
 
               
                   break;
@@ -435,24 +460,40 @@ class BankAccountDetails extends React.Component {
                         </Col>
                     </Row> */}
                     <Row>
+                        
                         <Col md={12}>
-                            <Card className="card-chart">
+                            <Card className="card-pricing card-plain">
                                 <CardHeader>
                                     {"Your progress towards the max tier: " + 'S$' + this.state.currentProgress + " / S$" + this.state.maxProgress}
                                     
                                 </CardHeader>
                                 <CardBody>
-                                    <ProgressBar animated now={this.state.percentage} max={100} label={this.state.percentage + '%'} />
-                                    {/* <h6>Place holder for progress bar</h6> */}
+                                    <Row>
+                                        <Col xs='3'>
+                                        
+                                        </Col>
+
+                                        <Col>
+                                        <ProgressBar style={{backgroundColor: 'grey', borderColor: 'black'}} animated now={this.state.percentage} max={100} label={this.state.percentage + '%'} />
+                                        </Col>
+
+                                        <Col xs = '3'>
+                                        
+                                        </Col>
+
+                                    </Row>
+                                   
+                                    
                                 </CardBody>
                             </Card>
                         </Col>
+                        
                     </Row>
 
 
                     <Row sm={12}>
                         <Col sm={6} >
-                            <Card className="">
+                            <Card className="card-stats">
                                 <CardHeader>
                                     <h5 className="card-category"></h5>
                                     <CardTitle tag="h2" >Recommendations</CardTitle>
@@ -470,7 +511,7 @@ class BankAccountDetails extends React.Component {
 
                                             {this.state.recommendation.map((recommendation) => 
                                             <Table responsive className="table-shopping">
-
+                                            <tbody>
                                             <Spring
                                                 from={{ opacity : 0, marginTop: 500}}
                                                 to={{ opacity : 1, marginTop : 0}}
@@ -482,17 +523,34 @@ class BankAccountDetails extends React.Component {
                                                          
                                                         <td >
                                                             {recommendation.isRecommCompleted ? 
-                                                            (<Button color="success" className="btn-round btn-icon">
-                                                            <i className="now-ui-icons ui-1_check" />
-                                                            </Button>) 
+                                                            (
+                                                            <div className="info info-horizontal">
+                                                                <div className="icon icon-success icon-circle">
+                                                                    <i className="fa fa-check" />
+                                                                </div>
+                                                            </div>
+                                                            
+                                                            
+                                                            ) 
                                                             : 
-                                                            (<Button color="" className="btn-round btn-icon" >
-                                                            !
-                                                            </Button>)
+                                                            (
+                                                            
+                                                            <div className="info info-horizontal">
+                                                                <div className="icon icon-danger icon-circle">
+                                                                <i className="fa fa-exclamation" />
+                                                                </div>
+                                                            </div>
+                                                            
+                                                           )
                                                             }
                                                         </td>
-                                                        <td >
-                                                            {recommendation.recommendation}
+
+                                                        <td>
+                                                       
+                                                            <div>
+                                                                {recommendation.recommendation}
+                                                            </div>
+                                                            
                                                         </td>
                                                     </tr>
                                                     
@@ -502,6 +560,7 @@ class BankAccountDetails extends React.Component {
 
 
                                             </Spring>
+                                            </tbody>
                                            
                                             </Table>
 
@@ -605,7 +664,7 @@ class BankAccountDetails extends React.Component {
                                                 
                                                 <Col xs="3">
                                                     <Button onClick={this.clearBankStatement} color="danger" className="btn-round btn-icon" style={{display: 'block,', margin: 'auto'}}>
-                                                    <i className="now-ui-icons ui-1_simple-remove" />
+                                                    <i className="fa fa-times" />
                                                     </Button>
                                                 </Col>
                                                 </div>

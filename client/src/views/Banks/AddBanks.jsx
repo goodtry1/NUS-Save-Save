@@ -274,9 +274,9 @@ export class AddBanks extends Component {
                 <PanelHeader
                     size="sm"
                     content=
-                    {<div style={{ textAlign: 'center' }}><h5 style={{ color: 'white' }}>Add a new bank <i id="info" className="now-ui-icons travel_info" /></h5>
+                    {<div style={{ textAlign: 'center' }}><h5 style={{ color: 'white' }}>Add a new bank account <i id="info" className="now-ui-icons travel_info" /></h5>
                         <Tooltip placement="right" target="info" isOpen={this.state.accountToolTipState} toggle={this.toggleToolTip}>
-                            Add an account in 3 easy steps! Note: accounts that you currently own in Save save will be disabled.
+                            Add an account in 3 easy steps! Note: accounts that you currently own in Save Save will be disabled.
                         </Tooltip>
                     </div>
                     }
