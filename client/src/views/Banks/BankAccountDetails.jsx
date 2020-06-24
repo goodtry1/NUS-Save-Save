@@ -418,7 +418,7 @@ class BankAccountDetails extends React.Component {
                             </Card>
                         </Col>
                     </Row>
-                    <Row>
+                    {/* <Row>
                         <Col md={12}>
                             <Card className="card-chart">
                                 <CardHeader>
@@ -430,7 +430,7 @@ class BankAccountDetails extends React.Component {
                                 </CardBody>
                             </Card>
                         </Col>
-                    </Row>
+                    </Row> */}
                     <Row>
                         <Col md={12}>
                             <Card className="card-chart">
@@ -484,7 +484,7 @@ class BankAccountDetails extends React.Component {
                                                             </Button>) 
                                                             : 
                                                             (<Button color="" className="btn-round btn-icon" >
-                                                            <i className="now-ui-icons ui-1_simple-remove" />
+                                                            !
                                                             </Button>)
                                                             }
                                                         </td>
@@ -531,7 +531,7 @@ class BankAccountDetails extends React.Component {
                                              <div className="stats">
                                         <i className="now-ui-icons arrows-1_refresh-69" />
 
-                                        
+                                        {"Generated on: "}
                                         {moment(this.state.recommendation[0].timeStamp)
                                         .tz("Singapore")
                                         .format('DD-MM-YYYY HH:mm:ss')}
@@ -683,7 +683,7 @@ class BankAccountDetails extends React.Component {
                 </div>
 
                 {this.state.recommendation != null && this.state.recommendation? (
-                    <FeedbackPlugin ref="feedbackPlugin" sessionId = {this.state.sessionId}>
+                    <FeedbackPlugin ref="feedbackPlugin" sessionId = {this.state.sessionId} recommendation={this.state.recommendation}>
 
                     </FeedbackPlugin>
                 ) : (<div></div>)}

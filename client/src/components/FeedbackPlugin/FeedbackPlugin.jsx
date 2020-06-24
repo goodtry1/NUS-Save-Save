@@ -19,7 +19,7 @@ import React, { Component } from "react";
 // used for making the prop types of this component
 import PropTypes from "prop-types";
 // react plugin used to create switch buttons
-import { Button, Row, Col } from "reactstrap";
+import { Button, Row, Col, Table } from "reactstrap";
 
 
 //Feedback dialog
@@ -42,11 +42,11 @@ class FeedbackPlugin extends Component {
         super(props);
         this.state = {
             classes: "dropdown",
-            feedbackDialogOpen: '',
-            rating: '',
-            feedbackString: '',
+            feedbackDialogOpen: false,
             alert: null,
-            show: false
+            show: false,
+            recommendation: '',
+            totalRecommendationNum: 0
         };
         this.hideAlert = this.hideAlert.bind(this);
        
@@ -56,18 +56,41 @@ class FeedbackPlugin extends Component {
         
     }
 
-    onStarClick(nextValue) {
-        this.setState({ rating: nextValue });
+    onStarClick(Id, nextValue) {
+
+        var recommendations = this.state.recommendation
+       
+       
+        for (var i = 0; i < recommendations.length; i++) {
+            if (recommendations[i].recommendationId === Id) {
+                recommendations[i].rating = nextValue
+            }
+        }
+
+        this.setState({ recommendation : recommendations})
     }
 
     onFeedbackStringChange = (event) => {
 
-        this.setState({
-            [event.target.name]: event.target.value,
-          });
+        var Id = event.target.id
+
+        var recommendations = this.state.recommendation
+       
+       
+        for (var i = 0; i < recommendations.length; i++) {
+
+            if (recommendations[i].recommendationId == Id) {
+                recommendations[i].feedback = event.target.value
+            }
+        }
+
+        this.setState({ recommendation : recommendations})
     }
 
     componentDidMount = () => {
+        this.setState({ recommendation: this.props.recommendation, totalRecommendationNum: this.props.recommendation.length })
+
+
         /* setTimeout(() => {
             this.setState({ classes: "dropdown show" });
       }, 10000); */
@@ -101,38 +124,60 @@ class FeedbackPlugin extends Component {
    
 
     submitFeedback = () => {
-        var rating = this.state.rating
-        var feedbackString = this.state.feedbackString
 
-        this.setState({
-            rating: '',
-            feedbackString: ''
-        })
+        var recommendations = this.state.recommendation
 
-        console.log(rating + " " + feedbackString)
+        var numFeedbackSubmitted
+
+        for (var i = 0; i < recommendations.length; i++) {
+            var rating = recommendations[i].rating
+            var feedback = recommendations[i].feedback
+            var recommendationId = recommendations[i].recommendationId
+
+            axios({
+                method: 'post',
+                url: '/addFeedback',
+                data: {
+                    recommendationId: recommendationId,
+                    feedbackRating: rating,
+                    feedbackComment: feedback
+                }
+            }).then((response) => {
+                console.log(response)
+
+                numFeedbackSubmitted ++
+
+                if (response.status === 200) {
+                    
+                   
+                    
+                } else {
+                    
+                }
+            }).catch((err) => {
+                console.log(err.message)
+            }).finally( () => {
+                if (numFeedbackSubmitted == this.state.totalRecommendationNum) {
+                    this.handleClose()
+                    this.successAlert()
+                    this.setState({ classes: "dropdown" })
+                }
+                
+            })
+
+           
+
+           
+        }
+
+
         
-        axios({
-            method: 'post',
-            url: '/addFeedback',
-            data: {
-                sessionId: this.props.sessionId,
-                feedbackRating: rating,
-                feedbackComment: feedbackString
-            }
-        }).then((response) => {
-            console.log(response)
-            if (response.status === 200) {
-                this.handleClose()
-                this.successAlert()
-                
-            } else {
-                
-            }
-        }).catch((err) => {
-            console.log(err.message)
-        }).finally( () => {
-            this.setState({ classes: "dropdown" })
-        })
+
+        
+
+        
+        
+       
     }
 
     successAlert = () => {
@@ -220,31 +265,53 @@ class FeedbackPlugin extends Component {
                                         Your feedback is important to help us improve! Let us know if the recommendations given helped you. We appreciate your time.
                                         
                         </DialogContentText>
+                                {this.state.recommendation? (
+                                    <Table responsive>
+                                    <tbody>
+                                        {this.state.recommendation.map((recommendation) =>
+                                        <tr key={recommendation.recommendationId}>
+                                          <td> 
+                                              {recommendation.recommendation} 
+                                              
+                                         
+                                          <center>
+                                                <ReactStars
+                                                    name="rate1"
+                                                    count={5}
+                                                    onChange={this.onStarClick.bind(this, recommendation.recommendationId)}
+                                                    size={24}
+                                                    value={recommendation.rating}
+                                                    half={false}
+                                                    color2={'#ffd700'}
+                                                />
+                                          </center>
 
-                                    How did we do?
-                                    <center>
-                                        <ReactStars
-                                            count={5}
-                                            onChange={this.onStarClick.bind(this)}
-                                            size={24}
-                                            value={this.state.rating}
-                                            half={false}
-                                            color2={'#ffd700'}
-                                             />
-                                    </center>
 
 
+                                            <TextField
+                                                autoFocus
+                                                margin="dense"
+                                                id={recommendation.recommendationId.toString()}
+                                                name="feedbackString"
+                                                label="Additional comments"
+                                                type="text"
+                                                fullWidth
+                                                onChange={this.onFeedbackStringChange}
+                                            />
+                                          </td>
+                                        </tr>)}
+                                    
+                                        
+                                            
+                                        
+                                    </tbody>
+                                    </Table>
+                                    
+                                ) :(<div></div>)}
+                                    
 
-                                    <TextField
-                                        autoFocus
-                                        margin="dense"
-                                        id="feedbackString"
-                                        name="feedbackString"
-                                        label="Additional comments"
-                                        type="text"
-                                        fullWidth
-                                        onChange={this.onFeedbackStringChange}
-                                    />
+                                   
+                                    
                                 </DialogContent>
                                 <DialogActions>
                                     <Button onClick={this.handleClose} color="primary">
