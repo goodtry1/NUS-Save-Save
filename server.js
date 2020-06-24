@@ -418,39 +418,59 @@ let uploadConfig = upload.fields([{name: 'bankStatement', maxCount: 1}, {name: '
 //upload bank account statement client passes userId and accountTypeId
 app.post('/uploadBankStatement', uploadConfig, async(req, res) => {
 
-	let dataBuffer = fs.readFileSync('./uploads/' + req.files['bankStatement'][0].originalname);
+	let dataBufferStatement = fs.readFileSync('./uploads/' + req.files['bankStatement'][0].originalname);
 	
 	const options = {
 	pagerender: render_page,
 	version: 'v1.10.100'
-	};                                                
+	};                     
 
-	PDFParser(dataBuffer, options).then(async function (data) {
+    let result = {}
+	
+	let creditCardParseData = {}
+
+	PDFParser(dataBufferStatement, options).then(async function (data) {
 		fs.writeFileSync('./uploads/result.txt', data.text);
 		result  = await parseStatement(req.body.accountTypeId);
-		console.log(result);
-		deleteFile("./uploads/")
-		res.status(200).send()
+		
 	});
+	
+	if(req.files['creditCard'][0])
+	{
+		let dataBufferCard = fs.readFileSync('./uploads/' + req.files['creditCard'][0].originalname);
   
+		PDFParser(dataBufferCard, options).then(async function (data) {
+			fs.writeFileSync('./uploads/resultCard.txt', data.text);
+			creditCardParseData  = await parseCard();
+
+		});
+	}
+	else
+	{
+		creditCardParseData['creditCardSpend']=0;
+	}
+
+	
+	
     var dateAnalysed = DATE_FORMATER( new Date(), "yyyy-mm-dd HH:MM:ss" );
 	//Update the Bank acocunt details table
 	
 	sql.connect(sqlConfig,  function() {
 	var request = new sql.Request();
 
-	let qu = `INSERT INTO dbo.[parsedBankStatementData](dateAnalysed, userId, accountTypeId, previousMonthBalance, statementDate, salary, currentMonthBalance, totalWithdrawal, totalDeposit,  totalInterest, averageDailyBalance) 
-		   VALUES ( '`+ dateAnalysed + `', '` + req.body.userId + `', '`+ req.body.accountTypeId + `', '`+ result['previousMonthBalance'] + `' , '`+ result['date'] + `' , '`+ result['salary'] + `' , '`+ result['currentMonthBalance'] + `' , '`+ result['totalWithdrawals'] + `' , '`+ result['totalDeposits'] + `' , '`+ result['totalInterests'] + `' , '`+ result['averageDailyBalance'] + `')`;
-
-			 
+	let qu = `INSERT INTO dbo.[parsedBankStatementData](dateAnalysed, userId, accountTypeId, previousMonthBalance, statementDate, salary, currentMonthBalance, totalWithdrawal, totalDeposit,  totalInterest, averageDailyBalance, creditCardSpend) 
+		   VALUES ( '`+ dateAnalysed + `', '` + req.body.userId + `', '`+ req.body.accountTypeId + `', '`+ result['previousMonthBalance'] + `' , '`+ result['date'] + `' , '`+ result['salary'] + `' , '`+ result['currentMonthBalance'] + `' , '`+ result['totalWithdrawals'] + `' , '`+ result['totalDeposits'] + `' , '`+ result['totalInterests'] + `' , '`+ result['averageDailyBalance'] + `', '`+ creditCardParseData['creditCardSpend'] + `')`;
+	 
 	request.query(qu, function(error, recordset) {
 	if(error){
 		res.status(400).send()
+		deleteFile("./uploads/")
 	}
 	else 
 	{
 		recommendationEngine(req.body.userId, req.body.accountTypeId)
 		res.status(200).send()
+		deleteFile("./uploads/")
 		
 	}
 	});
@@ -537,10 +557,10 @@ function render_page(pageData) {
 }
 
 
-function parseStatement(parsestatement)
+ function parseStatement(parsestatement)
 {
 	
-  return new promise(function(resolve, reject) {
+  return new promise(async function(resolve, reject) {
   // record the index of each line in raw text data
   let lineIndex = 1;
 
@@ -549,7 +569,7 @@ function parseStatement(parsestatement)
   let indexMap = new Map();
 
   // extracted information
-  let result = {};
+  let result = await initializeParseData();
 
   let readInterface = readline.createInterface({
     input: fs.createReadStream('./uploads/result.txt')
@@ -607,11 +627,67 @@ function parseStatement(parsestatement)
     result['totalInterests'] = parseFloat(textMap.get(indexMap.get('totalInterests')).replace(/\s|,|/g, ''));
     result['averageDailyBalance'] = parseFloat(textMap.get(indexMap.get('averageDailyBalance')).replace(/\s|,|/g, ''));
 
-    // send the final result for this month
-   // console.log(result);
 	resolve (result)
+	console.log(result)
 	
   });
+  
+  });
+
+}
+
+function initializeParseData()
+{
+	return new promise(function(resolve, reject) {
+		let result = {}
+		result['previousMonthBalance'] = 0;
+		result['currentMonthBalance'] = 0;
+		result['averageDailyBalance'] =0;
+		result['date'] = 0;
+		result['salary']  = 0;
+		result['totalWithdrawals']  = 0 ;
+		result['totalDeposits'] =0;
+		result['totalInterests'] =0;
+		resolve (result);
+  });
+}
+
+
+function parseCard()
+{
+	
+	return new promise(function(resolve, reject) {
+	// record the index of each line in raw text data
+	let lineIndex = 1;
+
+	// map and index map
+	let textMap = new Map();
+	let indexMap = new Map();
+
+	// extracted information
+	let result = {};
+
+	let readInterface = readline.createInterface({
+		input: fs.createReadStream('./uploads/resultCard.txt')
+	});
+
+	readInterface.on('line', function (line) {
+		textMap.set(lineIndex, line);
+
+		if (line === 'TOTAL AMOUNT DUE') {
+		  indexMap.set('creditCardSpend', lineIndex + 1);
+		}
+
+		lineIndex++;
+    });
+
+
+	readInterface.on('close', function () {
+		let array = textMap.get(indexMap.get('creditCardSpend')).trim().split(/\s+/);
+		result['creditCardSpend'] = parseFloat(array[0].replace(/\s|,|/g, ''));
+		resolve (result);
+		console.log(result)
+	});
   
   });
 
