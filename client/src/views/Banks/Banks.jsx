@@ -110,25 +110,25 @@ export class Banks extends Component {
 
                 {this.state.accounts.map((account) =>
                     <Row key={account.userBankAccountId} >
-                        <Col xs={12} md={12}>
+                        <Col xs={12}>
                             <Card className="card-chart">
 
                                 <CardBody>
                                     <Row >
-                                        <Col xs={2} ></Col>
+                                        <Col xs={3} ></Col>
 
-                                        <Col xs={8} >
+                                        <Col xs={6} >
                                             <center><h3>{account.accountTypeName}</h3></center>
                                         </Col>
 
-                                        <Col xs={2}>
+                                        <Col xs={3}>
                                             <Button onClick={(e) => this.redirectToBankAccountDetails(e, account)} color="info" className="btn-round btn-icon">
                                                 <i className="now-ui-icons ui-1_zoom-bold" />
                                             </Button>
 
-                                            <Button color="danger" className="btn-round btn-icon">
+                                            {/* <Button color="danger" className="btn-round btn-icon">
                                                 <i className="now-ui-icons ui-1_simple-remove" />
-                                            </Button>
+                                            </Button> */}
                                         </Col>
 
 
