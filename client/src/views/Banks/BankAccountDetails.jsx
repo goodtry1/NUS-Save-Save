@@ -75,6 +75,7 @@ import moment from "moment";
 import "moment-timezone"
 
 import ProgressBar from 'react-bootstrap/ProgressBar'
+import { isBlock } from "typescript";
 
 /* var mapData = {
     AU: 760,
@@ -274,6 +275,15 @@ class BankAccountDetails extends React.Component {
         )
     }
 
+    clearCCStatement = () => {
+        this.setState(
+            {
+                ccStatement : '',
+                ccFileName : ''
+            }
+        )
+    }
+
     uploadBankStatement = () => {
         if (!this.state.bankStatement) {
             /* this.setState(
@@ -320,25 +330,21 @@ class BankAccountDetails extends React.Component {
     }
 
 
-    createTableData() {
-        var tableRows = [];
-        for (var i = 0; i < table_data.length; i++) {
-            tableRows.push(
-                <tr key={i}>
-                    <td>
-                        <div className="flag">
-                            <img src={table_data[i].flag} alt="us_flag" />
-                        </div>
-                    </td>
-                    <td>{table_data[i].country}</td>
-                    <td className="text-right">{table_data[i].count}</td>
-                    <td className="text-right">{table_data[i].percentage}</td>
-                </tr>
-            );
-        }
-        return tableRows;
+   colSizeBankUpload = () => {
+       if (this.state.bankStatement) {
+           return 9
+       } else {
+           return 12
+       }
+   }
 
+   colSizeCCUpload = () => {
+    if (this.state.ccStatement) {
+        return 9
+    } else {
+        return 12
     }
+}
 
     
         
@@ -560,14 +566,20 @@ class BankAccountDetails extends React.Component {
 
                                 </CardHeader>
                                 <CardBody>
-                                    <Row>
-                                            <Col sm='12'>
-                                                <h5>Bank statement</h5>
+                                    <Row >
+                                        <Col sm='12'>
+                                             <h5>Bank statement</h5>
+                                        </Col>
+                                       
+
+
+                                            <Col  xs={this.colSizeBankUpload()}>
+                                                
                                                 <FormGroup className="form-file-upload form-file-simple">
                                                     <Input
                                                     type="text"
                                                     className="inputFileVisible"
-                                                    placeholder="Click me to upload"
+                                                    placeholder="Bank statement is mandatory"
                                                     onClick={e => this.handleFileInput(e, "singleFile")}
                                                     defaultValue={this.state.singleFileName}
                                                     
@@ -576,20 +588,41 @@ class BankAccountDetails extends React.Component {
                                                     type="file"
                                                     accept='.pdf'
                                                     className="inputFileHidden"
-                                                    style={{ zIndex: -1 }}
+                                                   /*  style={{ zIndex: -1 }} */
                                                     ref={this.singleFile}
                                                     onChange={e => this.addFile(e, "singleFile", "bankStatement")}
                                                     />
                                                 </FormGroup>
+
+                                                
                                             </Col>
 
+                                            {this.state.bankStatement? (
+                                                <div>
+                                                
+                                                <Col xs="3">
+                                                    <Button onClick={this.clearBankStatement} color="danger" className="btn-round btn-icon" style={{display: 'block,', margin: 'auto'}}>
+                                                    <i className="now-ui-icons ui-1_simple-remove" />
+                                                    </Button>
+                                                </Col>
+                                                </div>
+                                            ) : (<div></div>)}
+
+                                                
+
+                                                
+                                           
                                             <Col sm='12'>
-                                                <h5>Credit card statement</h5>
+                                            <h5>Credit card statement</h5>
+                                            </Col>
+
+                                            <Col xs={this.colSizeCCUpload()}>
+                                                
                                                 <FormGroup className="form-file-upload form-file-simple">
                                                     <Input
                                                     type="text"
                                                     className="inputFileVisible"
-                                                    placeholder="We do not keep a copy of your statements"
+                                                    placeholder="Supplement your credit card statement"
                                                     onClick={e => this.handleFileInput(e, "ccStatement")}
                                                     defaultValue={this.state.ccFileName}
                                                     />
@@ -607,6 +640,17 @@ class BankAccountDetails extends React.Component {
                                             
                                             </Col>
 
+                                            {this.state.ccStatement? (
+                                                <div>
+                                                
+                                                <Col xs="3">
+                                                    <Button onClick={this.clearCCStatement} color="danger" className="btn-round btn-icon" style={{display: 'block,', margin: 'auto'}}>
+                                                    <i className="now-ui-icons ui-1_simple-remove" />
+                                                    </Button>
+                                                </Col>
+                                                </div>
+                                            ) : (<div></div>)}
+
 
                                     </Row>
                                 
@@ -617,7 +661,7 @@ class BankAccountDetails extends React.Component {
                                 <div>
                                     {this.state.bankStatement ? 
                                     (<div><Button onClick={this.uploadBankStatement}> Submit</Button>
-                                        <Button onClick={this.clearBankStatement}> Clear </Button></div>) : (<div></div>) }
+                                        </div>) : (<div></div>) }
 
                                 </div>
                                 
