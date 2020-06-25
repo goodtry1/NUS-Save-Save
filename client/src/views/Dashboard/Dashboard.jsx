@@ -226,7 +226,7 @@ class Dashboard extends React.Component {
               <Card className="card-stats card-raised">
                 <CardBody>
                   <Row>
-                    <Col md="9">
+                  <Col md="9" xs="12">
                       <div className="intro">
                         <div className="info">
 
@@ -235,12 +235,12 @@ class Dashboard extends React.Component {
                         </div>
                       </div>
                     </Col>
-                    <Col md="3">
+                    <Col md="3" >
                       <div className="intro">
                         <div className="info">
 
 
-                          <p className="info-title">Member since: {moment(this.state.user.joinDate)
+                          <p className="info-title" >Member since: {moment(this.state.user.joinDate)
                             .tz("Singapore")
                             .format('DD-MMMM-YYYY')}</p>
 
