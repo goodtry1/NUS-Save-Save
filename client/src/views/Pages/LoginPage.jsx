@@ -43,6 +43,7 @@ import { logIn } from '../../redux/actions/actions' */
 
 // core components
 import nowLogo from "assets/img/now-logo.png";
+import piggyBank from "assets/img/piggyBank.png";
 
 import bgImage from "assets/img/bg14.jpg";
 
@@ -415,7 +416,7 @@ class LoginPage extends React.Component {
                 <Card className="card-login card-plain">
                   <CardHeader>
                     <div className="logo-container">
-                      <img src={nowLogo} alt="now-logo" />
+                      <img src={piggyBank} alt="piggy-bank" />
                     </div>
                   </CardHeader>
                   {this.state.twoFA ? (
