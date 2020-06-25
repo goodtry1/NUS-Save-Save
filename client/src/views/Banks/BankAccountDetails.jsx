@@ -332,6 +332,7 @@ class BankAccountDetails extends React.Component {
             formData.append('accountTypeId', this.state.bankAccountDetails.accountTypeId);
             formData.append('creditCard', this.state.ccStatement)
 
+
             this.setState({bankStatement : ''})
             this.setState({singleFileName : ''})
             this.setState({ccStatement: ''})
