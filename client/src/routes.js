@@ -97,7 +97,7 @@ let routes = [
     name: "Profile",
     state: "openProfile",
     icon: "now-ui-icons business_bank",
-    invisible: false,
+    invisible: true,
     views: [
       {
         path: "/myProfile",
@@ -114,28 +114,29 @@ let routes = [
     name: "Pages",
     state: "openPages",
     icon: "now-ui-icons design_image",
+    invisible: true,
     views: [
-      {
+      /* {
         path: "/timeline-page",
         name: "Timeline Page",
         mini: "TP",
         component: TimelinePage,
         layout: "/admin"
-      },
-      {
+      }, */
+      /* {
         path: "/user-page",
         name: "User Profile",
         mini: "UP",
         component: UserPage,
         layout: "/admin"
-      },
-      {
+      }, */
+      /* {
         path: "/rtl-support",
         name: "RTL Support",
         mini: "RS",
         component: RTL,
         layout: "/admin"
-      },
+      }, */
       {
         path: "/register-page",
         name: "Register Page",
@@ -152,7 +153,7 @@ let routes = [
         component: LoginPage,
         layout: "/auth"
       },
-      {
+     /*  {
         path: "/pricing-page",
         name: "Pricing Page",
         short: "Pricing",
@@ -167,7 +168,7 @@ let routes = [
         mini: "LSP",
         component: LockScreenPage,
         layout: "/auth"
-      }
+      } */
     ]
   },
   {
@@ -176,8 +177,9 @@ let routes = [
     name: "Components",
     state: "openComponents",
     icon: "now-ui-icons education_atom",
+    invisible: true,
     views: [
-      {
+     /*  {
         path: "/buttons",
         name: "Buttons",
         mini: "B",
@@ -225,7 +227,7 @@ let routes = [
         mini: "T",
         component: Typography,
         layout: "/admin"
-      }
+      } */
     ]
   },
   {
@@ -234,8 +236,9 @@ let routes = [
     name: "Forms",
     state: "openForms",
     icon: "now-ui-icons design_bullet-list-67",
+    invisible: true,
     views: [
-      {
+     /*  {
         path: "/regular-forms",
         name: "Regular Forms",
         mini: "RF",
@@ -262,7 +265,7 @@ let routes = [
         mini: "W",
         component: Wizard,
         layout: "/admin"
-      }
+      } */
     ]
   },
   {
@@ -271,8 +274,9 @@ let routes = [
     name: "Tables",
     state: "openTables",
     icon: "now-ui-icons files_single-copy-04",
+    invisible: true,
     views: [
-      {
+    /*   {
         path: "/regular-tables",
         name: "Regular Tables",
         mini: "RT",
@@ -292,7 +296,7 @@ let routes = [
         mini: "RT",
         component: ReactTable,
         layout: "/admin"
-      }
+      } */
     ]
   },
   {
@@ -301,8 +305,9 @@ let routes = [
     name: "Maps",
     state: "openMaps",
     icon: "now-ui-icons location_pin",
+    invisible: true,
     views: [
-      {
+     /*  {
         path: "/google-maps",
         name: "Google Maps",
         mini: "GM",
@@ -322,15 +327,15 @@ let routes = [
         mini: "VM",
         component: VectorMap,
         layout: "/admin"
-      }
+      } */
     ]
   },
-  {
+ /*  {
     path: "/widgets",
     name: "Widgets",
     icon: "now-ui-icons objects_diamond",
     component: Widgets,
-    layout: "/admin"
+    layout: "/admin",
   },
   {
     path: "/charts",
@@ -345,7 +350,7 @@ let routes = [
     icon: "now-ui-icons media-1_album",
     component: Calendar,
     layout: "/admin"
-  }
+  } */
 ];
 
 export default routes;

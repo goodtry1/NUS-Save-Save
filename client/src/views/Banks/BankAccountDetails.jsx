@@ -418,7 +418,7 @@ class BankAccountDetails extends React.Component {
                             <Card className="card-stats card-raised">
                                 <CardBody>
                                     <Row>
-                                        <Col md="9">
+                                        <Col xs="8">
                                             <div className="intro">
                                                 <div className="info">
 
@@ -427,7 +427,7 @@ class BankAccountDetails extends React.Component {
                                                 </div>
                                             </div>
                                         </Col>
-                                        <Col md="3">
+                                        <Col xs="4">
                                             <div className="intro">
                                                 <div className="info">
 
