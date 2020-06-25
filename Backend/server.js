@@ -187,7 +187,7 @@ app.post('/signin', (req, res) => {
 app.get('/bankdetails', function (req, res) {
     sql.connect(sqlConfig, function() {
         var request = new sql.Request();
-        request.query('select * from dbo.bank', function(error, results) {
+        request.query('select * from dbo.bank where bankId = 2 ', function(error, results) {
 			if (error)
 			{
 			   console.log("error occured");

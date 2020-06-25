@@ -39,7 +39,7 @@ class Admin extends React.Component {
   notificationAlert = React.createRef();
   mainPanel = React.createRef();
   componentDidMount() {
-    document.body.classList.toggle("sidebar-mini");
+    /* document.body.classList.toggle("sidebar-mini"); */
     if (navigator.platform.indexOf("Win") > -1) {
       document.documentElement.className += " perfect-scrollbar-on";
       document.documentElement.classList.remove("perfect-scrollbar-off");
@@ -127,7 +127,7 @@ class Admin extends React.Component {
         <Sidebar
           {...this.props}
           routes={routes}
-          /* minimizeSidebar={this.minimizeSidebar} */
+          minimizeSidebar={this.minimizeSidebar}
           backgroundColor={this.state.backgroundColor}
         />
         <div className="main-panel" ref={this.mainPanel}>
