@@ -97,7 +97,7 @@ let routes = [
     name: "Profile",
     state: "openProfile",
     icon: "now-ui-icons business_bank",
-    invisible: false,
+    invisible: true,
     views: [
       {
         path: "/myProfile",
@@ -114,8 +114,9 @@ let routes = [
     name: "Pages",
     state: "openPages",
     icon: "now-ui-icons design_image",
+    invisible: true,
     views: [
-      {
+     /*  {
         path: "/timeline-page",
         name: "Timeline Page",
         mini: "TP",
@@ -135,7 +136,7 @@ let routes = [
         mini: "RS",
         component: RTL,
         layout: "/admin"
-      },
+      }, */
       {
         path: "/register-page",
         name: "Register Page",
@@ -152,7 +153,7 @@ let routes = [
         component: LoginPage,
         layout: "/auth"
       },
-      {
+     /*  {
         path: "/pricing-page",
         name: "Pricing Page",
         short: "Pricing",
@@ -167,10 +168,10 @@ let routes = [
         mini: "LSP",
         component: LockScreenPage,
         layout: "/auth"
-      }
+      } */
     ]
   },
-  {
+  /* {
     collapse: true,
     path: "/components",
     name: "Components",
@@ -345,7 +346,7 @@ let routes = [
     icon: "now-ui-icons media-1_album",
     component: Calendar,
     layout: "/admin"
-  }
+  } */
 ];
 
 export default routes;
