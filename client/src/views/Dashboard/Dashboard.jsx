@@ -54,8 +54,10 @@ import swim from "assets/img/prada.jpg";
 */
 
 import { table_data } from "variables/general.jsx";
-import { User } from '../../models/User';
-import { Bank } from '../../models/Bank';
+import moment from "moment";
+import "moment-timezone"
+//import { User } from '../../models/User';
+//import { Bank } from '../../models/Bank';
 
 //Axios
 import axios from 'axios';
@@ -87,12 +89,8 @@ class Dashboard extends React.Component {
 
   componentDidMount = () => {
     var user = localStorage.getItem('user')
-    //console.log("this is user " + user)
-    //console.log("this is ussser from session " + localStorage.getItem('user'))
     this.setState({ user: JSON.parse(user) }, () => {
-      console.log("username " + JSON.stringify(this.state.user))
-
-      //console.log("username date" + this.state.user.joinDate.toLocaleDateString())
+      //console.log("username " + JSON.stringify(this.state.user))
     })
 
 
@@ -113,11 +111,9 @@ class Dashboard extends React.Component {
     }).then((response) => {
       if (response.status === 200) {
         this.setState({ accounts: response.data.userBankAccountDetails })
-        console.log(" UserBankAcc Success")
-
 
       } else {
-        console.log("Failed to load user banks")
+        //console.log("Failed to load user banks")
       }
     }).catch((err) => {
       console.log(err.message)
@@ -131,6 +127,58 @@ class Dashboard extends React.Component {
     })
   }
 
+  //this is still WIP..
+  getBankProgress = (accountTypeId) => {
+    var currentProgress = 0;
+    var maxProgress = 0;
+    var percentage = 0;
+    console.log("API called.. accountTypeId ->" + accountTypeId )
+    console.log("userid.. "+ this.state.user.userId)
+
+    axios({
+      method: 'post',
+      url: '/fetchrecommendations',
+      data: {
+        userId: this.state.user.userId,
+        accountTypeid: accountTypeId
+      }
+    }).then((response) => {
+      if (response.status === 200) {
+        var recommendation = response.data.recommendation
+
+        if (recommendation.length > 0) {
+
+          var maxInterest = 0
+          var currentInterest = 0
+
+          for (var i = 0; i < recommendation.length; i++) {
+            maxInterest += recommendation[i].interestEarned
+            maxInterest += recommendation[i].interestToBeEarned
+            currentInterest += recommendation[i].interestEarned
+
+
+
+
+            currentProgress = (Math.round(currentInterest * 100) / 100).toFixed(2) 
+            maxProgress = (Math.round(maxInterest * 100) / 100).toFixed(2) 
+
+            percentage = (Math.round(currentInterest / maxInterest * 100)).toFixed(0) 
+            console.log(percentage)
+          }
+          return percentage
+
+        } else {
+
+        }
+
+      } else {
+        
+      }
+    }).catch((err) => {
+
+    })
+    return 0
+  }
 
   createTableData() {
     var tableRows = [];
@@ -192,8 +240,10 @@ class Dashboard extends React.Component {
                         <div className="info">
 
 
-                          <p className="info-title">Member since: {this.state.user.joinDate}</p>
-                          {/* TODO:... check why cannot check for joiningDate!*/}
+                          <p className="info-title">Member since: {moment(this.state.user.joinDate)
+                            .tz("Singapore")
+                            .format('DD-MMMM-YYYY')}</p>
+
                         </div>
                       </div>
                     </Col>
@@ -240,9 +290,12 @@ class Dashboard extends React.Component {
                             <b> {account.accountTypeName} </b>
                           </CardHeader>
                           <CardBody>
-                            Date Created: {account.date}
+                            Date Created: {moment(account.date)
+                              .tz("Singapore")
+                              .format('DD-MMMM-YYYY')}
+
                             <br />
-                          Progress:  <b> To be updated.. PLACEHOLDER </b>
+                          Progress:  <b> To be updated.. PLACEHOLDER </b>{/* this.getBankProgress(account.accountTypeId) */}
                             <br />
                           Interest Rates  <b> To be updated.. PLACEHOLDER </b>
                             <br />

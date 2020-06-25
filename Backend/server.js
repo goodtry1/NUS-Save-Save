@@ -260,7 +260,7 @@ app.post('/editProfile', (req, res) =>  {
         var request = new sql.Request();
 
 		let qu = `UPDATE dbo.[User] 
-				SET email = '` +req.body.email+ `', firstName = '` +req.body.firstName+ `', lastName = '` +req.body.lastName+ `', contactNumber = '` +req.body.contactNumber+ `',twoFactorAuth = ` +req.body.twoFactorAuth+ `
+				SET email = '` +req.body.email+ `', firstName = '` +req.body.firstName+ `', lastName = '` +req.body.lastName+ `', contactNumber = '` +req.body.contactNumber+ `',twoFactorAuth = '` +req.body.twoFactorAuth+ `'
 				WHERE userId = '` + req.body.userId + `'`;
 				  
 		request.query(qu, function(err, recordset) {
@@ -301,7 +301,7 @@ app.post('/changePassword', async (req, res) =>  {
 	}
 	else
 	{
-	  console.log("old password does not match")
+	  //console.log("old password does not match")
 	  res.status(206).send()
 	}
 })

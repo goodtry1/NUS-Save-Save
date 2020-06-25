@@ -238,7 +238,7 @@ class Sidebar extends React.Component {
                     this.setState({ openAvatar: !this.state.openAvatar })
                   }
                 >
-                  <span>
+                  <span style={{ whiteSpace: 'normal'}}>
                     {this.state.user.firstName} {this.state.user.lastName}
                     <b className="caret" />
                   </span>

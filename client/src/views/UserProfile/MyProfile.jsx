@@ -87,9 +87,9 @@ export class MyProfile extends Component {
 
     toggleTwoFa = (e) => {
         var tempUpdatedUser = this.state.updatedUser
-        console.log("updating 2fa, current is -> " + tempUpdatedUser.twoFAAuth)
+        //console.log("updating 2fa, current is -> " + tempUpdatedUser.twoFAAuth)
         tempUpdatedUser.twoFAAuth = !(tempUpdatedUser.twoFAAuth)
-        console.log("now !  " + tempUpdatedUser["twoFAAuth"])
+        //console.log("now !  " + tempUpdatedUser["twoFAAuth"])
 
         this.setState({ updatedUser: tempUpdatedUser })
     }
@@ -107,18 +107,15 @@ export class MyProfile extends Component {
     }
 
     handlePwUpdate = (e) => {
-        var key = e.target.name
-        var value = e.target.value
-
         this.setState({ [e.target.name]: e.target.value })
-        console.log(key + "__" + value)
+        //console.log(key + "__" + value)
     }
 
     handleUpdateButton = (e) => {
 
-        console.log("update button called")
+        //console.log("update button called")
         var updatedUser = this.state.updatedUser;
-        console.log(JSON.stringify(updatedUser));
+        //console.log(JSON.stringify(updatedUser));
         this.setState({ updateLoading: true })
 
         axios({
@@ -135,7 +132,7 @@ export class MyProfile extends Component {
         }).then((response) => {
             if (response.status === 200) {
                 //this.setState({ accounts: response.data.userBankAccountDetails })
-                console.log(" Update Success!")
+                //console.log(" Update Success!")
                 //var tempUser = updatedUser;
                 var tempUser = new User(updatedUser.userId, updatedUser.email, updatedUser.firstName, updatedUser.lastName, updatedUser.joinDate, updatedUser.contactNo, updatedUser.twoFAAuth);
 
@@ -152,7 +149,7 @@ export class MyProfile extends Component {
 
 
             } else {
-                console.log("Failed to Update proper")
+                //console.log("Failed to Update proper")
                 this.setState({
                     notifyMsg: "Failed to update properly, please check your fields",
                     updateLoading: false
@@ -162,7 +159,7 @@ export class MyProfile extends Component {
 
             }
         }).catch((err) => {
-            console.log(err.message)
+            //console.log(err.message)
             this.setState({
                 notifyMsg: "Unknown Error. Please contact admin!",
                 updateLoading: false
@@ -175,11 +172,11 @@ export class MyProfile extends Component {
     }
 
     handlePwUpdateButton = (e) => {
-        console.log("ChangePw button called")
+        //console.log("ChangePw button called")
         this.setState({ changePwLoading: true })
 
-        if ((this.state.oldPw == '') || (this.state.newPw == '') || (this.state.retypeNewPw == '')) {
-            console.log("Error! One of the fields is empty.");
+        if ((this.state.oldPw === '') || (this.state.newPw === '') || (this.state.retypeNewPw ==='')) {
+            //console.log("Error! One of the fields is empty.");
             this.setState({ 
                 notifyMsg: "Error! One of the fields is empty. ",
                 changePwLoading: false
@@ -188,8 +185,8 @@ export class MyProfile extends Component {
             })
 
         } else {
-            if (this.state.newPw != this.state.retypeNewPw) {
-                console.log("Error! New passwords do not match.")
+            if (this.state.newPw !== this.state.retypeNewPw) {
+                //console.log("Error! New passwords do not match.")
                 this.setState({ 
                     notifyMsg: "Error! New passwords do not match. ",
                     changePwLoading: false
@@ -198,7 +195,7 @@ export class MyProfile extends Component {
                 })
 
             } else {
-                console.log("Check correct.")
+                //console.log("Check correct.")
                 axios({
                     method: 'post',
                     url: '/changePassword',
@@ -209,7 +206,7 @@ export class MyProfile extends Component {
                     }
                 }).then((response) => {
                     if (response.status === 200) {
-                        console.log(" Password changed Success!")
+                        //console.log(" Password changed Success!")
 
                         this.setState({ oldPw: '' })
                         this.setState({ newPw: '' })
@@ -227,8 +224,8 @@ export class MyProfile extends Component {
 
 
 
-                    } else if (response.status == 206) {
-                        console.log("Password do not match. Try again!")
+                    } else if (response.status === 206) {
+                        //console.log("Password do not match. Try again!")
                         this.setState({ 
                             notifyMsg: "Error! Your old password do not match. Please try again!",
                             changePwLoading: false
@@ -238,7 +235,7 @@ export class MyProfile extends Component {
 
                     }
                 }).catch((err) => {
-                    console.log(err.message)
+                    //console.log(err.message)
                     this.setState({ 
                         notifyMsg: "Unknown Error. Please contact admin!",
                         changePwLoading: false
@@ -334,7 +331,7 @@ export class MyProfile extends Component {
                             </Card>
                         </Col>
                     </Row>
-                    {this.state.hideEdit != true ? (
+                    {this.state.hideEdit !== true ? (
                         <Row>
                             <Spring
                                 from={{ opacity: 0, marginTop: 500 }}
@@ -438,7 +435,7 @@ export class MyProfile extends Component {
                                                             />
                                                         </Col>
                                                     </Row>
-                                                    {this.state.updateLoading != true ? (
+                                                    {this.state.updateLoading !== true ? (
 
                                                         <Button color="primary" className="btn-round float-right" onClick={(e) => this.handleUpdateButton(e)} >
                                                             Update my Profile
@@ -464,7 +461,7 @@ export class MyProfile extends Component {
                     ) : (
                             <div />
                         )}
-                    {this.state.hideChangePw != true ? (
+                    {this.state.hideChangePw !== true ? (
                         <Row>
                             <Spring
                                 from={{ opacity: 0, marginTop: 500 }}
@@ -527,7 +524,7 @@ export class MyProfile extends Component {
                                                         </Col>
                                                     </Row>
 
-                                                    {this.state.changePwLoading != true ? (
+                                                    {this.state.changePwLoading !== true ? (
                                                         <Button color="primary" className="btn-round float-right" onClick={(e) => this.handlePwUpdateButton(e)} >
                                                             Change password
                                                         </Button>

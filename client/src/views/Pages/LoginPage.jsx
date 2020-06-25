@@ -246,14 +246,6 @@ class LoginPage extends React.Component {
           this.setState({ message: "Login Successful! Redirecting you now" })
           this.notify("tc", 5)
 
-          var d = new Date(user.joiningDate)
-          console.log(d.toString());
-          var c = new Intl.DateTimeFormat("en-GB", {
-            year: "numeric",
-            month: "long",
-            day: "2-digit"
-          }).format(d);
-
           var user = new User(user.userId, user.email, user.firstName, user.lastName, user.joiningDate, user.contactNumber, user.twoFactorAuth)
 
           localStorage.setItem('isLoggedIn', true)
