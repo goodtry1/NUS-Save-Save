@@ -265,9 +265,10 @@ class RegisterPage extends React.Component {
 
 
   handleSubmit = (event) => {
-    this.setState({renderLoading : true})
+    
 
     if (this.isValidated()) {
+      this.setState({renderLoading : true})
       //this.registerViaServer()
 
       axios({

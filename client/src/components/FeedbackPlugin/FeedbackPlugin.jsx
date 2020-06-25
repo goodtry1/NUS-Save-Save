@@ -238,7 +238,7 @@ class FeedbackPlugin extends Component {
         return (
     
           <div>
-            <Button color="primary"  disabled size="lg" className="mb-3 btn-round" block>
+            <Button color="primary"  disabled >
                   <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
             Loading...
             </Button>
