@@ -417,7 +417,11 @@ class LoginPage extends React.Component {
                   <CardHeader>
                     <div className="logo-container">
                       <img src={piggyBank} alt="piggy-bank" />
+                      
                     </div>
+
+                    <center><h5 style={{color: 'white'}}>Save Save</h5></center>
+                   
                   </CardHeader>
                   {this.state.twoFA ? (
 
@@ -428,7 +432,6 @@ class LoginPage extends React.Component {
                       <div>
                         <Form onSubmit={this.handleSubmit}>
                           <CardBody>
-
                          <InputGroup
                               className={
                                 "no-border form-control-lg " +

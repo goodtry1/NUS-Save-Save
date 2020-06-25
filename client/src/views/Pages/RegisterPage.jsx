@@ -427,20 +427,20 @@ class RegisterPage extends React.Component {
           <div className="register-page">
             <Container>
               <Row className="justify-content-center">
-               {/*  <Col lg={5} md={8} xs={12}>
+                <Col lg={5} md={8} xs={12}>
                   <div className="info-area info-horizontal mt-5">
                     <div className="icon icon-primary">
                       <i className="now-ui-icons media-2_sound-wave" />
                     </div>
                     <div className="description">
-                      <h5 className="info-title">Marketing</h5>
+                      <h5 className="info-title">Save Save</h5>
                       <p className="description">
-                        We've created the marketing campaign of the website. It
-                        was a very interesting collaboration.
+                        Join us today to experience the next step of smart banking.
+                        We analyse your bank statements to optimise your interest rates.
                       </p>
                     </div>
                   </div>
-                  <div className="info-area info-horizontal">
+                  {/* <div className="info-area info-horizontal">
                     <div className="icon icon-primary">
                       <i className="now-ui-icons media-1_button-pause" />
                     </div>
@@ -451,8 +451,8 @@ class RegisterPage extends React.Component {
                         CSS3. The client has access to the code using GitHub.
                       </p>
                     </div>
-                  </div>
-                  <div className="info-area info-horizontal">
+                  </div> */}
+                 {/*  <div className="info-area info-horizontal">
                     <div className="icon icon-info">
                       <i className="now-ui-icons users_single-02" />
                     </div>
@@ -463,8 +463,8 @@ class RegisterPage extends React.Component {
                         for this product.
                       </p>
                     </div>
-                  </div>
-                </Col> */}
+                  </div> */}
+                </Col>
                 <Col lg={4} md={8} xs={12}>
                   <Form onSubmit={this.handleSubmit}>
                     <Card className="card-signup">
