@@ -280,8 +280,6 @@ class RegisterPage extends React.Component {
       }).then((response) => {
         this.setState({ renderLoading: false})
         if (response.status === 200) {
-          console.log("Retrieved response")
-          console.log(response.data)
 
           // localStorage.setItem('code', response.data.otp)
 
@@ -292,7 +290,6 @@ class RegisterPage extends React.Component {
             () => { this.notify('br', 4) })
         }
       }).catch((err) => {
-        console.log(err.message)
       })
 
 
@@ -315,12 +312,6 @@ class RegisterPage extends React.Component {
       lastName: this.state.lastName
     };
 
-    console.log("Clearing values now")
-
-
-
-    console.log("values:", values);
-
     fetch("/signUp", {
       method: "POST",
       body: JSON.stringify(values),
@@ -330,10 +321,7 @@ class RegisterPage extends React.Component {
     })
       .then((response) => {
 
-        console.log("response status:" + response.status)
-
         if (response.status === 200) {
-          console.log("Signup successful")
           this.setState({ message: 'Sign Up successful! You have achieved your first step as a smart saver!' })
           // this.setState({ notificationColor: 5 })
           this.notify('tc', 5)
@@ -354,7 +342,6 @@ class RegisterPage extends React.Component {
       })
 
       .catch(err => {
-        console.log(err)
 
       }).then(() => {
         this.setState({

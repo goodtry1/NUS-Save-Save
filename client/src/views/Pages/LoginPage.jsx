@@ -218,7 +218,6 @@ class LoginPage extends React.Component {
       if (response.status === 200) {
 
         var user = response.data.userDetails
-        console.log(user.twoFactorAuth)
 
         if (user.twoFactorAuth) {
           this.setState({ twoFA: true, user })
@@ -237,8 +236,6 @@ class LoginPage extends React.Component {
               this.setState({
                 otp: response.data.otp,
               }, () => { console.log(this.state.otp) })
-
-              console.log("twoFA set to true: " + response.data.otp)
             }
           })
 
@@ -269,7 +266,7 @@ class LoginPage extends React.Component {
         password: ''
       })
     }).catch((err) => {
-      console.log(err.message)
+
     })
 
   }
@@ -283,7 +280,6 @@ class LoginPage extends React.Component {
 
           var user = this.state.user
           var d = new Date(user.joiningDate)
-          console.log(d.toString());
           var c = new Intl.DateTimeFormat("en-GB", {
             year: "numeric",
             month: "long",
@@ -294,7 +290,6 @@ class LoginPage extends React.Component {
           localStorage.setItem('user', JSON.stringify(user))
 
           this.notify("tc", 5)
-          console.log("Redirecting")
           this.redirect()
 
         })

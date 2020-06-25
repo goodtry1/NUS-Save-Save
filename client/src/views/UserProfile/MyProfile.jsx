@@ -484,7 +484,7 @@ export class MyProfile extends Component {
                                                                     placeholder="Old Password"
                                                                     required={true}
                                                                     name="oldPw"
-                                                                    type="text"
+                                                                    type="password"
                                                                     onChange={this.handlePwUpdate}
                                                                 />
                                                             </FormGroup>
@@ -501,7 +501,7 @@ export class MyProfile extends Component {
                                                                     name="newPw"
                                                                     required={true}
                                                                     placeholder="New Password"
-                                                                    type="text"
+                                                                    type="password"
                                                                     onChange={this.handlePwUpdate}
                                                                 />
                                                             </FormGroup>
@@ -516,7 +516,7 @@ export class MyProfile extends Component {
                                                                     name="retypeNewPw"
                                                                     required={true}
                                                                     placeholder="Retype New Password"
-                                                                    type="text"
+                                                                    type="password"
                                                                     onChange={this.handlePwUpdate}
                                                                 />
                                                             </FormGroup>

@@ -64,7 +64,6 @@ export class AddBanks extends Component {
                 pathname: '/admin/myBanks' // your data array of objects
             })
         } else {
-            console.log(this.props.location.data)
             this.setState({ userAccounts: this.props.location.data })
         }
 
@@ -95,8 +94,6 @@ export class AddBanks extends Component {
 
         axios.get('/bankDetails')
             .then((res) => {
-                console.log("res.status: " + res.status)
-                console.log("Num banks: " + res.data.banks.length)
                 var banks = []
 
                 banks = res.data.banks
@@ -106,7 +103,6 @@ export class AddBanks extends Component {
                 this.setState({ banks: banks })
             })
             .catch((err) => {
-                console.log(err)
             })
             .finally(() => {
                 this.getAccountTypes()
@@ -120,8 +116,6 @@ export class AddBanks extends Component {
         var transformedBanks = []
 
         for (var i = 0; i < this.state.banks.length; i++) {
-            console.log("******Fetching accounts for bankId: " + this.state.banks[i].bankId)
-            console.log(this.state.banks[i].bankName)
 
             let fetchedResult = await this.getAccountTypesFromBankId(this.state.banks[i].bankId)
             var accountTypes = []
@@ -132,11 +126,8 @@ export class AddBanks extends Component {
             transformedBanks.push(transformedBank)
 
 
-            console.log("******Finished fetching accounts for bankId: " + this.state.banks[i].bankId)
-
         }
 
-        console.log("Banks after processing: " + transformedBanks.length)
 
         this.setState({ banks: transformedBanks })
         this.setState({ banksLoaded: true })
@@ -144,7 +135,6 @@ export class AddBanks extends Component {
     }
 
     transformBank = (bankId, bankName, accountTypes) => {
-        console.log("Transforming bank: " + bankName)
 
         var bank = new Bank(bankId, bankName, accountTypes)
         // console.log(bank.bankId + " , " + bank.bankName + " , " + bank.accountTypes[0].accountTypeName)
@@ -159,7 +149,6 @@ export class AddBanks extends Component {
                 bankid: bankId
             }
         }).catch((err) => {
-            console.log(err)
         })
     }
 
@@ -187,8 +176,6 @@ export class AddBanks extends Component {
     }
 
     createAccountOnClick = (e) => {
-        console.log(this.state.user.userId)
-        console.log(this.state.selectedAccountTypeId)
 
         axios({
             method: 'post',
@@ -226,7 +213,6 @@ export class AddBanks extends Component {
             if (this.state.userAccounts[i].accountTypeId === accountId) {
                 return true
             } else {
-                console.log(this.state.userAccounts[i].accountTypeId + " != " + accountId)
             }
         }
 

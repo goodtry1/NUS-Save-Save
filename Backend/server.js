@@ -13,6 +13,11 @@ const DATE_FORMATER = require( 'dateformat' );
 var nodemailer = require('nodemailer');
 var randomize = require('randomatic');
 
+
+//cors
+var cors = require('cors');
+app.use(cors());
+
 var storage = multer.diskStorage({
   destination: function (req, files, cb) {
     cb(null, 'uploads')
