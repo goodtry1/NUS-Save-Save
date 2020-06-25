@@ -331,8 +331,6 @@ class BankAccountDetails extends React.Component {
             formData.append('userId', this.state.bankAccountDetails.userId);
             formData.append('accountTypeId', this.state.bankAccountDetails.accountTypeId);
             formData.append('creditCard', this.state.ccStatement)
-           
-            console.log(formData)
 
             this.setState({bankStatement : ''})
             this.setState({singleFileName : ''})
@@ -341,7 +339,6 @@ class BankAccountDetails extends React.Component {
 
             axios.post('/uploadBankStatement', formData)
             .then(res => {
-                console.log("Response status: " + res.status)
                
 
                 if (res.status === 200) {
@@ -353,7 +350,7 @@ class BankAccountDetails extends React.Component {
                     
                 }
             })
-            .catch(err => console.log(err))
+            .catch(err => {})
         }
     }
 

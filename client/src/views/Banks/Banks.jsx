@@ -60,14 +60,11 @@ export class Banks extends Component {
         }).then((response) => {
             if (response.status === 200) {
                 this.setState({ accounts: response.data.userBankAccountDetails })
-                console.log("Successfully loaded user banks")
 
 
             } else {
-                console.log("Failed to load user banks")
             }
         }).catch((err) => {
-            console.log(err.message)
         })
     }
 
