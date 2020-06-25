@@ -13,11 +13,6 @@ const DATE_FORMATER = require( 'dateformat' );
 var nodemailer = require('nodemailer');
 var randomize = require('randomatic');
 
-
-//cors
-var cors = require('cors');
-app.use(cors());
-
 var storage = multer.diskStorage({
   destination: function (req, files, cb) {
     cb(null, 'uploads')
@@ -192,7 +187,7 @@ app.post('/signin', (req, res) => {
 app.get('/bankdetails', function (req, res) {
     sql.connect(sqlConfig, function() {
         var request = new sql.Request();
-        request.query('select * from dbo.bank where bankId = 1', function(error, results) {
+        request.query('select * from dbo.bank', function(error, results) {
 			if (error)
 			{
 			   console.log("error occured");

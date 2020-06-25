@@ -332,6 +332,7 @@ class BankAccountDetails extends React.Component {
             formData.append('accountTypeId', this.state.bankAccountDetails.accountTypeId);
             formData.append('creditCard', this.state.ccStatement)
 
+
             this.setState({bankStatement : ''})
             this.setState({singleFileName : ''})
             this.setState({ccStatement: ''})
@@ -347,10 +348,12 @@ class BankAccountDetails extends React.Component {
                     this.setState({recommendation : ''})
                     this.retrievePreviousRecommendations()
                 } else {
-                    
+                    this.setState({message : "Unknown error has occured. Please try again later", renderLoading: false}, () => {this.notify('br', 3)})
                 }
             })
-            .catch(err => {})
+            .catch(err => {
+                this.setState({message : "Unknown error has occured. Please try again later", renderLoading: false}, () => {this.notify('br', 3)})
+            })
         }
     }
 
