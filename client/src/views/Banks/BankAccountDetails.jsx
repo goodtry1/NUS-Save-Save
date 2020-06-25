@@ -348,7 +348,7 @@ class BankAccountDetails extends React.Component {
                     this.setState({recommendation : ''})
                     this.retrievePreviousRecommendations()
                 } else {
-                    
+                    this.setState({message : "Unknown error has occured. Please try again later", renderLoading: false}, () => {this.notify('br', 3)})
                 }
             })
             .catch(err => {
