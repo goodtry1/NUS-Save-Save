@@ -427,7 +427,7 @@ class RegisterPage extends React.Component {
           <div className="register-page">
             <Container>
               <Row className="justify-content-center">
-                <Col lg={5} md={8} xs={12}>
+               {/*  <Col lg={5} md={8} xs={12}>
                   <div className="info-area info-horizontal mt-5">
                     <div className="icon icon-primary">
                       <i className="now-ui-icons media-2_sound-wave" />
@@ -464,7 +464,7 @@ class RegisterPage extends React.Component {
                       </p>
                     </div>
                   </div>
-                </Col>
+                </Col> */}
                 <Col lg={4} md={8} xs={12}>
                   <Form onSubmit={this.handleSubmit}>
                     <Card className="card-signup">
