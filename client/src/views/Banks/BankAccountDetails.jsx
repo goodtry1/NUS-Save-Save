@@ -350,7 +350,9 @@ class BankAccountDetails extends React.Component {
                     
                 }
             })
-            .catch(err => {})
+            .catch(err => {
+                this.setState({message : "Unknown error has occured. Please try again later", renderLoading: false}, () => {this.notify('br', 3)})
+            })
         }
     }
 

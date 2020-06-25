@@ -290,6 +290,7 @@ class RegisterPage extends React.Component {
             () => { this.notify('br', 4) })
         }
       }).catch((err) => {
+        this.setState({message : "Unknown error has occured. Please try again later", renderLoading: false}, () => {this.notify('tc', 3)})
       })
 
 
@@ -341,8 +342,8 @@ class RegisterPage extends React.Component {
         //this.notify('tc', this.state.notificationColor)
       })
 
-      .catch(err => {
-
+      .catch((err) => {
+        this.setState({message : "Unknown error has occured. Please try again later", renderLoading: false}, () => {this.notify('tc', 3)})
       }).then(() => {
         this.setState({
           email: '',

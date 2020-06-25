@@ -273,7 +273,7 @@ class LoginPage extends React.Component {
         password: ''
       })
     }).catch((err) => {
-
+      this.setState({message : "Unknown error has occured. Please try again later", renderLoading: false}, () => {this.notify('tc', 3)})
     })
 
   }
