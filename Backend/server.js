@@ -13,11 +13,6 @@ const DATE_FORMATER = require( 'dateformat' );
 var nodemailer = require('nodemailer');
 var randomize = require('randomatic');
 
-
-//cors
-var cors = require('cors');
-app.use(cors());
-
 var storage = multer.diskStorage({
   destination: function (req, files, cb) {
     cb(null, 'uploads')
@@ -192,7 +187,7 @@ app.post('/signin', (req, res) => {
 app.get('/bankdetails', function (req, res) {
     sql.connect(sqlConfig, function() {
         var request = new sql.Request();
-        request.query('select * from dbo.bank where bankId = 1', function(error, results) {
+        request.query('select * from dbo.bank', function(error, results) {
 			if (error)
 			{
 			   console.log("error occured");
@@ -426,37 +421,32 @@ app.post('/uploadBankStatement', uploadConfig, async(req, res) => {
 	let dataBufferStatement = fs.readFileSync('./uploads/' + req.files['bankStatement'][0].originalname);
 	
 	const options = {
-	pagerender: render_page,
-	version: 'v1.10.100'
+		pagerender: render_page,
+		version: 'v1.10.100'
 	};                     
 
     let result = {}
 	
 	let creditCardParseData = {}
+	creditCardParseData['creditCardSpend']=0; 
 
 	PDFParser(dataBufferStatement, options).then(async function (data) {
+		
 		fs.writeFileSync('./uploads/result.txt', data.text);
 		result  = await parseStatement(req.body.accountTypeId);
-		
-	});
+    
 	
-	if(req.files['creditCard'][0])
-	{
-		let dataBufferCard = fs.readFileSync('./uploads/' + req.files['creditCard'][0].originalname);
-  
-		PDFParser(dataBufferCard, options).then(async function (data) {
-			fs.writeFileSync('./uploads/resultCard.txt', data.text);
-			creditCardParseData  = await parseCard();
+		if(req.files['creditCard'] && req.files['creditCard'][0])
+		{
+			let dataBufferCard = fs.readFileSync('./uploads/' + req.files['creditCard'][0].originalname);
+	  
+			PDFParser(dataBufferCard, options).then(async function (data) {
+				fs.writeFileSync('./uploads/resultCard.txt', data.text);
+				creditCardParseData  = await parseCard();
+			});
+			
+		}
 
-		});
-	}
-	else
-	{
-		creditCardParseData['creditCardSpend']=0;
-	}
-
-	
-	
     var dateAnalysed = DATE_FORMATER( new Date(), "yyyy-mm-dd HH:MM:ss" );
 	//Update the Bank acocunt details table
 	
@@ -465,7 +455,9 @@ app.post('/uploadBankStatement', uploadConfig, async(req, res) => {
 
 	let qu = `INSERT INTO dbo.[parsedBankStatementData](dateAnalysed, userId, accountTypeId, previousMonthBalance, statementDate, salary, currentMonthBalance, totalWithdrawal, totalDeposit,  totalInterest, averageDailyBalance, creditCardSpend) 
 		   VALUES ( '`+ dateAnalysed + `', '` + req.body.userId + `', '`+ req.body.accountTypeId + `', '`+ result['previousMonthBalance'] + `' , '`+ result['date'] + `' , '`+ result['salary'] + `' , '`+ result['currentMonthBalance'] + `' , '`+ result['totalWithdrawals'] + `' , '`+ result['totalDeposits'] + `' , '`+ result['totalInterests'] + `' , '`+ result['averageDailyBalance'] + `', '`+ creditCardParseData['creditCardSpend'] + `')`;
-	 
+	
+	console.log(qu)
+	deleteFile("./uploads/")
 	request.query(qu, function(error, recordset) {
 	if(error){
 		res.status(400).send()
@@ -474,12 +466,11 @@ app.post('/uploadBankStatement', uploadConfig, async(req, res) => {
 	else 
 	{
 		recommendationEngine(req.body.userId, req.body.accountTypeId)
-		res.status(200).send()
-		deleteFile("./uploads/")
-		
+		res.status(200).send()		
 	}
 	});
 
+	});
 	});
 	
 })
