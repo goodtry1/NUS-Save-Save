@@ -13,21 +13,22 @@ const DATE_FORMATER = require( 'dateformat' );
 var nodemailer = require('nodemailer');
 var randomize = require('randomatic');
 
-var storage = multer.diskStorage({
-  destination: function (req, files, cb) {
-    cb(null, 'uploads')
-  },
-  filename: function (req, files, cb) {
-    cb(null, files.originalname)
-  }
-})
 
+// Configuration for file uploads
+var storage = multer.diskStorage({
+		destination: function (req, files, cb) {
+		cb(null, 'uploads')
+	},
+		filename: function (req, files, cb) {
+		cb(null, files.originalname)
+	}
+})
 
 var upload = multer({ storage: storage })
 
 app.use(bodyParser.json())
 
-// Connection string parameters.
+// Configuration for sql connection
 var sqlConfig = {
     user: 'fintechlab',
     password: 'InformationSystems88DISA!',
@@ -45,11 +46,11 @@ var server = app.listen(5001, function () {
 
 //two factor authentication email configuration
 var transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: 'savesave462@gmail.com',
-    pass: 'SaveSave123$'
-  }
+	service: 'gmail',
+	auth: {
+		user: 'savesave462@gmail.com',
+		pass: 'SaveSave123$'
+	}
 });
 
 // two factor authentication for signup
@@ -60,23 +61,23 @@ app.post('/twoFactorAuthenticate', async (req, res) => {
 	console.log('userId' +userId)
 	if(action == "signUp" && userId != 0)
 	{
-			console.log('user already exist')
-			res.status(206).send()
+		console.log('user already exist')
+		res.status(206).send()
 	}
 	else if (action == "signIn" && userId == 0)
 	{	
-			console.log('user does not exist')
-			res.status(206).send()
+		console.log('user does not exist')
+		res.status(206).send()
 	}
 	else
 	{
 		var otp = randomize('0', 6)
 		var otpDate = DATE_FORMATER( new Date(), "yyyy-mm-dd HH:MM:ss" );
 		var mailOptions = {
-		  from: 'savesave462@gmail.com',
-		  to: req.body.email,
-		  subject: 'Save Save - One Time Password',
-		  text: `Dear User,
+			from: 'savesave462@gmail.com',
+			to: req.body.email,
+			subject: 'Save Save - One Time Password',
+			text: `Dear User,
 		  	        
 	Your Login OTP is ${otp}.
 	This OTP is generated at ${otpDate}.
@@ -140,47 +141,47 @@ app.post('/signUp', async (req, res) => {
 
 // signin
 app.post('/signin', (req, res) => {
-  let email = req.body.email;
-  let password = req.body.password;
-  console.log('body' + req.body.email + req.body.password);
-  sql.connect(sqlConfig, function() {
-  var request = new sql.Request();
- 
-  let qu = `SELECT * FROM dbo.[User]
-          WHERE email= '` + req.body.email + `'`;
- 
-  request.query(qu, async function (error, results, fields) {
-    if (error)
-    {
-       console.log("error occured");
-	   res.status(400).send()
-    }
-    else
-    {
-      if(results.recordset && results.recordset.length >0)
-      {
-        //const comparision = await bcrypt.compare(password, results.recordset[0].password //ToDO - encrypt the password
-		const comparision = (password == results.recordset[0].password)
-        if(comparision)
-        {
-           console.log("login successful")
-		   res.status(200).send({"userDetails" : results.recordset[0]})
+	let email = req.body.email;
+	let password = req.body.password;
+	console.log('body' + req.body.email + req.body.password);
+	sql.connect(sqlConfig, function() {
+		var request = new sql.Request();
 
-        }
-        else
-        {
-          console.log("Email and password does not match")
-		  res.status(204).send()
-        }
-      }
-      else
-      {
-         console.log("Email does not exits")
-		 res.status(206).send()
-      }
-    }
-  });
-  });
+		let qu = `SELECT * FROM dbo.[User]
+		  WHERE email= '` + req.body.email + `'`;
+
+		request.query(qu, async function (error, results, fields) {
+			if (error)
+			{
+				console.log("error occured");
+				res.status(400).send()
+			}
+			else
+			{
+				if(results.recordset && results.recordset.length >0)
+				{
+				    //const comparision = await bcrypt.compare(password, results.recordset[0].password //ToDO - encrypt the password
+					const comparision = (password == results.recordset[0].password)
+					if(comparision)
+					{
+					   console.log("login successful")
+					   res.status(200).send({"userDetails" : results.recordset[0]})
+
+					}
+					else
+					{
+					    console.log("Email and password does not match")
+					    res.status(204).send()
+					}
+				}
+				else
+				{
+					console.log("Email does not exits")
+					res.status(206).send()
+				}
+			}
+		});
+	});
 }); 
 
 //get banks
@@ -447,29 +448,28 @@ app.post('/uploadBankStatement', uploadConfig, async(req, res) => {
 			
 		}
 
-    var dateAnalysed = DATE_FORMATER( new Date(), "yyyy-mm-dd HH:MM:ss" );
-	//Update the Bank acocunt details table
-	
-	sql.connect(sqlConfig,  function() {
-	var request = new sql.Request();
+		var dateAnalysed = DATE_FORMATER( new Date(), "yyyy-mm-dd HH:MM:ss" );
+		
+		//Update the Bank account details table
+		sql.connect(sqlConfig,  function() {
+		var request = new sql.Request();
 
-	let qu = `INSERT INTO dbo.[parsedBankStatementData](dateAnalysed, userId, accountTypeId, previousMonthBalance, statementDate, salary, currentMonthBalance, totalWithdrawal, totalDeposit,  totalInterest, averageDailyBalance, creditCardSpend) 
-		   VALUES ( '`+ dateAnalysed + `', '` + req.body.userId + `', '`+ req.body.accountTypeId + `', '`+ result['previousMonthBalance'] + `' , '`+ result['date'] + `' , '`+ result['salary'] + `' , '`+ result['currentMonthBalance'] + `' , '`+ result['totalWithdrawals'] + `' , '`+ result['totalDeposits'] + `' , '`+ result['totalInterests'] + `' , '`+ result['averageDailyBalance'] + `', '`+ creditCardParseData['creditCardSpend'] + `')`;
-	
-	console.log(qu)
-	deleteFile("./uploads/")
-	request.query(qu, function(error, recordset) {
-	if(error){
-		res.status(400).send()
-	}
-	else 
-	{
-		recommendationEngine(req.body.userId, req.body.accountTypeId)
-		res.status(200).send()		
-	}
-	});
+		let qu = `INSERT INTO dbo.[parsedBankStatementData](dateAnalysed, userId, accountTypeId, previousMonthBalance, statementDate, salary, currentMonthBalance, totalWithdrawal, totalDeposit,  totalInterest, averageDailyBalance, creditCardSpend) 
+			   VALUES ( '`+ dateAnalysed + `', '` + req.body.userId + `', '`+ req.body.accountTypeId + `', '`+ result['previousMonthBalance'] + `' , '`+ result['date'] + `' , '`+ result['salary'] + `' , '`+ result['currentMonthBalance'] + `' , '`+ result['totalWithdrawals'] + `' , '`+ result['totalDeposits'] + `' , '`+ result['totalInterests'] + `' , '`+ result['averageDailyBalance'] + `', '`+ creditCardParseData['creditCardSpend'] + `')`;
+		
+		deleteFile("./uploads/")
+		request.query(qu, function(error, recordset) {
+		if(error){
+			res.status(400).send()
+		}
+		else 
+		{
+			recommendationEngine(req.body.userId, req.body.accountTypeId)
+			res.status(200).send()		
+		}
+		});
 
-	});
+		});
 	});
 	
 })
@@ -552,7 +552,7 @@ function render_page(pageData) {
 }
 
 
- function parseStatement(parsestatement)
+function parseStatement(parsestatement)
 {
 	
   return new promise(async function(resolve, reject) {
@@ -602,12 +602,6 @@ function render_page(pageData) {
     if (line === 'GIRO - SALARY') {
       indexMap.set('salary', lineIndex - 1);
       result['salary'] = parseFloat(textMap.get(lineIndex - 1).trim().split(/\s+/)[2].replace(/\s|,|/g, ''));
-    }
-
-    // try to find credit card payment
-    if (line === 'BILL PAYMENT     INB') {
-      indexMap.set('creditCardSpend', lineIndex - 1);
-      result['creditCardSpend'] = parseFloat(textMap.get(lineIndex - 1).trim().split(/\s+/)[2].replace(/\s|,|/g, ''));
     }
 
     lineIndex++;
