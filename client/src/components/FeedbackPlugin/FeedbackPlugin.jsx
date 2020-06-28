@@ -111,6 +111,10 @@ class FeedbackPlugin extends Component {
         this.setState({ classes: "dropdown show" });
     }
 
+    closeFeedback() {
+        this.setState({ classes: "dropdown"})
+    }
+
     
     
 

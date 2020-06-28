@@ -171,7 +171,7 @@ let routes = [
       } */
     ]
   },
-  /* {
+  {
     collapse: true,
     path: "/components",
     name: "Components",
@@ -346,7 +346,7 @@ let routes = [
     icon: "now-ui-icons media-1_album",
     component: Calendar,
     layout: "/admin"
-  } */
+  }
 ];
 
 export default routes;
