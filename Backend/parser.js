@@ -13,9 +13,6 @@ function initializeParseData()
 		result['averageDailyBalance'] =0;
 		result['date'] = 0;
 		result['salary']  = 0;
-		result['totalWithdrawals']  = 0 ;
-		result['totalDeposits'] =0;
-		result['totalInterests'] =0;
 		resolve (result);
   });
 }
@@ -32,9 +29,9 @@ function parseStatement(parsestatement)
   let textMap = new Map();
   let indexMap = new Map();
 
-  // extracted information
   let result = await initializeParseData();
 
+  // extracted information
   let readInterface = readline.createInterface({
     input: fs.createReadStream('./uploads/result.txt')
   });
@@ -79,14 +76,16 @@ function parseStatement(parsestatement)
 
   readInterface.on('close', function () {
     // set this month's total withdraws/deposits, total interests this year and this month's average daily balance
-    let array = textMap.get(indexMap.get('totalWithdrawalsDeposits')).trim().split(/\s+/);
-    result['totalWithdrawals'] = parseFloat(array[1].replace(/\s|,|/g, ''));
-    result['totalDeposits'] = parseFloat(array[0].replace(/\s|,|/g, ''));
-    result['totalInterests'] = parseFloat(textMap.get(indexMap.get('totalInterests')).replace(/\s|,|/g, ''));
-    result['averageDailyBalance'] = parseFloat(textMap.get(indexMap.get('averageDailyBalance')).replace(/\s|,|/g, ''));
-
-	resolve (result)
-	console.log(result)
+	if(indexMap.get('totalWithdrawalsDeposits'))
+	{
+		let array = textMap.get(indexMap.get('totalWithdrawalsDeposits')).trim().split(/\s+/);
+		if(array.length == 2)
+		{
+			result['averageDailyBalance'] = parseFloat(textMap.get(indexMap.get('averageDailyBalance')).replace(/\s|,|/g, ''));
+		}	
+	}
+		resolve (result)
+		console.log(result)
 	
   });
   });
@@ -104,7 +103,8 @@ function parseCard()
 	let indexMap = new Map();
 
 	// extracted information
-	let result = {};
+	let result = {}
+	result['creditCardSpend']= 0;
 
 	let readInterface = readline.createInterface({
 		input: fs.createReadStream('./uploads/resultCard.txt')
@@ -122,18 +122,22 @@ function parseCard()
 
 
 	readInterface.on('close', function () {
-		let array = textMap.get(indexMap.get('creditCardSpend')).trim().split(/\s+/);
-		result['creditCardSpend'] = parseFloat(array[0].replace(/\s|,|/g, ''));
-		resolve (result);
+
+		if(indexMap.get('creditCardSpend'))
+		{
+			let array = textMap.get(indexMap.get('creditCardSpend')).trim().split(/\s+/);
+			if(array.length == 1)
+			{
+				result['creditCardSpend'] = parseFloat(array[0].replace(/\s|,|/g, ''));
+			}	
+		}
+		resolve (result)
 		console.log(result)
 	});
   
   });
 
 }
-
-
-
 
 
 module.exports = { 
