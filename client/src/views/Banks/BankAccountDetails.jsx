@@ -80,8 +80,10 @@ import "moment-timezone"
 import Datetime from "react-datetime";
 
 import ProgressBar from 'react-bootstrap/ProgressBar'
-import { isBlock } from "typescript";
 
+//PDFDetails model
+import { PDFDetails } from '../../models/PDFDetails'
+import Moment from "react-moment";
 
 
 /* var mapData = {
@@ -124,25 +126,25 @@ class BankAccountDetails extends React.Component {
 
             showPdfDetails: false,
             PdfDetails: {
-                previousMonthBalance: 1000,
-                date: '28/6/2020',
-                salaryCredited: 1000,
-                currentMonthBalance: 1000,
-                totalWithdrawals: 1000,
-                totalDeposits: 1000,
-                totalInterests: 1000,
-                creditCardSpend: 1000
+                previousMonthBalance: 0,
+                startDate: '',
+                endDate: '',
+                salary: 0,
+                currentMonthBalance: 0,
+                creditCardSpend: 0,
+                averageDailyBalance: 0,
+                wealth: 0
             },
 
             userInputPdfDetails: {
                 previousMonthBalance: '',
-                date: '',
-                salaryCredited: '',
+                startDate: '',
+                endDate: '',
+                salary: '',
                 currentMonthBalance: '',
-                totalWithdrawals: '',
-                totalDeposits: '',
-                totalInterests: '',
-                creditCardSpend: ''
+                creditCardSpend: '',
+                averageDailyBalance: '',
+                wealth: ''
             }
 
 
@@ -345,6 +347,7 @@ class BankAccountDetails extends React.Component {
     }
 
     uploadBankStatement = () => {
+
         if (!this.state.bankStatement) {
             /* this.setState(
                 {
@@ -359,37 +362,59 @@ class BankAccountDetails extends React.Component {
 
         } else {
 
-            this.setState({ showPdfDetails: true })
-            this.closeFeedback()
 
-            /*  const formData = new FormData();
-             formData.append('bankStatement', this.state.bankStatement);
-             formData.append('userId', this.state.bankAccountDetails.userId);
-             formData.append('accountTypeId', this.state.bankAccountDetails.accountTypeId);
-             formData.append('creditCard', this.state.ccStatement)
- 
- 
-             this.setState({ bankStatement: '' })
-             this.setState({ singleFileName: '' })
-             this.setState({ ccStatement: '' })
-             this.setState({ ccFileName: '' })
- 
-             axios.post('/uploadBankStatement', formData)
-                 .then(res => {
- 
- 
-                     if (res.status === 200) {
-                         this.setState({ message: 'Your bank statement has been uploaded successfully' })
-                         this.notify('br', 5)
-                         this.setState({ recommendation: '' })
-                         this.retrievePreviousRecommendations()
-                     } else {
-                         this.setState({ message: "Unknown error has occured. Please try again later", renderLoading: false }, () => { this.notify('br', 3) })
-                     }
-                 })
-                 .catch(err => {
-                     this.setState({ message: "Unknown error has occured. Please try again later", renderLoading: false }, () => { this.notify('br', 3) })
-                 })*/
+
+            const formData = new FormData();
+            formData.append('bankStatement', this.state.bankStatement);
+            formData.append('userId', this.state.bankAccountDetails.userId);
+            formData.append('accountTypeId', this.state.bankAccountDetails.accountTypeId);
+            formData.append('creditCard', this.state.ccStatement)
+
+
+            this.setState({ bankStatement: '' })
+            this.setState({ singleFileName: '' })
+            this.setState({ ccStatement: '' })
+            this.setState({ ccFileName: '' })
+
+            axios.post('/uploadBankStatement', formData)
+                .then(res => {
+
+
+                    if (res.status === 200) {
+                        let parsedDate = res.data.parsedData.date.split("TO")
+                        console.log(parsedDate[0])
+
+
+
+
+
+                        let PdfDetails = new PDFDetails(res.data.parsedData.previousMonthBalance,
+                            res.data.parsedData.currentMonthBalance,
+                            res.data.parsedData.averageDailyBalance,
+                            parsedDate[0],
+                            parsedDate[1],
+                            res.data.parsedData.salary,
+                            res.data.parsedData.creditCardSpend)
+
+                        this.setState({ PdfDetails: PdfDetails })
+                        this.setState({ message: 'Your bank statement has been uploaded successfully' }, () => {
+                            setTimeout(() => {
+                                this.setState({ showPdfDetails: true })
+                            }, 2000);
+
+
+                        })
+                        this.notify('br', 5)
+                        //this.setState({ recommendation: '' })
+                        this.closeFeedback()
+                        //this.retrievePreviousRecommendations()
+                    } else {
+                        this.setState({ message: "Unknown error has occured. Please try again later", renderLoading: false }, () => { this.notify('br', 3) })
+                    }
+                })
+                .catch(err => {
+                    this.setState({ message: err.message, renderLoading: false }, () => { this.notify('br', 3) })
+                })
         }
     }
 
@@ -410,11 +435,85 @@ class BankAccountDetails extends React.Component {
         }
     }
 
-    renderCheckPDFDetailsSubmit = () => {
+    handleUserInputOnPdfDetails = (event) => {
+        console.log(event.target)
+
+
+        var userInputPdfDetails = this.state.userInputPdfDetails
+
+
+
+        userInputPdfDetails[event.target.name] = event.target.value
+
+        this.setState({
+            userInputPdfDetails
+        }, () => { console.log(this.state.userInputPdfDetails) })
+    }
+
+    handleDateTime = (moment, name) => {
+        var d = (moment.toDate())
+        d = d.split(" ")
+        var date = (d[1] + " " + d[2] + " " + d[3])
+
+        var userInputPdfDetails = this.state.userInputPdfDetails
+        userInputPdfDetails[name] = date
+
+        this.setState({
+            userInputPdfDetails
+        }, () => { console.log(this.state.userInputPdfDetails) })
+
 
     }
 
-    renderCheckPDFDetailsCancel = () => {
+    checkPDFDetailsSubmit = (event) => {
+        event.preventDefault();
+
+        var creditCardSpend
+
+        var PdfDetails = this.state.PdfDetails
+        var userInputPdfDetails = this.state.userInputPdfDetails
+
+
+        Object.keys(userInputPdfDetails).forEach(function (key) {
+            console.log(userInputPdfDetails[key])
+            if (userInputPdfDetails[key] === "") {
+                if (!PdfDetails[key] || PdfDetails[key] === "") {
+                    userInputPdfDetails[key] = 0
+                } else {
+                    userInputPdfDetails[key] = PdfDetails[key]
+                }
+
+            }
+
+
+        })
+
+
+
+        var statementDate = userInputPdfDetails.startDate + " TO " + userInputPdfDetails.endDate
+        userInputPdfDetails.date = statementDate
+
+        console.log(userInputPdfDetails)
+
+
+
+
+        axios({
+            method: 'post',
+            url: '/updateParsedData',
+            data: {
+                userId: this.state.bankAccountDetails.userId,
+                accountTypeId: this.state.bankAccountDetails.accountTypeId,
+                parsedData: userInputPdfDetails
+            }
+        }).then((res) => {
+            console.log(res.status)
+        }).catch((err) => {
+            console.log(err)
+        })
+    }
+
+    checkPDFDetailsCancel = () => {
         this.setState({ showPdfDetails: false })
     }
 
@@ -430,7 +529,7 @@ class BankAccountDetails extends React.Component {
                                 Help us improve our recommendation engine by verifying the fields below
 
                             </CardHeader>
-                            
+
                         </Card>
                     </Col>
 
@@ -439,39 +538,74 @@ class BankAccountDetails extends React.Component {
                     <Card className="card-chart">
                         <CardHeader>
                             <center>
-                                <CardTitle tag="h4">Here's what we got from the PDF you submitted</CardTitle>
+                                <CardTitle tag="h4">Here's what we got from the statements you submitted</CardTitle>
                             </center>
                         </CardHeader>
                         <CardBody>
-                            <Form action="#" >
+                            <Form onSubmit={this.checkPDFDetailsSubmit} >
                                 <Row>
-                                    <Col sm="4">
+                                    <Col sm="3">
                                     </Col>
 
-                                    <Col sm="4">
-                                        <label>Date</label>
+                                    <Col sm="3">
+                                        <label>Start Date</label>
                                         <FormGroup>
                                             <Datetime
-                                                inputProps={{ placeholder: this.state.PdfDetails.date }}
+                                                inputProps={{ placeholder: this.state.PdfDetails.startDate }}
+                                                dateFormat="DD/MM/YYYY"
                                                 timeFormat={false}
+                                                value={this.state.userInputPdfDetails.startDate}
+                                                onChange={moment => this.handleDateTime(moment, 'startDate')}
+                                            />
+                                        </FormGroup>
+
+
+                                    </Col>
+
+
+
+                                    <Col sm="3">
+                                        <label>End Date</label>
+                                        <FormGroup>
+                                            <Datetime
+                                                inputProps={{ placeholder: this.state.PdfDetails.endDate }}
+                                                timeFormat={false}
+                                                onChange={moment => this.handleDateTime(moment, 'endDate')}
                                             />
                                         </FormGroup>
                                     </Col>
 
-                                    <Col sm="4">
+                                    <Col sm="3">
                                     </Col>
                                 </Row>
 
                                 <Row>
                                     <Col sm="4">
+                                        <label>This month's current balance</label>
+                                        <FormGroup>
+                                            <Input
+                                                name="currentMonthBalance"
+                                                type="number"
+                                                min="0.00"
+                                                max="1000000"
+                                                step="100"
+                                                placeholder={this.state.PdfDetails.currentMonthBalance}
+                                                onChange={this.handleUserInputOnPdfDetails}
+                                            />
+                                        </FormGroup>
+                                    </Col>
+
+                                    <Col sm="4">
                                         <label>Previous month's Balance</label>
                                         <FormGroup>
                                             <Input
+                                                name="previousMonthBalance"
                                                 type="number"
                                                 min="0.00"
                                                 max="1000000"
                                                 step="100"
                                                 placeholder={this.state.PdfDetails.previousMonthBalance}
+                                                onChange={this.handleUserInputOnPdfDetails}
                                             />
                                         </FormGroup>
                                     </Col>
@@ -480,52 +614,36 @@ class BankAccountDetails extends React.Component {
                                         <label>Salary credited</label>
                                         <FormGroup>
                                             <Input
+                                                name="salary"
                                                 type="number"
                                                 min="0.00"
                                                 max="1000000"
                                                 step="100"
-                                                placeholder={this.state.PdfDetails.salaryCredited}
+                                                placeholder={this.state.PdfDetails.salary}
+                                                onChange={this.handleUserInputOnPdfDetails}
                                             />
                                         </FormGroup>
                                     </Col>
 
-                                    <Col sm="4">
-                                        <label>This month's current balance</label>
-                                        <FormGroup>
-                                            <Input
-                                                type="number"
-                                                min="0.00"
-                                                max="1000000"
-                                                step="100"
-                                                placeholder={this.state.PdfDetails.currentMonthBalance}
-                                            />
-                                        </FormGroup>
-                                    </Col>
+
                                 </Row>
 
                                 <Row>
-                                    <Col sm="4">
-                                        <label>Total withdrawals</label>
-                                        <FormGroup>
-                                            <Input
-                                                type="number"
-                                                min="0.00"
-                                                max="1000000"
-                                                step="100"
-                                                placeholder={this.state.PdfDetails.totalWithdrawals}
-                                            />
-                                        </FormGroup>
+                                    <Col sm="2">
+
                                     </Col>
 
                                     <Col sm="4">
-                                        <label>Total deposits</label>
+                                        <label>Average daily balance</label>
                                         <FormGroup>
                                             <Input
+                                                name="averageDailyBalance"
                                                 type="number"
                                                 min="0.00"
                                                 max="1000000"
                                                 step="100"
-                                                placeholder={this.state.PdfDetails.totalDeposits}
+                                                placeholder={this.state.PdfDetails.averageDailyBalance}
+                                                onChange={this.handleUserInputOnPdfDetails}
                                             />
                                         </FormGroup>
                                     </Col>
@@ -534,13 +652,19 @@ class BankAccountDetails extends React.Component {
                                         <label>Credit card spending</label>
                                         <FormGroup>
                                             <Input
+                                                name="creditCardSpend"
                                                 type="number"
                                                 min="0.00"
                                                 max="1000000"
                                                 step="100"
                                                 placeholder={this.state.PdfDetails.creditCardSpend}
+                                                onChange={this.handleUserInputOnPdfDetails}
                                             />
                                         </FormGroup>
+                                    </Col>
+
+                                    <Col sm="2">
+
                                     </Col>
                                 </Row>
 
@@ -550,8 +674,8 @@ class BankAccountDetails extends React.Component {
                                     </Col>
 
                                     <Col md="3" sm="6">
-                                        <Button onClick={this.renderCheckPDFDetailsCancel} > Cancel</Button>
-                                        <Button onClick="#" > Submit</Button>
+                                        <Button onClick={this.checkPDFDetailsCancel} > Cancel</Button>
+                                        <Button > Submit</Button>
                                     </Col>
 
                                 </Row>
@@ -835,9 +959,9 @@ class BankAccountDetails extends React.Component {
                                     {this.state.bankStatement ?
                                         (
 
-                                            
-                                                    <Button onClick={this.uploadBankStatement}> Submit</Button>
-                                                
+
+                                            <Button onClick={this.uploadBankStatement}> Submit</Button>
+
 
                                         ) : (<div></div>)}
 
