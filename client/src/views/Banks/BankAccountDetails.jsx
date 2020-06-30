@@ -72,7 +72,7 @@ import FeedbackPlugin from '../../components/FeedbackPlugin/FeedbackPlugin'
 import { Spring } from 'react-spring/renderprops'
 
 //moment
-
+import Moment from 'react-moment'
 import moment from "moment";
 import "moment-timezone"
 
@@ -83,7 +83,7 @@ import ProgressBar from 'react-bootstrap/ProgressBar'
 
 //PDFDetails model
 import { PDFDetails } from '../../models/PDFDetails'
-import Moment from "react-moment";
+
 
 
 /* var mapData = {
@@ -382,7 +382,13 @@ class BankAccountDetails extends React.Component {
 
                     if (res.status === 200) {
                         let parsedDate = res.data.parsedData.date.split("TO")
-                        console.log(parsedDate[0])
+                        var startDate = parsedDate[0].split(" ")
+                        var endDate = parsedDate[1]
+
+                     
+
+                        var d1 = new Date(startDate)
+                        var d2 = new Date(endDate)
 
 
 
@@ -391,8 +397,8 @@ class BankAccountDetails extends React.Component {
                         let PdfDetails = new PDFDetails(res.data.parsedData.previousMonthBalance,
                             res.data.parsedData.currentMonthBalance,
                             res.data.parsedData.averageDailyBalance,
-                            parsedDate[0],
-                            parsedDate[1],
+                            d1,
+                            d2,
                             res.data.parsedData.salary,
                             res.data.parsedData.creditCardSpend)
 
@@ -451,12 +457,10 @@ class BankAccountDetails extends React.Component {
     }
 
     handleDateTime = (moment, name) => {
-        var d = (moment.toDate())
-        d = d.split(" ")
-        var date = (d[1] + " " + d[2] + " " + d[3])
+        console.log(moment)
 
         var userInputPdfDetails = this.state.userInputPdfDetails
-        userInputPdfDetails[name] = date
+        userInputPdfDetails[name] = moment
 
         this.setState({
             userInputPdfDetails
@@ -468,7 +472,6 @@ class BankAccountDetails extends React.Component {
     checkPDFDetailsSubmit = (event) => {
         event.preventDefault();
 
-        var creditCardSpend
 
         var PdfDetails = this.state.PdfDetails
         var userInputPdfDetails = this.state.userInputPdfDetails
@@ -488,7 +491,13 @@ class BankAccountDetails extends React.Component {
 
         })
 
+        /* Processing Date */
+        var d1 = userInputPdfDetails.startDate.toString().split(" ")
+        userInputPdfDetails.startDate = d1[2] + " " + d1[1] + " " + d1[3] 
 
+        var d2 = userInputPdfDetails.endDate.toString().split(" ")
+        userInputPdfDetails.endDate = d2[2] + " " + d2[1] + " " + d2[3] 
+        
 
         var statementDate = userInputPdfDetails.startDate + " TO " + userInputPdfDetails.endDate
         userInputPdfDetails.date = statementDate
@@ -507,9 +516,20 @@ class BankAccountDetails extends React.Component {
                 parsedData: userInputPdfDetails
             }
         }).then((res) => {
-            console.log(res.status)
+            this.setState({ message: "Your financial statements have been verified!" },
+                () => {
+                    this.notify('br', 5)
+                    setTimeout(() => {
+                        this.setState({ showPdfDetails: false })
+                    }, 2000);
+                    setTimeout(() => {
+                        this.retrievePreviousRecommendations()
+                    }, 4000);
+                })
         }).catch((err) => {
-            console.log(err)
+            this.setState({ message: err.message },
+                () => { this.notify('br', 3) })
+
         })
     }
 
@@ -551,10 +571,18 @@ class BankAccountDetails extends React.Component {
                                         <label>Start Date</label>
                                         <FormGroup>
                                             <Datetime
-                                                inputProps={{ placeholder: this.state.PdfDetails.startDate }}
+                                                inputProps={{
+                                                    placeholder: moment(this.state.PdfDetails.startDate)
+                                                        .tz("Singapore")
+                                                        .format('DD/MM/YYYY')
+                                                }}
                                                 dateFormat="DD/MM/YYYY"
                                                 timeFormat={false}
-                                                value={this.state.userInputPdfDetails.startDate}
+
+
+                                                /* value={moment(this.state.userInputPdfDetails.startDate)
+                                                    .tz("Singapore")
+                                                    .format('DD/MM/YYYY')} */
                                                 onChange={moment => this.handleDateTime(moment, 'startDate')}
                                             />
                                         </FormGroup>
@@ -568,7 +596,12 @@ class BankAccountDetails extends React.Component {
                                         <label>End Date</label>
                                         <FormGroup>
                                             <Datetime
-                                                inputProps={{ placeholder: this.state.PdfDetails.endDate }}
+                                                inputProps={{
+                                                    placeholder: moment(this.state.PdfDetails.endDate)
+                                                        .tz("Singapore")
+                                                        .format('DD/MM/YYYY')
+                                                }}
+
                                                 timeFormat={false}
                                                 onChange={moment => this.handleDateTime(moment, 'endDate')}
                                             />
