@@ -92,6 +92,7 @@ class LoginPage extends React.Component {
 
 
   componentDidMount() {
+    console.log(api)
     
     if (localStorage.getItem('isLoggedIn')) {
       this.setState({ redirect: true })
@@ -208,7 +209,7 @@ class LoginPage extends React.Component {
 
     axios({
       method: 'post',
-      url: api.api_url + '/signin',
+      url: api + '/signin',
       data: {
         "email": this.state.email,
         "password": this.state.password
