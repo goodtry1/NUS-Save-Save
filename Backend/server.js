@@ -13,6 +13,9 @@ const DATE_FORMATER = require( 'dateformat' );
 var nodemailer = require('nodemailer');
 var randomize = require('randomatic');
 
+//cors
+var cors = require('cors');
+app.use(cors());
 
 // Configuration for file uploads
 var storage = multer.diskStorage({
@@ -36,8 +39,16 @@ var sqlConfig = {
     database: 'SaveSave'
 }
 
-// Start server and listen on http://localhost:5001/
-var server = app.listen(5001, function () {
+
+// upon enter..
+app.get('/', (req,res) => {
+    res.send("App is working fine but you are not supposed to enter here.... :D.")
+})
+
+
+
+// Start server and listen on whicher port OR http://localhost:5001/
+var server = app.listen(process.env.PORT || 5001, function () {
     var host = server.address().address
     var port = server.address().port
     console.log("app listening at %s", port)
@@ -188,7 +199,7 @@ app.post('/signin', (req, res) => {
 app.get('/bankdetails', function (req, res) {
     sql.connect(sqlConfig, function() {
         var request = new sql.Request();
-        request.query('select * from dbo.bank', function(error, results) {
+        request.query('select * from dbo.bank where bankId = 2', function(error, results) {
 			if (error)
 			{
 			   console.log("error occured");

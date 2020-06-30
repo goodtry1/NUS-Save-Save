@@ -39,7 +39,6 @@ class Admin extends React.Component {
   notificationAlert = React.createRef();
   mainPanel = React.createRef();
   componentDidMount() {
-    document.body.classList.toggle("sidebar-mini");
     if (navigator.platform.indexOf("Win") > -1) {
       document.documentElement.className += " perfect-scrollbar-on";
       document.documentElement.classList.remove("perfect-scrollbar-off");

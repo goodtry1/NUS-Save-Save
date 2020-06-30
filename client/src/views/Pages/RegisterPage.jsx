@@ -311,7 +311,8 @@ class RegisterPage extends React.Component {
       email: this.state.email,
       password: this.state.password,
       firstName: this.state.firstName,
-      lastName: this.state.lastName
+      lastName: this.state.lastName,
+      contactNumber: this.state.number
     };
 
     fetch("/signUp", {
@@ -336,14 +337,9 @@ class RegisterPage extends React.Component {
           this.notify('tc', 4)
         }
 
-        return response.json();
+        //return response.json();
 
-      }).then((data) => {
-        this.setState({ message: data.message })
-        //this.notify('tc', this.state.notificationColor)
-      })
-
-      .catch((err) => {
+      }).catch((err) => {
         this.setState({message : "Unknown error has occured. Please try again later", renderLoading: false}, () => {this.notify('tc', 3)})
       }).then(() => {
         this.setState({
