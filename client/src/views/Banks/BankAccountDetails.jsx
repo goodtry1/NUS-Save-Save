@@ -156,7 +156,7 @@ class BankAccountDetails extends React.Component {
 
         axios({
             method: 'post',
-            url: '/fetchrecommendations',
+            url: 'http://localhost:5001/fetchrecommendations',
             data: {
                 userId: this.state.bankAccountDetails.userId,
                 accountTypeid: this.state.bankAccountDetails.accountTypeId
@@ -338,7 +338,7 @@ class BankAccountDetails extends React.Component {
             this.setState({ccStatement: ''})
             this.setState({ccFileName: ''})
 
-            axios.post('/uploadBankStatement', formData)
+            axios.post('http://localhost:5001/uploadBankStatement', formData)
             .then(res => {
                
 

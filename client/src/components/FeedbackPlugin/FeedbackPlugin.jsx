@@ -148,7 +148,7 @@ class FeedbackPlugin extends Component {
 
             axios({
                 method: 'post',
-                url: '/addFeedback',
+                url: 'http://localhost:5001/addFeedback',
                 data: {
                     recommendationId: recommendationId,
                     feedbackRating: rating,

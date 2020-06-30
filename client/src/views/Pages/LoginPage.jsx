@@ -206,7 +206,7 @@ class LoginPage extends React.Component {
 
     axios({
       method: 'post',
-      url: '/signin',
+      url: 'http://localhost:5001/signin',
       data: {
         "email": this.state.email,
         "password": this.state.password
@@ -224,7 +224,7 @@ class LoginPage extends React.Component {
 
           axios({
             method: 'post',
-            url: '/twoFactorAuthenticate',
+            url: 'http://localhost:5001/twoFactorAuthenticate',
             data: {
               email: this.state.email,
               action: "signIn"

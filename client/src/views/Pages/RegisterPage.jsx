@@ -273,7 +273,7 @@ class RegisterPage extends React.Component {
 
       axios({
         method: 'post',
-        url: '/twoFactorAuthenticate',
+        url: 'http://localhost:5001/twoFactorAuthenticate',
         data: {
           "email": this.state.email,
           "action": "signUp"
@@ -315,7 +315,7 @@ class RegisterPage extends React.Component {
       contactNumber: this.state.number
     };
 
-    fetch("/signUp", {
+    fetch("http://localhost:5001/signUp", {
       method: "POST",
       body: JSON.stringify(values),
       headers: new Headers({

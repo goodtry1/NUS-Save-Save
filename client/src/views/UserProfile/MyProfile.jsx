@@ -120,7 +120,7 @@ export class MyProfile extends Component {
 
         axios({
             method: 'post',
-            url: '/editProfile',
+            url: 'http://localhost:5001/editProfile',
             data: {
                 userId: this.state.updatedUser.userId,
                 email: this.state.updatedUser.email,
@@ -198,7 +198,7 @@ export class MyProfile extends Component {
                 //console.log("Check correct.")
                 axios({
                     method: 'post',
-                    url: '/changePassword',
+                    url: 'http://localhost:5001/changePassword',
                     data: {
                         userId: this.state.updatedUser.userId,
                         oldPassword: this.state.oldPw,

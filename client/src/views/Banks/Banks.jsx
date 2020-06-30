@@ -53,7 +53,7 @@ export class Banks extends Component {
 
         axios({
             method: 'post',
-            url: '/userBankAccountDetails',
+            url: 'http://localhost:5001/userBankAccountDetails',
             data: {
                 userId: this.state.user.userId
             }

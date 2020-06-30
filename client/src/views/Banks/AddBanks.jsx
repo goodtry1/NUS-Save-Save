@@ -92,7 +92,7 @@ export class AddBanks extends Component {
 
 
 
-        axios.get('/bankDetails')
+        axios.get('http://localhost:5001/bankDetails')
             .then((res) => {
                 var banks = []
 
@@ -144,7 +144,7 @@ export class AddBanks extends Component {
     getAccountTypesFromBankId = (bankId) => {
         return axios({
             method: 'post',
-            url: '/fetchAccountType',
+            url: 'http://localhost:5001/fetchAccountType',
             data: {
                 bankid: bankId
             }
@@ -179,7 +179,7 @@ export class AddBanks extends Component {
 
         axios({
             method: 'post',
-            url: '/addBankAccount',
+            url: 'http://localhost:5001/addBankAccount',
             data: {
                 userId: this.state.user.userId,
                 accountTypeId: this.state.selectedAccountTypeId,

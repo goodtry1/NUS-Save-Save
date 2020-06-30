@@ -104,7 +104,7 @@ class Dashboard extends React.Component {
 
     axios({
       method: 'post',
-      url: '/userBankAccountDetails',
+      url: 'http://localhost:5001/userBankAccountDetails',
       data: {
         userId: this.state.user.userId
       }
@@ -137,7 +137,7 @@ class Dashboard extends React.Component {
 
     axios({
       method: 'post',
-      url: '/fetchrecommendations',
+      url: 'http://localhost:5001/fetchrecommendations',
       data: {
         userId: this.state.user.userId,
         accountTypeid: accountTypeId
