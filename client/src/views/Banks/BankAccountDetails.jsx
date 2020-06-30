@@ -382,14 +382,20 @@ class BankAccountDetails extends React.Component {
 
                     if (res.status === 200) {
                         let parsedDate = res.data.parsedData.date.split("TO")
-                        var startDate = parsedDate[0].split(" ")
-                        var endDate = parsedDate[1]
+                        var startDate = parsedDate[0].trim()
+                        var endDate = parsedDate[1].trim()
 
-                     
 
-                        var d1 = new Date(startDate)
-                        var d2 = new Date(endDate)
+                        var d1 = new moment(startDate)
+                        var d2 = new moment(endDate)
 
+                        console.log(d1)
+                        console.log(d2)
+
+                        let userInputPdfDetails = this.state.userInputPdfDetails
+                        userInputPdfDetails.startDate = d1
+                        userInputPdfDetails.endDate = d2
+                        this.setState({ userInputPdfDetails })
 
 
 
@@ -493,11 +499,11 @@ class BankAccountDetails extends React.Component {
 
         /* Processing Date */
         var d1 = userInputPdfDetails.startDate.toString().split(" ")
-        userInputPdfDetails.startDate = d1[2] + " " + d1[1] + " " + d1[3] 
+        userInputPdfDetails.startDate = d1[2] + " " + d1[1] + " " + d1[3]
 
         var d2 = userInputPdfDetails.endDate.toString().split(" ")
-        userInputPdfDetails.endDate = d2[2] + " " + d2[1] + " " + d2[3] 
-        
+        userInputPdfDetails.endDate = d2[2] + " " + d2[1] + " " + d2[3]
+
 
         var statementDate = userInputPdfDetails.startDate + " TO " + userInputPdfDetails.endDate
         userInputPdfDetails.date = statementDate
@@ -580,9 +586,9 @@ class BankAccountDetails extends React.Component {
                                                 timeFormat={false}
 
 
-                                                /* value={moment(this.state.userInputPdfDetails.startDate)
+                                                value={moment(this.state.userInputPdfDetails.startDate)
                                                     .tz("Singapore")
-                                                    .format('DD/MM/YYYY')} */
+                                                    .format('DD/MM/YYYY')}
                                                 onChange={moment => this.handleDateTime(moment, 'startDate')}
                                             />
                                         </FormGroup>
@@ -602,6 +608,10 @@ class BankAccountDetails extends React.Component {
                                                         .format('DD/MM/YYYY')
                                                 }}
 
+                                                value={moment(this.state.userInputPdfDetails.endDate)
+                                                    .tz("Singapore")
+                                                    .format('DD/MM/YYYY')}
+                                                dateFormat="DD/MM/YYYY"
                                                 timeFormat={false}
                                                 onChange={moment => this.handleDateTime(moment, 'endDate')}
                                             />
