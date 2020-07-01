@@ -15,6 +15,7 @@
 
 */
 import React from "react";
+import { api } from '../../api-config'
 
 // reactstrap components
 import {
@@ -273,7 +274,7 @@ class RegisterPage extends React.Component {
 
       axios({
         method: 'post',
-        url: '/twoFactorAuthenticate',
+        url: `${api}/twoFactorAuthenticate`,
         data: {
           "email": this.state.email,
           "action": "signUp"
@@ -316,7 +317,7 @@ class RegisterPage extends React.Component {
       
     };
 
-    fetch("/signUp", {
+    fetch(`${api}/signUp`, {
       method: "POST",
       body: JSON.stringify(values),
       headers: new Headers({

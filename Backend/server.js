@@ -13,6 +13,9 @@ const DATE_FORMATER = require( 'dateformat' );
 var nodemailer = require('nodemailer');
 var randomize = require('randomatic');
 
+//cors
+var cors = require('cors');
+app.use(cors());
 
 var parser = require("./parser")
 

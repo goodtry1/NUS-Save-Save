@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import { api } from '../../api-config'
 
 // reactstrap components
 import {
@@ -92,7 +93,7 @@ export class AddBanks extends Component {
 
 
 
-        axios.get('/bankDetails')
+        axios.get(`${api}/bankDetails`)
             .then((res) => {
                 var banks = []
 
@@ -144,7 +145,7 @@ export class AddBanks extends Component {
     getAccountTypesFromBankId = (bankId) => {
         return axios({
             method: 'post',
-            url: '/fetchAccountType',
+            url: `${api}/fetchAccountType`,
             data: {
                 bankid: bankId
             }
@@ -179,7 +180,7 @@ export class AddBanks extends Component {
 
         axios({
             method: 'post',
-            url: '/addBankAccount',
+            url: `${api}/addBankAccount`,
             data: {
                 userId: this.state.user.userId,
                 accountTypeId: this.state.selectedAccountTypeId,

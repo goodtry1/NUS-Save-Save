@@ -20,6 +20,8 @@ import React from "react";
 // react plugin for creating vector maps
 //import { VectorMap } from "react-jvectormap";
 
+import { api } from '../../api-config'
+
 // reactstrap components
 import {
     Card,
@@ -190,7 +192,7 @@ class BankAccountDetails extends React.Component {
 
         axios({
             method: 'post',
-            url: '/fetchrecommendations',
+            url: `${api}/fetchrecommendations`,
             data: {
                 userId: this.state.bankAccountDetails.userId,
                 accountTypeid: this.state.bankAccountDetails.accountTypeId
@@ -376,7 +378,7 @@ class BankAccountDetails extends React.Component {
             this.setState({ ccStatement: '' })
             this.setState({ ccFileName: '' })
 
-            axios.post('/uploadBankStatement', formData)
+            axios.post(`${api}/uploadBankStatement`, formData)
                 .then(res => {
 
 
@@ -515,7 +517,7 @@ class BankAccountDetails extends React.Component {
 
         axios({
             method: 'post',
-            url: '/updateParsedData',
+            url: `${api}/updateParsedData`,
             data: {
                 userId: this.state.bankAccountDetails.userId,
                 accountTypeId: this.state.bankAccountDetails.accountTypeId,

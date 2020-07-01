@@ -33,6 +33,7 @@ import ReactStars from 'react-stars'
 
 //Axios
 import axios from 'axios'
+import { api } from '../../api-config'
 
 //Sweet alert
 import SweetAlert from "react-bootstrap-sweetalert";
@@ -152,7 +153,7 @@ class FeedbackPlugin extends Component {
 
             axios({
                 method: 'post',
-                url: '/addFeedback',
+                url: `${api}/addFeedback`,
                 data: {
                     recommendationId: recommendationId,
                     feedbackRating: rating,
