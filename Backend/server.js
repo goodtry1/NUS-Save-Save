@@ -464,8 +464,8 @@ app.post('/updateParsedData', (req, res) => {
 	sql.connect(sqlConfig,  function() {
 	var request = new sql.Request();
 
-	let qu = `INSERT INTO dbo.[parsedBankStatementData](dateAnalysed, userId, accountTypeId, previousMonthBalance, statementDate, salary, currentMonthBalance, averageDailyBalance, creditCardSpend) 
-		   VALUES ( '`+ dateAnalysed + `', '` + req.body.userId + `', '`+ req.body.accountTypeId + `', '`+ result['previousMonthBalance'] + `' , '`+ result['date'] + `' , '`+ result['salary'] + `' , '`+ result['currentMonthBalance'] + `' , '`+ result['averageDailyBalance'] + `', '`+ result['creditCardSpend'] + `')`;
+	let qu = `INSERT INTO dbo.[parsedBankStatementData](dateAnalysed, userId, accountTypeId, previousMonthBalance, salary, currentMonthBalance, averageDailyBalance, creditCardSpend, startDate, endDate) 
+		   VALUES ( '`+ dateAnalysed + `', '` + req.body.userId + `', '`+ req.body.accountTypeId + `', '`+ result['previousMonthBalance'] + `' , '`+ result['salary'] + `' , '`+ result['currentMonthBalance'] + `' , '`+ result['averageDailyBalance'] + `', '`+ result['creditCardSpend'] + `', '`+ result['startDate'] + `', '`+ result['endDate'] + `')`;
 
 	console.log(qu)
 	request.query(qu, function(error, recordset) {
