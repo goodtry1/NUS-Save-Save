@@ -169,7 +169,7 @@ class BankAccountDetails extends React.Component {
     }
 
     componentDidMount = () => {
-        
+
 
         if (this.props.location.data) {
             this.setState({ bankAccountDetails: this.props.location.data }, () => {
@@ -472,14 +472,44 @@ class BankAccountDetails extends React.Component {
     }
 
     handleDateTime = (moment, name) => {
-        console.log(moment)
 
-        var userInputPdfDetails = this.state.userInputPdfDetails
-        userInputPdfDetails[name] = moment
+        var canUpdate = true
 
-        this.setState({
-            userInputPdfDetails
-        }, () => { console.log(this.state.userInputPdfDetails) })
+        if (name === "startDate") {
+            var startDate = moment.valueOf()
+            var endDate = this.state.userInputPdfDetails.endDate
+
+
+
+            
+
+            if (startDate > endDate) {
+                canUpdate = false
+                this.setState({ message: "Start date cannot be later than end date!" }, () => { this.notify('br', 4) })
+            }
+        } else {
+
+            var endDate = moment.valueOf()
+            var startDate = this.state.userInputPdfDetails.startDate
+
+
+
+            if (startDate > endDate) {
+                canUpdate = false
+                this.setState({ message: "End date must be later than start date!" }, () => { this.notify('br', 4) })
+            }
+        }
+
+        if (canUpdate) {
+            var userInputPdfDetails = this.state.userInputPdfDetails
+            userInputPdfDetails[name] = moment
+
+            this.setState({
+                userInputPdfDetails
+            }, () => { console.log(this.state.userInputPdfDetails) })
+        }
+
+
 
 
     }
@@ -1113,7 +1143,7 @@ class BankAccountDetails extends React.Component {
                             </Card>
                         </Col>
                     </Row> */}
-                    
+
 
 
                     {this.state.showPdfDetails ? (this.renderCheckPDFDetails()) : (this.renderNormal())}
@@ -1152,7 +1182,7 @@ class BankAccountDetails extends React.Component {
                     </FeedbackPlugin>
                 ) : (<div></div>)}
 
-                
+
 
             </>
         );
