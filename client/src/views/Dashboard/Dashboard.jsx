@@ -84,7 +84,8 @@ class Dashboard extends React.Component {
     this.retrieveUserBanks.bind(this)
     this.state = {
       user: '',
-      accounts: []
+      accounts: [],
+      finishedLoading: ''
       //redirectToAddBanks: false
     }
   }
@@ -113,6 +114,7 @@ class Dashboard extends React.Component {
     }).then((response) => {
       if (response.status === 200) {
         this.setState({ accounts: response.data.userBankAccountDetails })
+        this.setState({ finishedLoading: true })
 
       } else {
         //console.log("Failed to load user banks")
@@ -134,8 +136,8 @@ class Dashboard extends React.Component {
     var currentProgress = 0;
     var maxProgress = 0;
     var percentage = 0;
-    console.log("API called.. accountTypeId ->" + accountTypeId )
-    console.log("userid.. "+ this.state.user.userId)
+    console.log("API called.. accountTypeId ->" + accountTypeId)
+    console.log("userid.. " + this.state.user.userId)
 
     axios({
       method: 'post',
@@ -161,10 +163,10 @@ class Dashboard extends React.Component {
 
 
 
-            currentProgress = (Math.round(currentInterest * 100) / 100).toFixed(2) 
-            maxProgress = (Math.round(maxInterest * 100) / 100).toFixed(2) 
+            currentProgress = (Math.round(currentInterest * 100) / 100).toFixed(2)
+            maxProgress = (Math.round(maxInterest * 100) / 100).toFixed(2)
 
-            percentage = (Math.round(currentInterest / maxInterest * 100)).toFixed(0) 
+            percentage = (Math.round(currentInterest / maxInterest * 100)).toFixed(0)
             console.log(percentage)
           }
           return percentage
@@ -174,7 +176,7 @@ class Dashboard extends React.Component {
         }
 
       } else {
-        
+
       }
     }).catch((err) => {
 
@@ -200,19 +202,49 @@ class Dashboard extends React.Component {
     }
     return tableRows;
   }
+
+  redirectToAddBanks = () => {
+    this.props.history.push({
+      pathname: '/admin/addBanks',
+      data: this.state.accounts // your data array of objects
+    })
+
+  }
+
+  renderLoading() {
+    console.log("rendering loading..")
+    return (
+
+      <div>
+        <center>
+          <button className="btn btn-info btn-sm mb" type="button" disabled>
+            <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                        Loading...
+                                        </button>
+        </center>
+      </div>
+    )
+  }
+
+
   render() {
-
-    //User user = localStorage.getItem('user');
-    //var user = JSON.parse(localStorage.getItem('user'));
-    //var b = new User();
-
-
-    //console.log("This is the user --> " + user);
     return (
       <>
 
         <PanelHeader
-          size="sm" />
+          size="md"
+          content={
+            <div className="header text-center">
+              <h2 className="title">Welcome, {this.state.user.firstName} </h2>
+              <p className="category">
+                Member since: {moment(this.state.user.joinDate)
+                  .tz("Singapore")
+                  .format('DD-MMMM-YYYY')}
+              </p>
+            </div>
+          }
+
+        />
 
         {/** 
             content={
@@ -223,93 +255,74 @@ class Dashboard extends React.Component {
           */}
 
         <div className="content">
-          <Row>
-            <Col xs={12} md={12}>
-              <Card className="card-stats card-raised">
-                <CardBody>
-                  <Row>
-                  <Col md="9" xs="12">
-                      <div className="intro">
-                        <div className="info">
 
-                          <h2 className="info-title">Welcome back,</h2>
-                          <p className="info-title">{this.state.user.firstName}</p>
-                        </div>
-                      </div>
-                    </Col>
-                    <Col md="3" >
-                      <div className="intro">
-                        <div className="info">
-
-
-                          <p className="info-title" >Member since: {moment(this.state.user.joinDate)
-                            .tz("Singapore")
-                            .format('DD-MMMM-YYYY')}</p>
-
-                        </div>
-                      </div>
-                    </Col>
-                  </Row>
-                </CardBody>
-              </Card>
-            </Col>
-          </Row>
 
           <Row>
             <Col xs={12} md={12}>
               <Card className="card-chart">
                 <CardHeader>
                   <h5 className="card-category"></h5>
-                  <CardTitle tag="h2" >Your Bank Accounts:</CardTitle>
-                  {/*  
-                  <UncontrolledDropdown>
-                    <DropdownToggle
-                      className="btn-round btn-icon"
-                      color="default"
-                      outline
-                    >
-                      <i className="now-ui-icons loader_gear" />
-                    </DropdownToggle>
-                    <DropdownMenu right>
-                      <DropdownItem>Action</DropdownItem>
-                      <DropdownItem>Another Action</DropdownItem>
-                      <DropdownItem>Something else here</DropdownItem>
-                      <DropdownItem className="text-danger">
-                        Remove data
-                      </DropdownItem>
-                    </DropdownMenu>
-                  </UncontrolledDropdown>
-                  */}
+                  <CardTitle tag="h2" >
+                    My Bank Status
 
+                  </CardTitle>
                 </CardHeader>
                 <CardBody>
                   <Row>
-                    {this.state.accounts.map((account) =>
 
-                      <Col key={account.userBankAccountId} xs={12} md={4}>
-                        <Card className="card-chart">
-                          <CardHeader>
-                            <b> {account.accountTypeName} </b>
-                          </CardHeader>
-                          <CardBody>
-                            Date Created: {moment(account.date)
-                              .tz("Singapore")
-                              .format('DD-MMMM-YYYY')}
+                    {this.state.finishedLoading === true ? (
 
-                            <br />
-                          Progress:  <b> To be updated.. PLACEHOLDER </b>{/* this.getBankProgress(account.accountTypeId) */}
-                            <br />
-                          Interest Rates  <b> To be updated.. PLACEHOLDER </b>
-                            <br />
 
-                            <Button color="primary" className="btn-round float-right" onClick={(e) => this.redirectToBankAccountDetails(e, account)}>
-                              View more
-                            </Button>
-                          </CardBody>
-                        </Card>
+                      this.state.accounts.length !== 0 ? (
+                        this.state.accounts.map((account) =>
 
-                      </Col>
-                    )}
+                          <Col key={account.userBankAccountId} xs={12} md={4}>
+                            <Card className="card-chart">
+                              <CardHeader>
+                                <b> {account.accountTypeName} </b>
+                              </CardHeader>
+                              <CardBody>
+                                Date Created: {moment(account.date)
+                                  .tz("Singapore")
+                                  .format('DD-MMMM-YYYY')}
+
+                                <br />
+                                  Progress:  <b> To be updated.. PLACEHOLDER </b>{/* this.getBankProgress(account.accountTypeId) */}
+                                <br />
+                                  Interest Rates  <b> To be updated.. PLACEHOLDER </b>
+                                <br />
+
+                                <Button color="primary" className="btn-round float-right" onClick={(e) => this.redirectToBankAccountDetails(e, account)}>
+                                  View more
+                             </Button>
+                              </CardBody>
+                            </Card>
+
+                          </Col>
+                        )
+                      ) : (
+                          <Col>
+                          
+                            <CardHeader>
+                              <center>
+                                <b>You have no bank accounts added with us..... Lets get started now! </b>
+                                <br/>
+                                <Button color="alert" onClick={this.redirectToAddBanks} className="btn-round btn-icon">
+                                        <i className="now-ui-icons ui-1_simple-add" />
+                                    </Button>
+                              </center>
+                            </CardHeader>
+                          </Col>
+                        )
+
+                    ) : (
+                        <Col md={12}>
+
+                          {this.renderLoading()}
+                        </Col>
+                      )
+                    }
+
                   </Row>
                   {/*
                     <Col xs={12} md={4}>
