@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { api } from '../../api-config'
 
 // reactstrap components
 import {
@@ -120,7 +121,7 @@ export class MyProfile extends Component {
 
         axios({
             method: 'post',
-            url: '/editProfile',
+            url: `${api}/editProfile`,
             data: {
                 userId: this.state.updatedUser.userId,
                 email: this.state.updatedUser.email,
@@ -198,7 +199,7 @@ export class MyProfile extends Component {
                 //console.log("Check correct.")
                 axios({
                     method: 'post',
-                    url: '/changePassword',
+                    url: `${api}/changePassword`,
                     data: {
                         userId: this.state.updatedUser.userId,
                         oldPassword: this.state.oldPw,

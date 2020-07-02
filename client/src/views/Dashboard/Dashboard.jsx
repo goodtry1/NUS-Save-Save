@@ -20,6 +20,8 @@ import React from "react";
 // react plugin for creating vector maps
 // import { VectorMap } from "react-jvectormap";
 
+import { api } from '../../api-config'
+
 // reactstrap components
 import {
   Button,
@@ -104,7 +106,7 @@ class Dashboard extends React.Component {
 
     axios({
       method: 'post',
-      url: '/userBankAccountDetails',
+      url: `${api}/userBankAccountDetails`,
       data: {
         userId: this.state.user.userId
       }
@@ -137,7 +139,7 @@ class Dashboard extends React.Component {
 
     axios({
       method: 'post',
-      url: '/fetchrecommendations',
+      url: `${api}/fetchrecommendations`,
       data: {
         userId: this.state.user.userId,
         accountTypeid: accountTypeId

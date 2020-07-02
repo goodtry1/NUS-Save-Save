@@ -15,6 +15,7 @@
 
 */
 import React from "react";
+import { api } from '../../api-config'
 
 // reactstrap components
 import {
@@ -91,6 +92,7 @@ class LoginPage extends React.Component {
 
 
   componentDidMount() {
+    console.log(api)
     if (localStorage.getItem('isLoggedIn')) {
       this.setState({ redirect: true })
     }
@@ -206,7 +208,7 @@ class LoginPage extends React.Component {
 
     axios({
       method: 'post',
-      url: '/signin',
+      url: `${api}/signin`,
       data: {
         "email": this.state.email,
         "password": this.state.password
@@ -224,7 +226,7 @@ class LoginPage extends React.Component {
 
           axios({
             method: 'post',
-            url: '/twoFactorAuthenticate',
+            url: api + '/twoFactorAuthenticate',
             data: {
               email: this.state.email,
               action: "signIn"

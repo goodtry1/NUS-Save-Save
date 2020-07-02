@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 //import { Redirect } from 'react-router-dom';
+import { api } from '../../api-config'
 
 // reactstrap components
 import {
@@ -53,7 +54,7 @@ export class Banks extends Component {
 
         axios({
             method: 'post',
-            url: '/userBankAccountDetails',
+            url: `${api}/userBankAccountDetails`,
             data: {
                 userId: this.state.user.userId
             }

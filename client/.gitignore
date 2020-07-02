@@ -25,3 +25,6 @@ yarn-error.log*
 /screenshots
 reg.json
 reportKitPro.html
+
+#build
+/build

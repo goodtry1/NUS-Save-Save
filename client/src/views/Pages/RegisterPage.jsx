@@ -15,6 +15,7 @@
 
 */
 import React from "react";
+import { api } from '../../api-config'
 
 // reactstrap components
 import {
@@ -273,7 +274,7 @@ class RegisterPage extends React.Component {
 
       axios({
         method: 'post',
-        url: '/twoFactorAuthenticate',
+        url: `${api}/twoFactorAuthenticate`,
         data: {
           "email": this.state.email,
           "action": "signUp"
@@ -291,7 +292,7 @@ class RegisterPage extends React.Component {
             () => { this.notify('br', 4) })
         }
       }).catch((err) => {
-        this.setState({message : "Unknown error has occured. Please try again later", renderLoading: false}, () => {this.notify('tc', 3)})
+        this.setState({message : "An error has occured, please try again later", renderLoading: false}, () => {this.notify('tc', 3)})
       })
 
 
@@ -311,10 +312,12 @@ class RegisterPage extends React.Component {
       email: this.state.email,
       password: this.state.password,
       firstName: this.state.firstName,
-      lastName: this.state.lastName
+      lastName: this.state.lastName,
+      contactNumber: this.state.number,
+      
     };
 
-    fetch("/signUp", {
+    fetch(`${api}/signUp`, {
       method: "POST",
       body: JSON.stringify(values),
       headers: new Headers({
@@ -329,22 +332,19 @@ class RegisterPage extends React.Component {
           this.notify('tc', 5)
         } else {
 
-          this.setState({ message: 'An error has occured' })
+          this.setState({ message: 'An error has occured, please try again later' })
 
           // console.log("An error occured")
           // this.setState({ notificationColor: 4 })
           this.notify('tc', 4)
+
+          
         }
 
-        return response.json();
+        
 
-      }).then((data) => {
-        this.setState({ message: data.message })
-        //this.notify('tc', this.state.notificationColor)
-      })
-
-      .catch((err) => {
-        this.setState({message : "Unknown error has occured. Please try again later", renderLoading: false}, () => {this.notify('tc', 3)})
+      }).catch((err) => {
+        this.setState({message : "An error has occured, please try again later", renderLoading: false}, () => {this.notify('tc', 3)})
       }).then(() => {
         this.setState({
           email: '',
