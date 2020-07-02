@@ -179,8 +179,24 @@ const dashboardPanelChart = {
           fill: true,
           backgroundColor: gradientFill,
           borderWidth: 2,
-          data: [50, 150, 100, 190, 130, 90, 150, 160, 120, 140, 190, 95]
-        }
+          data: [500, 150, 100, 190, 130, 90, 150, 160, 120, 140, 190, 95]
+        }, 
+        {
+          label: "Data1",
+          borderColor: chartColor,
+          pointBorderColor: chartColor,
+          pointBackgroundColor: "#2c2c2c",
+          pointHoverBackgroundColor: "#2c2c2c",
+          pointHoverBorderColor: chartColor,
+          pointBorderWidth: 1,
+          pointHoverRadius: 7,
+          pointHoverBorderWidth: 2,
+          pointRadius: 5,
+          fill: true,
+          backgroundColor: gradientFill,
+          borderWidth: 2,
+          data: [400, 160, 120, 140, 190, 95, 500, 150, 100, 190, 130, 90]
+        } 
       ]
     };
   },

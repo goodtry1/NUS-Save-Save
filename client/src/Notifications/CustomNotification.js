@@ -1,6 +1,7 @@
 import React from 'react'
 
 const CustomNotification = {
+   
     notify(place, color, message) {
         var type;
         switch (color) {
