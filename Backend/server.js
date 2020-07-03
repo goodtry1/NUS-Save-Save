@@ -48,6 +48,66 @@ var server = app.listen(5001, function () {
 	console.log("app listening at %s", port)
 });
 
+// NOTE: This code is only used at the start when we changed from plaintext pw to hash. No longer needed. Delete as required.
+function updateUserTable() {
+	console.log("updateUserTable called :D ")
+	sql.connect(sqlConfig, function () {
+
+		var request = new sql.Request();
+		//var joiningDate = DATE_FORMATER(new Date(), "yyyy-mm-dd HH:MM:ss");
+		let qu = `SELECT * FROM dbo.[User]
+				  WHERE hashedPw  IS NULL `;
+
+		request.query(qu, function (error, results) {
+			if (error) {
+				console.log("error occured");
+				console.log(error)
+				
+			}
+			else {
+				console.log(results.recordset.length);
+				let record = results.recordset;
+				let size = results.recordset.length;
+				let rounds = 10;
+				//results.recordset[0].password
+				//for ( i = 0; i < 1; i++  ) {
+					var pw = record[0].password;
+				//	var uId = record[i].userId;
+				//	console.log(record[i].firstName)
+
+					bcrypt.hash(pw, rounds).then(function(hash) {
+						if (hash == false) {
+							console.log(err);
+							res.status(400).send()
+						}
+						console.log(hash)
+						console.log("updating for user: " + record[0].firstName + "uid: " + record[0].userId)
+						let newQu = `UPDATE dbo.[User] 
+									SET hashedPw = '` + hash + `'
+									WHERE userId = '` + 44 + `'`;
+
+
+						request.query(newQu, function (error,results) {
+							if (error) {
+								console.log("db error. cannot update.") 
+								console.log(error) 
+							} else {
+								console.log("success!")
+								//console.log(results)  
+							}
+						})
+					})
+				//}
+
+
+
+
+			} 
+		});
+
+	});
+}
+
 
 //two factor authentication email configuration
 var transporter = nodemailer.createTransport({
@@ -119,8 +179,8 @@ app.post('/signUp', async (req, res) => {
 	else {
 		var rounds = 10; // cost factor of 10 rounds. meaning calculation is done 2^10 times  to get final hash.  
 		var plainTextPw = req.body.password;
-		bcrypt.hash(plainTextPw, rounds, (error, hash) => {
-			if (error) {
+		bcrypt.hash(plainTextPw, rounds).then(function(hash) {
+			if (hash == false) {
 				console.log(err);
 				res.status(400).send()
 			}
@@ -165,8 +225,10 @@ app.post('/signin', (req, res) => {
 			else {
 				if (results.recordset && results.recordset.length > 0) {
 					//const comparision = 
-					bcrypt.compare(password, results.recordset[0].password, (err, result) => {
-						if (err) {
+					console.log(results.recordset[0].hashedPw)
+					console.log("input pw: " + password)
+					bcrypt.compare(password, results.recordset[0].hashedPw).then(function(result) {
+						if (result == false) {
 							console.log("Email and password does not match")
 							res.status(204).send()
 						}
@@ -280,8 +342,8 @@ app.post('/changePassword', async (req, res) => {
 	var newPlainTextPw = req.body.newPassword;
 	var rounds = 10; // cost factor of 10 rounds. meaning calculation is done 2^10 times  to get final hash.  
 
-	bcrypt.compare(oldPlainTextPw, oldHashedPass, (err, result) => {
-		if (err) {
+	bcrypt.compare(oldPlainTextPw, oldHashedPass).then(function(result) {
+		if (result == false) {
 			console.log("Email and password does not match")
 			res.status(204).send()
 		}

@@ -225,8 +225,8 @@ export class MyProfile extends Component {
 
 
 
-                    } else if (response.status === 206) {
-                        //console.log("Password do not match. Try again!")
+                    } else{
+                        console.log(response.status)
                         this.setState({ 
                             notifyMsg: "Error! Your old password do not match. Please try again!",
                             changePwLoading: false
