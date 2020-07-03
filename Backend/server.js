@@ -49,7 +49,7 @@ var server = app.listen(5001, function () {
 });
 
 // NOTE: This code is only used at the start when we changed from plaintext pw to hash. No longer needed. Delete as required.
-function updateUserTable() {
+/* function updateUserTable() {
 	console.log("updateUserTable called :D ")
 	sql.connect(sqlConfig, function () {
 
@@ -106,7 +106,7 @@ function updateUserTable() {
 		});
 
 	});
-}
+} */
 
 
 //two factor authentication email configuration

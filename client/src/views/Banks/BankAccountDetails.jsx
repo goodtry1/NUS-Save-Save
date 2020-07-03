@@ -110,6 +110,8 @@ class BankAccountDetails extends React.Component {
         this.state = {
             user: '',
             bankAccountDetails: '',
+            bankStatementRenderLoading: false,
+            bankStatementVerificationLoading: false,
 
             singleSelect: null,
             singleFileName: "",
@@ -370,6 +372,7 @@ class BankAccountDetails extends React.Component {
                 ) */
 
         } else {
+            this.setState({bankStatementRenderLoading : true})
 
 
 
@@ -380,13 +383,20 @@ class BankAccountDetails extends React.Component {
             formData.append('creditCard', this.state.ccStatement)
 
 
-            this.setState({ bankStatement: '' })
+            /* this.setState({ bankStatement: '' })
             this.setState({ singleFileName: '' })
             this.setState({ ccStatement: '' })
-            this.setState({ ccFileName: '' })
+            this.setState({ ccFileName: '' }) */
 
             axios.post(`${api}/uploadBankStatement`, formData)
                 .then(res => {
+                    this.setState({
+                        bankStatementRenderLoading: false,
+                        bankStatement: '',
+                        singleFileName: '',
+                        ccStatement: '',
+                        ccFileName: ''
+                    })
 
 
                     if (res.status === 200) {
@@ -516,7 +526,7 @@ class BankAccountDetails extends React.Component {
 
     checkPDFDetailsSubmit = (event) => {
         event.preventDefault();
-
+        this.setState({bankStatementVerificationLoading: true})
 
         var PdfDetails = this.state.PdfDetails
         var userInputPdfDetails = this.state.userInputPdfDetails
@@ -565,7 +575,7 @@ class BankAccountDetails extends React.Component {
                 () => {
                     this.notify('br', 5)
                     setTimeout(() => {
-                        this.setState({ showPdfDetails: false })
+                        this.setState({ showPdfDetails: false, bankStatementVerificationLoading: false })
                     }, 2000);
                     setTimeout(() => {
                         this.retrievePreviousRecommendations()
@@ -750,17 +760,66 @@ class BankAccountDetails extends React.Component {
                                     </Col>
                                 </Row>
 
+                            
+                                {this.state.bankStatementVerificationLoading? 
+                                (
+                                    <div>
+                                        <Row>
+                                            <Col md="10">
+                                            
+                                            </Col>
 
-                                <Row>
-                                    <Col md="9" sm="6">
-                                    </Col>
+                                            <Col md="2">
+                                                <Button 
+                                                        
+                                                    color="primary"
+                                                    size="md"
+                                                    className="mb-3 btn-round"
+                                                    disabled
+                                                    > <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                                    Loading...
+                                                </Button>
 
-                                    <Col md="3" sm="6">
-                                        <Button onClick={this.checkPDFDetailsCancel} > Cancel</Button>
-                                        <Button > Submit</Button>
-                                    </Col>
+                                            </Col>
 
-                                </Row>
+                                            
+                                        
+                                        </Row>
+
+                                    </div>
+                                ) : (
+                                    <div>
+                                            <Row >
+                                            <Col md="9" sm="6">
+                                            </Col>
+
+                                    
+
+                                            <Col md="3" sm="6" >
+                                                <Button 
+                                                        
+                                                        color=""
+                                                        size="md"
+                                                        className="mb-3 btn-round"
+                                                        onClick={this.checkPDFDetailsCancel} 
+                                                    > Cancel
+                                                    </Button>
+                                                    
+
+                                                <Button 
+                                                        
+                                                        color="primary"
+                                                        size="md"
+                                                        className="mb-3 btn-round"
+                                                    > Submit
+                                                </Button>
+                                            </Col>
+
+                                        </Row>
+                                    </div>
+                                )}
+
+                               
 
 
 
@@ -1043,9 +1102,37 @@ class BankAccountDetails extends React.Component {
                                     {this.state.bankStatement ?
                                         (
 
-
-                                            <Button onClick={this.uploadBankStatement}> Submit</Button>
-
+                                    this.state.bankStatementRenderLoading?
+                                    (<div>
+                                        <Row sm="12">
+                                            <Col sm="4">
+                                                <Button color="primary"  
+                                                disabled size="md" 
+                                                className="mb-3 btn-round"
+                                                >
+                                                    <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                                Loading...
+                                                </Button>
+                                            </Col>
+                                        </Row>
+                                      </div>) : 
+                                    (<div>
+                                        <Row sm="12">
+                                        <Col sm="4">
+                                            <Button
+                                            type="submit"
+                                            color="primary"
+                                            size="md"
+                                            className="mb-3 btn-round"
+                                            onClick={this.uploadBankStatement}
+                                            >
+                                                Submit
+                                            
+                                            </Button>
+                                        </Col>
+                                    </Row>
+                                    </div>) 
+                            
 
                                         ) : (<div></div>)}
 
