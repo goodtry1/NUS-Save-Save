@@ -334,6 +334,32 @@ app.post('/fetchAccountType', (req, res) =>  {
     });
 })
 
+//get the paramters for the graph
+app.post('/getParametersForGraph', (req, res) =>  {
+	userId = req.body.userId;
+    //console.log('userId' + userId)
+    accountTypeid = req.body.accountTypeid;
+    sql.connect(sqlConfig, function() {
+        var request = new sql.Request();
+		
+	
+		let qu = "exec [dbo].[usp_getParametersForGraph] " + userId + ", " +accountTypeid;
+		console.log(qu)
+				 
+		request.query(qu, function(err, recordset) {
+		if(err){
+			console.log("error occured");
+			res.status(400).send()
+		}
+		else 
+		{	
+			console.log(recordset)
+			res.status(200).send()
+		}
+		});
+    });
+})
+
 //Deletes files in the folder.
 function deleteFile(path)
 {
