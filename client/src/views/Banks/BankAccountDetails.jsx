@@ -982,7 +982,7 @@ class BankAccountDetails extends React.Component {
                                                 {"Generated on: "}
                                                 {moment(this.state.recommendation[0].timeStamp)
                                                     .tz("Singapore")
-                                                    .format('DD-MM-YYYY HH:mm:ss')}
+                                                    .format('DD-MMMM-YYYY HH:mm:ss')}
 
 
                                                 {/* Generated on: <Moment format="DD/MM/YYYY HH:MM" parse="YYYY-MM-DD">{this.state.recommendation[0].timeStamp}</Moment> */}
@@ -1175,7 +1175,7 @@ class BankAccountDetails extends React.Component {
                             <p className="category">
                                 Created since: {moment(this.state.bankAccountDetails.date)
                                     .tz("Singapore")
-                                    .format('DD-MM-YYYY')}
+                                    .format('DD-MMMM-YYYY')}
                             </p>
                         </div>
                     }>
