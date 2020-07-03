@@ -16,7 +16,7 @@
 */
 import React from "react";
 // react plugin used to create charts
-//import { Line } from "react-chartjs-2";
+import { Line } from "react-chartjs-2";
 // react plugin for creating vector maps
 //import { VectorMap } from "react-jvectormap";
 
@@ -34,7 +34,7 @@ import {
     //  DropdownItem,
     // UncontrolledDropdown,
     Table,
-    // Progress,
+    Progress,
     Row,
     Col,
     FormGroup,
@@ -45,15 +45,17 @@ import {
     Label
 } from "reactstrap";
 
+import Chart from './Chart'
+
 // core components
 import PanelHeader from "components/PanelHeader/PanelHeader.jsx";
 
-/* import {
+import {
     dashboardPanelChart,
-    dashboardActiveUsersChart,
-    dashboardSummerChart,
-    dashboardActiveCountriesCard
-} from "variables/charts.jsx"; */
+    //dashboardActiveUsersChart,
+    //dashboardSummerChart,
+    //dashboardActiveCountriesCard
+} from "variables/charts.jsx";
 
 /* import jacket from "assets/img/saint-laurent.jpg";
 import shirt from "assets/img/balmain.jpg";
@@ -147,6 +149,11 @@ class BankAccountDetails extends React.Component {
                 creditCardSpend: '',
                 averageDailyBalance: '',
                 wealth: ''
+            },
+
+            chart: {
+                data: '',
+                options: ''
             }
 
 
@@ -465,14 +472,44 @@ class BankAccountDetails extends React.Component {
     }
 
     handleDateTime = (moment, name) => {
-        console.log(moment)
 
-        var userInputPdfDetails = this.state.userInputPdfDetails
-        userInputPdfDetails[name] = moment
+        var canUpdate = true
 
-        this.setState({
-            userInputPdfDetails
-        }, () => { console.log(this.state.userInputPdfDetails) })
+        if (name === "startDate") {
+            var startDate = moment.valueOf()
+            var endDate = this.state.userInputPdfDetails.endDate
+
+
+
+            
+
+            if (startDate > endDate) {
+                canUpdate = false
+                this.setState({ message: "Start date cannot be later than end date!" }, () => { this.notify('br', 4) })
+            }
+        } else {
+
+            var endDate = moment.valueOf()
+            var startDate = this.state.userInputPdfDetails.startDate
+
+
+
+            if (startDate > endDate) {
+                canUpdate = false
+                this.setState({ message: "End date must be later than start date!" }, () => { this.notify('br', 4) })
+            }
+        }
+
+        if (canUpdate) {
+            var userInputPdfDetails = this.state.userInputPdfDetails
+            userInputPdfDetails[name] = moment
+
+            this.setState({
+                userInputPdfDetails
+            }, () => { console.log(this.state.userInputPdfDetails) })
+        }
+
+
 
 
     }
@@ -549,10 +586,10 @@ class BankAccountDetails extends React.Component {
     renderCheckPDFDetails = () => {
         return (
             <>
-                <Row>
+                {/* <Row>
 
                     <Col md={12}>
-                        <Card className="card-pricing card-plain">
+                        <Card className="card-pricing card-plain ">
                             <CardHeader>
                                 Help us improve our recommendation engine by verifying the fields below
 
@@ -561,7 +598,7 @@ class BankAccountDetails extends React.Component {
                         </Card>
                     </Col>
 
-                </Row>
+                </Row> */}
                 <Col sm={12} >
                     <Card className="card-chart">
                         <CardHeader>
@@ -734,7 +771,7 @@ class BankAccountDetails extends React.Component {
                         <CardFooter>
                             <div className="stats">
                                 <i className="now-ui-icons emoticons_satisfied" />
-                                Leave the fields untouched if they are correct
+                                Help us improve our recommendation engine by verifying the fields below
                             </div>
                         </CardFooter>
 
@@ -752,8 +789,9 @@ class BankAccountDetails extends React.Component {
                 <Row>
 
                     <Col md={12}>
-                        <Card className="card-pricing card-plain">
+                        <Card className="card-pricing ">
                             <CardHeader>
+
                                 {"Your progress towards the max tier: " + 'S$' + this.state.currentProgress + " / S$" + this.state.maxProgress}
 
                             </CardHeader>
@@ -764,6 +802,7 @@ class BankAccountDetails extends React.Component {
                                     </Col>
 
                                     <Col>
+
                                         <ProgressBar style={{ backgroundColor: 'grey', borderColor: 'black' }} animated now={this.state.percentage} max={100} label={this.state.percentage + '%'} />
                                     </Col>
 
@@ -1043,16 +1082,18 @@ class BankAccountDetails extends React.Component {
             <>
                 <NotificationAlert ref="notificationAlert" />
                 <PanelHeader
-                    size="sm" >
-                    <Row >
-                        <Col sm='9'>
+                    content={
+                        <div className="header text-center">
+                            <h2 className="title">{this.state.bankAccountDetails.accountTypeName}</h2>
+                            <p className="category">
+                                Created since: {moment(this.state.bankAccountDetails.date)
+                                    .tz("Singapore")
+                                    .format('DD-MM-YYYY')}
+                            </p>
+                        </div>
+                    }>
 
-                        </Col>
 
-                        <Col sm='3'>
-
-                        </Col>
-                    </Row>
 
 
 
@@ -1068,12 +1109,13 @@ class BankAccountDetails extends React.Component {
           */}
 
                 <div className="content">
-                    <Row>
-                        <Col xs={12} md={12}>
+                    {/*  <Row>
+                        <Col xs={3} md={3}></Col>
+                        <Col xs={6} md={6}>
                             <Card className="card-stats card-raised">
                                 <CardBody>
                                     <Row>
-                                        <Col xs="8" md="9">
+                                        <Col xs="6" md="6">
                                             <div className="intro">
                                                 <div className="info">
 
@@ -1082,7 +1124,7 @@ class BankAccountDetails extends React.Component {
                                                 </div>
                                             </div>
                                         </Col>
-                                        <Col xs="4" md="3">
+                                        <Col xs="6" md="6">
                                             <div className="intro">
                                                 <div className="info">
 
@@ -1100,7 +1142,12 @@ class BankAccountDetails extends React.Component {
                                 </CardBody>
                             </Card>
                         </Col>
-                    </Row>
+                    </Row> */}
+
+
+
+                    {this.state.showPdfDetails ? (this.renderCheckPDFDetails()) : (this.renderNormal())}
+
                     {/* <Row>
                         <Col md={12}>
                             <Card className="card-chart">
@@ -1109,16 +1156,19 @@ class BankAccountDetails extends React.Component {
                                     
                                 </CardHeader>
                                 <CardBody>
-                                    <h6>Place holder for chart</h6>
+                                <PanelHeader
+                                    size="lg"
+                                    content={
+                                        <Line
+                                        data={Chart.data}
+                                        options={Chart.options}
+                                        />
+                                    }
+                                    />
                                 </CardBody>
                             </Card>
                         </Col>
                     </Row> */}
-
-
-                    {this.state.showPdfDetails ? (this.renderCheckPDFDetails()) : (this.renderNormal())}
-
-
 
 
 
@@ -1131,6 +1181,8 @@ class BankAccountDetails extends React.Component {
 
                     </FeedbackPlugin>
                 ) : (<div></div>)}
+
+
 
             </>
         );
