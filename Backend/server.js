@@ -12,6 +12,7 @@ var promise = require('promise');
 const DATE_FORMATER = require('dateformat');
 var nodemailer = require('nodemailer');
 var randomize = require('randomatic');
+const secureRandomPw = require('secure-random-password');
 
 //cors
 var cors = require('cors');
@@ -179,7 +180,7 @@ app.post('/signUp', async (req, res) => {
 	else {
 		var rounds = 10; // cost factor of 10 rounds. meaning calculation is done 2^10 times  to get final hash.  
 		var plainTextPw = req.body.password;
-		bcrypt.hash(plainTextPw, rounds).then(function(hash) {
+		bcrypt.hash(plainTextPw, rounds).then(function (hash) {
 			if (hash == false) {
 				console.log(err);
 				res.status(400).send()
@@ -227,7 +228,7 @@ app.post('/signin', (req, res) => {
 					//const comparision = 
 					console.log(results.recordset[0].hashedPw)
 					console.log("input pw: " + password)
-					bcrypt.compare(password, results.recordset[0].hashedPw).then(function(result) {
+					bcrypt.compare(password, results.recordset[0].hashedPw).then(function (result) {
 						if (result == false) {
 							console.log("Email and password does not match")
 							res.status(204).send()
@@ -342,7 +343,7 @@ app.post('/changePassword', async (req, res) => {
 	var newPlainTextPw = req.body.newPassword;
 	var rounds = 10; // cost factor of 10 rounds. meaning calculation is done 2^10 times  to get final hash.  
 
-	bcrypt.compare(oldPlainTextPw, oldHashedPass).then(function(result) {
+	bcrypt.compare(oldPlainTextPw, oldHashedPass).then(function (result) {
 		if (result == false) {
 			console.log("Email and password does not match")
 			res.status(204).send()
@@ -375,6 +376,85 @@ app.post('/changePassword', async (req, res) => {
 
 			})
 		}
+	})
+})
+
+// Reset password for users who forgot their password
+// POST method takes in email & phone number for verification before resetting to a random password
+app.post('/resetPassword', (req, res) => {
+	email = req.body.email;
+	contactNumber = req.body.contactNumber;
+
+	sql.connect(sqlConfig, function () {
+		var request = new sql.Request();
+		let qu = `SELECT * FROM dbo.[User]
+         	 		  WHERE email= '` + email + `'`;
+
+		request.query(qu, function (error, results, fields) {
+			if (error) {
+				console.log("error occured");
+				res.status(400).send()
+			} else {
+				if (results.recordset && results.recordset.length > 0) {
+					if (results.recordset[0].contactNumber != contactNumber) {
+						console.log("email found, but phone number do not match.");
+						res.status(400).send("Phone number do not match.");
+					} else {
+						var userId = results.recordset[0].userId;
+						var newPw = secureRandomPw.randomPassword({ length: 13 })
+
+						//update pw
+						bcrypt.hash(newPw, 10).then(function(hash) {
+							if (error) {
+								console.log(error);
+								res.status(400).send()
+							}
+							console.log("newPW..." + hash)
+
+							var request = new sql.Request();
+							let qu = `UPDATE dbo.[User] 
+										  SET hashedPw = '` + hash + `'
+										  WHERE userId = '` + userId + `'`;
+
+							request.query(qu, function (err, recordset) {
+								if (err) {
+									res.status(400).send()
+								}
+								else {
+									console.log("Pass changed.. Sending Email! ")
+									//email new pw to user
+									var resetDate = DATE_FORMATER(new Date(), "yyyy-mm-dd HH:MM:ss");
+									var mailOptions = {
+										from: 'savesave462@gmail.com',
+										to: req.body.email,
+										subject: 'Save Save - Password reset ',
+										text: `Dear User,
+														  
+										Your new password is ${newPw}
+										This request is generated at ${resetDate}.
+										The new password is confidential and for security reasons, DO NOT share the password with anyone.`
+									}
+
+									transporter.sendMail(mailOptions, function (error, info) {
+										if (error) {
+											console.log('error')
+											res.status(400).send("Email not sent. Please contact Admin.")
+										}
+										else {
+											console.log("email sent.")
+											res.status(200).send("Email has been sent.")
+										}
+									});							
+								}
+							});
+						})
+					}
+				} else {
+					console.log("user not present in the system!")
+					res.status(400).send("Error! No user found with the given email.")
+				}
+			}
+		});
 	})
 })
 
@@ -520,8 +600,8 @@ app.post('/updateParsedData', (req, res) => {
 	sql.connect(sqlConfig, function () {
 		var request = new sql.Request();
 
-	let qu = `INSERT INTO dbo.[parsedBankStatementData](dateAnalysed, userId, accountTypeId, previousMonthBalance, salary, currentMonthBalance, averageDailyBalance, creditCardSpend, startDate, endDate) 
-		   VALUES ( '`+ dateAnalysed + `', '` + req.body.userId + `', '`+ req.body.accountTypeId + `', '`+ result['previousMonthBalance'] + `' , '`+ result['salary'] + `' , '`+ result['currentMonthBalance'] + `' , '`+ result['averageDailyBalance'] + `', '`+ result['creditCardSpend'] + `', '`+ result['startDate'] + `', '`+ result['endDate'] + `')`;
+		let qu = `INSERT INTO dbo.[parsedBankStatementData](dateAnalysed, userId, accountTypeId, previousMonthBalance, salary, currentMonthBalance, averageDailyBalance, creditCardSpend, startDate, endDate) 
+		   VALUES ( '`+ dateAnalysed + `', '` + req.body.userId + `', '` + req.body.accountTypeId + `', '` + result['previousMonthBalance'] + `' , '` + result['salary'] + `' , '` + result['currentMonthBalance'] + `' , '` + result['averageDailyBalance'] + `', '` + result['creditCardSpend'] + `', '` + result['startDate'] + `', '` + result['endDate'] + `')`;
 
 		console.log(qu)
 		request.query(qu, function (error, recordset) {
