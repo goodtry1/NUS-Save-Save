@@ -153,10 +153,129 @@ class BankAccountDetails extends React.Component {
                 wealth: ''
             },
 
-            chart: {
-                data: '',
-                options: ''
-            }
+            chartDetails : {
+                label: [],
+                interestEarned: [],
+                interestToBeEarned: []
+            },
+
+            chart : {
+
+                data: canvas => {
+                    const ctx = canvas.getContext("2d");
+                    var chartColor = "#FFFFFF";
+                    var gradientStroke = ctx.createLinearGradient(500, 0, 100, 0);
+                    gradientStroke.addColorStop(0, "#80b6f4");
+                    gradientStroke.addColorStop(1, chartColor);
+                    var gradientFill = ctx.createLinearGradient(0, 200, 0, 50);
+                    gradientFill.addColorStop(0, "rgba(128, 182, 244, 0)");
+                    gradientFill.addColorStop(1, "rgba(255, 255, 255, 0.14)");
+                    
+                  return {
+                    labels: this.state.chartDetails.label,
+                    datasets: [
+                      {
+                        label: "Interest earned (S$)",
+                        borderColor: chartColor,
+                        pointBorderColor: chartColor,
+                        pointBackgroundColor: chartColor,
+                        pointHoverBackgroundColor: chartColor,
+                        pointHoverBorderColor: chartColor,
+                        pointBorderWidth: 1,
+                        pointHoverRadius: 7,
+                        pointHoverBorderWidth: 2,
+                        pointRadius: 5,
+                        fill: true,
+                        backgroundColor: gradientFill,
+                        borderWidth: 2,
+                        data: this.state.chartDetails.interestEarned
+                      }, 
+                      {
+                        label: "Interest you could have earned (S$)",
+                        borderColor: "#00ff00",
+                        pointBorderColor: "#00ff00",
+                        pointBackgroundColor: "#00ff00",
+                        pointHoverBackgroundColor: "#00ff00",
+                        pointHoverBorderColor: "#00ff00",
+                        pointBorderWidth: 1,
+                        pointHoverRadius: 7,
+                        pointHoverBorderWidth: 2,
+                        pointRadius: 5,
+                        fill: true,
+                        backgroundColor: gradientFill,
+                        borderWidth: 2,
+                        data: this.state.chartDetails.interestToBeEarned
+                      } 
+                    ]
+                  };
+                },
+                options: {
+                  backgroundColor: "#ffffff",
+                  title: {
+                    display: true,
+                    text: "Your bank account's performance",
+                    fontSize: "24",
+                    fontColor: "#ffffff"
+                  },
+                  layout: {
+                    padding: {
+                      left: 40,
+                      right: 40,
+                      top: 0,
+                      bottom: 0
+                    }
+                  },
+                  maintainAspectRatio: false,
+                  tooltips: {
+                    backgroundColor: "#ffffff",
+                    titleFontColor: "#333",
+                    bodyFontColor: "#666",
+                    bodySpacing: 4,
+                    xPadding: 12,
+                    mode: "nearest",
+                    intersect: 0,
+                    position: "nearest"
+                  },
+                  legend: {
+                    position: "top",
+                    fillStyle: "#FFF",
+                    display: true
+                  },
+                  scales: {
+                    yAxes: [
+                      {
+                        ticks: {
+                          fontColor: "rgba(255,255,255,0.4)",
+                          fontStyle: "bold",
+                          beginAtZero: false,
+                          maxTicksLimit: 5,
+                          padding: 10
+                        },
+                        gridLines: {
+                          drawTicks: true,
+                          drawBorder: false,
+                          display: true,
+                          color: "rgba(255,255,255,0.1)",
+                          zeroLineColor: "transparent"
+                        }
+                      }
+                    ],
+                    xAxes: [
+                      {
+                        gridLines: {
+                          display: false,
+                          color: "rgba(255,255,255,0.1)"
+                        },
+                        ticks: {
+                          padding: 10,
+                          fontColor: "rgba(255,255,255,0.4)",
+                          fontStyle: "bold"
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
 
 
         }
@@ -171,26 +290,67 @@ class BankAccountDetails extends React.Component {
     }
 
     componentDidMount = () => {
-
+        
 
         if (this.props.location.data) {
             this.setState({ bankAccountDetails: this.props.location.data }, () => {
                 /* (() => { this.retrievePreviousRecommendations() })
                 (() => { localStorage.setItem("bankAccountDetails", JSON.stringify(this.state.bankAccountDetails)) }) */
                 this.retrievePreviousRecommendations()
-
+                this.retrieveChartDetails()
 
             })
         } else {
             var bankAccountDetails = localStorage.getItem("bankAccountDetails")
             this.setState({ bankAccountDetails: JSON.parse(bankAccountDetails) }, () => {
                 this.retrievePreviousRecommendations()
+                this.retrieveChartDetails()
             })
         }
 
 
 
 
+    }
+
+    retrieveChartDetails = () => {
+        axios({
+            method: 'post',
+            url: `${api}/getParametersForGraph`,
+            data: {
+                userId: this.state.bankAccountDetails.userId,
+                accountTypeid: this.state.bankAccountDetails.accountTypeId
+            }
+        }).then((response) => {
+            var recordSet = response.data.recordset
+
+            var label = []
+            var interestEarned = []
+            var interestToBeEarned = []
+
+            var month = ["", "January", "February", "March", "April", "May", "June",
+                            "July", "August", "September", "October", "November", "December" ];
+
+            
+
+            for (var i = 0; i < recordSet.length; i++) {
+                
+            label.push(month[recordSet[i].MONTHYEAR])
+            interestEarned.push(recordSet[i].INTERESTEARNED)
+            interestToBeEarned.push(recordSet[i].INTERESTTOBEEARNED)
+
+            }
+
+            var chartDetails = {
+                label,
+                interestEarned,
+                interestToBeEarned
+            }
+
+            this.setState({
+                chartDetails
+            })
+        })
     }
 
     retrievePreviousRecommendations = () => {
@@ -845,7 +1005,8 @@ class BankAccountDetails extends React.Component {
     renderNormal = () => {
         return (
             <>
-                <Row>
+                    
+                    <Row>
 
                     <Col md={12}>
                         <Card className="card-pricing ">
@@ -877,6 +1038,28 @@ class BankAccountDetails extends React.Component {
                     </Col>
 
                 </Row>
+
+                <Row>
+                            <Col md={12}>
+                                <Card className="card-chart card-plain" >
+                                    <CardHeader>
+                                       
+                                        
+                                    </CardHeader>
+                                    <CardBody>
+                                    <PanelHeader
+                                        size="lg"
+                                        content={
+                                            <Line
+                                            data={this.state.chart.data}
+                                            options={this.state.chart.options}
+                                            />
+                                        }
+                                        />
+                                    </CardBody>
+                                </Card>
+                            </Col>
+                    </Row>
                 <Row sm={12}>
                     <Col sm={6} >
                         <Card className="card-stats">
@@ -1153,6 +1336,8 @@ class BankAccountDetails extends React.Component {
 
                 </Row>
 
+                
+
 
             </>
         )
@@ -1235,27 +1420,7 @@ class BankAccountDetails extends React.Component {
 
                     {this.state.showPdfDetails ? (this.renderCheckPDFDetails()) : (this.renderNormal())}
 
-                    {/* <Row>
-                        <Col md={12}>
-                            <Card className="card-chart">
-                                <CardHeader>
-                                    Place holder for chart title
-                                    
-                                </CardHeader>
-                                <CardBody>
-                                <PanelHeader
-                                    size="lg"
-                                    content={
-                                        <Line
-                                        data={Chart.data}
-                                        options={Chart.options}
-                                        />
-                                    }
-                                    />
-                                </CardBody>
-                            </Card>
-                        </Col>
-                    </Row> */}
+                    
 
 
 

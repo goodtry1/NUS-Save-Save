@@ -420,7 +420,7 @@ app.post('/getParametersForGraph', (req, res) =>  {
 		else 
 		{	
 			console.log(recordset)
-			res.status(200).send()
+			res.status(200).send(recordset)
 		}
 		});
     });

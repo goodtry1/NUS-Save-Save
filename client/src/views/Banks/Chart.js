@@ -4,13 +4,13 @@ import { api } from '../../api-config'
 const data = {
     getData(){
 
-       /*  axios({
+        axios({
             method: 'post',
-            url: `${api}/`,
+            url: `${api}/getParametersForGraph`,
             data: {
                 
             }
-        }).then((response) => {console.log(response.status)}) */
+        }).then((response) => {console.log(response.status)})
         return {
             months: ["JAN", "FEB", "MAR"],
             interestEarned: ["100", "200", "300"],

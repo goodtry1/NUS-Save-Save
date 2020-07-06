@@ -74,6 +74,16 @@ class AuthNavbar extends React.Component {
                   <i className="now-ui-icons tech_mobile" /> Register
                 </Link>
               </NavItem>
+              
+              <NavItem className={this.activeRoute("/auth/forgetPassword-page")}>
+                <Link to="/auth/forgetPassword-page" className="nav-link">
+                  <i className="now-ui-icons ui-1_lock-circle-open" /> Reset Password
+                </Link>
+              </NavItem>
+
+              
+
+
 
 
               {/* <NavItem>

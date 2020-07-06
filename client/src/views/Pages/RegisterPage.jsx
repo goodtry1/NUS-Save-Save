@@ -38,7 +38,7 @@ import {
 } from "reactstrap";
 
 // core components
-import bgImage from "assets/img/bg16.jpg";
+import bgImage from "assets/img/MBS_night.jpg";
 
 //Additional imports
 import NotificationAlert from "react-notification-alert";

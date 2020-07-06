@@ -35,13 +35,14 @@ import VectorMap from "views/Maps/VectorMap.jsx";
 import Charts from "views/Charts/Charts.jsx";
 import Calendar from "views/Calendar/Calendar.jsx";
 import Widgets from "views/Widgets/Widgets.jsx";
-import UserPage from "views/Pages/UserPage.jsx";
+/* import UserPage from "views/Pages/UserPage.jsx";
 import TimelinePage from "views/Pages/TimelinePage.jsx";
 import RTL from "views/Pages/RTL.jsx";
-import PricingPage from "views/Pages/PricingPage.jsx";
+import PricingPage from "views/Pages/PricingPage.jsx"; */
 import LoginPage from "views/Pages/LoginPage.jsx";
 import RegisterPage from "views/Pages/RegisterPage.jsx";
-import LockScreenPage from "views/Pages/LockScreenPage.jsx";
+import ForgetPassword from "views/Pages/ForgetPassword"
+/* import LockScreenPage from "views/Pages/LockScreenPage.jsx"; */
 
 import Banks from './views/Banks/Banks'
 import AddBanks from './views/Banks/AddBanks'
@@ -143,6 +144,14 @@ let routes = [
         short: "Register",
         mini: "RP",
         component: RegisterPage,
+        layout: "/auth"
+      },
+      {
+        path: "/forgetPassword-page",
+        name: "Forget Password",
+        short: "Forget Password",
+        mini: "FP",
+        component: ForgetPassword,
         layout: "/auth"
       },
       {
