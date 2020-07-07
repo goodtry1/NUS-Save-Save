@@ -24,6 +24,9 @@ import NotificationAlert from "react-notification-alert";
 
 import CustomNotification from '../../Notifications/CustomNotification'
 
+//Axios
+import axios from 'axios'
+
 class ForgetPassword extends React.Component {
   constructor(props) {
     super(props);
@@ -51,6 +54,15 @@ class ForgetPassword extends React.Component {
 
   handleSubmit = (event) => {
     event.preventDefault();
+
+    /* axios({
+      method: 'post',
+      url: `${api}/signin`,
+      data: {
+        "email": this.state.email,
+        "password": this.state.password
+      }
+    }) */
   }
 
   render() {
