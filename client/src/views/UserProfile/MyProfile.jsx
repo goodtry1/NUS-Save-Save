@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { api } from '../../api-config'
+import cookie from 'react-cookies'
 
 // reactstrap components
 import {
@@ -52,12 +53,16 @@ export class MyProfile extends Component {
 
     componentDidMount = () => {
         var user = localStorage.getItem('user')
-        this.setState({ user: JSON.parse(user) })
-        this.setState({ updatedUser: JSON.parse(user) })
-        this.setState({ hideEdit: true })
-        this.setState({ hideChangePw: true })
-        this.setState({ updateLoading: false })
-        this.setState({ changePwLoading: false })
+        this.setState({
+            user: JSON.parse(user),
+            updatedUser: JSON.parse(user),
+            hideEdit: true,
+            hideChangePw: true,
+            updateLoading: false,
+            changePwLoading: false,
+            JWT_Token: cookie.load('JWT_Token')
+        })
+       
 
     }
 
@@ -122,6 +127,9 @@ export class MyProfile extends Component {
         axios({
             method: 'post',
             url: `${api}/editProfile`,
+            headers: {
+                authorisation: `Bearer ${this.state.JWT_Token}`
+              },
             data: {
                 userId: this.state.updatedUser.userId,
                 email: this.state.updatedUser.email,
@@ -176,9 +184,9 @@ export class MyProfile extends Component {
         //console.log("ChangePw button called")
         this.setState({ changePwLoading: true })
 
-        if ((this.state.oldPw === '') || (this.state.newPw === '') || (this.state.retypeNewPw ==='')) {
+        if ((this.state.oldPw === '') || (this.state.newPw === '') || (this.state.retypeNewPw === '')) {
             //console.log("Error! One of the fields is empty.");
-            this.setState({ 
+            this.setState({
                 notifyMsg: "Error! One of the fields is empty. ",
                 changePwLoading: false
             }, () => {
@@ -188,10 +196,10 @@ export class MyProfile extends Component {
         } else {
             if (this.state.newPw !== this.state.retypeNewPw) {
                 //console.log("Error! New passwords do not match.")
-                this.setState({ 
+                this.setState({
                     notifyMsg: "Error! New passwords do not match. ",
                     changePwLoading: false
-                 }, () => {
+                }, () => {
                     this.notify('br', 3)
                 })
 
@@ -200,6 +208,9 @@ export class MyProfile extends Component {
                 axios({
                     method: 'post',
                     url: `${api}/changePassword`,
+                    headers: {
+                        authorisation: `Bearer ${this.state.JWT_Token}`
+                      },
                     data: {
                         userId: this.state.updatedUser.userId,
                         oldPassword: this.state.oldPw,
@@ -213,10 +224,10 @@ export class MyProfile extends Component {
                         this.setState({ newPw: '' })
                         this.setState({ retypeNewPw: '' })
 
-                        this.setState({ 
+                        this.setState({
                             notifyMsg: "Success! Password changed successfully.",
                             changePwLoading: false
-                         }, () => {
+                        }, () => {
                             this.notify('br', 2)
 
                             this.toggleChangePw();
@@ -225,22 +236,22 @@ export class MyProfile extends Component {
 
 
 
-                    } else{
+                    } else {
                         console.log(response.status)
-                        this.setState({ 
+                        this.setState({
                             notifyMsg: "Error! Your old password do not match. Please try again!",
                             changePwLoading: false
-                         }, () => {
+                        }, () => {
                             this.notify('br', 3)
                         })
 
                     }
                 }).catch((err) => {
                     //console.log(err.message)
-                    this.setState({ 
+                    this.setState({
                         notifyMsg: "Unknown Error. Please contact admin!",
                         changePwLoading: false
-                     }, () => {
+                    }, () => {
                         this.notify('br', 3)
                     })
 

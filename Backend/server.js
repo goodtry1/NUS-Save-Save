@@ -18,6 +18,11 @@ const secureRandomPw = require('secure-random-password');
 var cors = require('cors');
 app.use(cors());
 
+//JWT
+const jwt = require('jsonwebtoken')
+require('dotenv').config()
+
+
 var parser = require("./parser")
 
 // Configuration for file uploads
@@ -48,6 +53,22 @@ var server = app.listen(5001, function () {
 	var port = server.address().port
 	console.log("app listening at %s", port)
 });
+
+function authenticateToken(req, res, next) {
+	const authHeader = req.headers['authorisation']
+	const token = authHeader && authHeader.split(' ')[1]
+
+	if (token === null) 
+		return res.sendStatus(401)
+
+	jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
+		if (err) return res.sendStatus(403)
+
+		req.user = user
+		next()
+
+	})
+}
 
 // NOTE: This code is only used at the start when we changed from plaintext pw to hash. No longer needed. Delete as required.
 /* function updateUserTable() {
@@ -234,8 +255,17 @@ app.post('/signin', (req, res) => {
 							res.status(204).send()
 						}
 						else {
+
+							console.log("****** "+process.env.ACCESS_TOKEN_SECRET)
+
+							var user = results.recordset[0]
+
+							var accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET)
+
+
+
 							console.log("login successful")
-							res.status(200).send({ "userDetails": results.recordset[0] })
+							res.status(200).send({ "userDetails": results.recordset[0], accessToken: accessToken })
 						}
 					})
 
@@ -267,7 +297,7 @@ app.get('/bankdetails', function (req, res) {
 
 
 //get user bank account details
-app.post('/userBankAccountDetails', function (req, res) {
+app.post('/userBankAccountDetails', authenticateToken, function (req, res) {
 	userId = req.body.userId;
 
 	sql.connect(sqlConfig, function () {
@@ -290,7 +320,7 @@ app.post('/userBankAccountDetails', function (req, res) {
 
 
 //add Bank Account for a particular user.
-app.post('/addBankAccount', (req, res) => {
+app.post('/addBankAccount', authenticateToken, (req, res) => {
 
 	sql.connect(sqlConfig, function () {
 		var request = new sql.Request();
@@ -315,7 +345,7 @@ app.post('/addBankAccount', (req, res) => {
 
 
 //Edit profile for a particular user.
-app.post('/editProfile', (req, res) => {
+app.post('/editProfile', authenticateToken, (req, res) => {
 
 	sql.connect(sqlConfig, function () {
 		var request = new sql.Request();
@@ -337,7 +367,7 @@ app.post('/editProfile', (req, res) => {
 
 // change password for a particular user for HASHed verison.
 // regenerate a new salt!
-app.post('/changePassword', async (req, res) => {
+app.post('/changePassword', authenticateToken, async (req, res) => {
 	oldHashedPass = await retrievePassword(req.body.userId)
 	var oldPlainTextPw = req.body.oldPassword;
 	var newPlainTextPw = req.body.newPassword;
@@ -459,7 +489,7 @@ app.post('/resetPassword', (req, res) => {
 })
 
 //get account type based on bank id
-app.post('/fetchAccountType', (req, res) => {
+app.post('/fetchAccountType', authenticateToken, (req, res) => {
 	bank_id = req.body.bankid;
 	console.log('bankid' + bank_id)
 	sql.connect(sqlConfig, function () {
@@ -481,7 +511,7 @@ app.post('/fetchAccountType', (req, res) => {
 })
 
 //get the paramters for the graph
-app.post('/getParametersForGraph', (req, res) =>  {
+app.post('/getParametersForGraph', authenticateToken, (req, res) =>  {
 	userId = req.body.userId;
     //console.log('userId' + userId)
     accountTypeid = req.body.accountTypeid;
@@ -582,7 +612,7 @@ function retrievePassword(userId) {
 let uploadConfig = upload.fields([{ name: 'bankStatement', maxCount: 1 }, { name: 'creditCard', maxCount: 1 }]);
 
 //upload bank account statement client passes userId and accountTypeId
-app.post('/uploadBankStatement', uploadConfig, async (req, res) => {
+app.post('/uploadBankStatement', authenticateToken, uploadConfig, async (req, res) => {
 
 	let dataBufferStatement = fs.readFileSync('./uploads/' + req.files['bankStatement'][0].originalname);
 
@@ -616,7 +646,7 @@ app.post('/uploadBankStatement', uploadConfig, async (req, res) => {
 
 
 //upload bank account statement client passes userId and accountTypeId
-app.post('/updateParsedData', (req, res) => {
+app.post('/updateParsedData', authenticateToken, (req, res) => {
 
 	result = req.body.parsedData
 
@@ -656,7 +686,7 @@ function launchParseCard(options, dataBufferCard) {
 
 
 //get recommendations for the userid and accounttypeid
-app.post('/fetchrecommendations', (req, res) => {
+app.post('/fetchrecommendations', authenticateToken, (req, res) => {
 	userId = req.body.userId;
 	console.log('userId' + userId)
 	accountTypeid = req.body.accountTypeid;
@@ -683,7 +713,7 @@ app.post('/fetchrecommendations', (req, res) => {
 
 
 //add feedback for a particular session Id.
-app.post('/addFeedback', (req, res) => {
+app.post('/addFeedback', authenticateToken, (req, res) => {
 
 	sql.connect(sqlConfig, function () {
 		var request = new sql.Request();
