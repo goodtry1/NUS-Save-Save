@@ -177,16 +177,16 @@ function parseTransactionHistory()
 
 
 	readInterface.on('close', function () {
-		//console.log("line index")
-		//console.log(lineIndex)
 		indexMap.set('transactionTableEnd', lineIndex - 2);
 		transactionTableEnd = lineIndex;
+		transactionMonth = 0
 		if(indexMap.get('transactionTable'))
 		{
 			let array = textMap.get(indexMap.get('transactionTable')).trim().split(/\s+/);
 			if(array.length > 0)
 			{
 				result['date'] = array[0].replace(/\s|,|/g, '');
+				transactionMonth = parseInt(array[0].substring(3, 5)); 
 			}	
 			
 			balanceNow = result['currentMonthBalance'];
@@ -198,15 +198,15 @@ function parseTransactionHistory()
 			
 			for (var i =transactionStartIndex; i<transactionTableEnd; i++) {  
 				
-				let array = (textMap.get(i)).trim().split("  ").filter(function(value, index, arr){ return value !=  "";});;
+				let array = (textMap.get(i)).trim().split("  ").filter(function(value, index, arr){ return value !=  "";});
 				
-				
-				if(array.length == 4) {
+
+				if((array.length) == 4 && (transactionMonth == parseInt(array[0].substring(3, 5)))) {
 					//console.log(array);
 				    
 					transactionLine = textMap.get(i)
 					//console.log(transactionLine)
-					
+
 					index = transactionLine.indexOf(array[3])
 					
 					currentTransactionday = parseInt(array[0].substring(0, 2)); 
@@ -214,6 +214,7 @@ function parseTransactionHistory()
 					if(i == transactionStartIndex)
 					{
 						lastDate = currentTransactionday;
+						//console.log(transactionMonth)
 						lastTransactionDay = currentTransactionday
 						balanceArray[lastTransactionDay]= result['currentMonthBalance'];
 					}
@@ -245,21 +246,15 @@ function parseTransactionHistory()
 				balanceArray[j] = balanceNow;
 			}
 			
-			//console.log(balanceNow) 
 			//console.log(balanceArray)
 			result['previousMonthBalance'] = parseFloat(balanceNow.toFixed(2))
 			var sum =0
-			
-			
-			///console.log(Object.keys(balanceArray)[0])
-			//console.log(size_dict(balanceArray))
-			//console.log(lastDate)
 			
 			for (var i=1;i<= lastDate;i++)
 			{
 				sum += balanceArray[i];
 			}
-			//console.log(sum)
+
 			result['averageDailyBalance'] = parseFloat((sum/size_dict(balanceArray)).toFixed(2)) ;			
 		}
 		resolve (result)
