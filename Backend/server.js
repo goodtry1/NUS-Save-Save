@@ -63,8 +63,6 @@ var server = app.listen(5001, function () {
 function authenticateToken(req, res, next) {
 
 	const accessToken = req.cookies.access_token
-	
-
 	if (accessToken === null) 
 		return res.sendStatus(401)
 
@@ -73,70 +71,8 @@ function authenticateToken(req, res, next) {
 
 		req.user = user
 		next()
-
 	})
 }
-
-// NOTE: This code is only used at the start when we changed from plaintext pw to hash. No longer needed. Delete as required.
-/* function updateUserTable() {
-	console.log("updateUserTable called :D ")
-	sql.connect(sqlConfig, function () {
-
-		var request = new sql.Request();
-		//var joiningDate = DATE_FORMATER(new Date(), "yyyy-mm-dd HH:MM:ss");
-		let qu = `SELECT * FROM dbo.[User]
-				  WHERE hashedPw  IS NULL `;
-
-		request.query(qu, function (error, results) {
-			if (error) {
-				console.log("error occured");
-				console.log(error)
-				
-			}
-			else {
-				console.log(results.recordset.length);
-				let record = results.recordset;
-				let size = results.recordset.length;
-				let rounds = 10;
-				//results.recordset[0].password
-				//for ( i = 0; i < 1; i++  ) {
-					var pw = record[0].password;
-				//	var uId = record[i].userId;
-				//	console.log(record[i].firstName)
-
-					bcrypt.hash(pw, rounds).then(function(hash) {
-						if (hash == false) {
-							console.log(err);
-							res.status(400).send()
-						}
-						console.log(hash)
-						console.log("updating for user: " + record[0].firstName + "uid: " + record[0].userId)
-						let newQu = `UPDATE dbo.[User] 
-									SET hashedPw = '` + hash + `'
-									WHERE userId = '` + 44 + `'`;
-
-
-						request.query(newQu, function (error,results) {
-							if (error) {
-								console.log("db error. cannot update.") 
-								console.log(error) 
-							} else {
-								console.log("success!")
-								//console.log(results)  
-							}
-						})
-					})
-				//}
-
-
-
-
-			} 
-		});
-
-	});
-} */
-
 
 //two factor authentication email configuration
 var transporter = nodemailer.createTransport({
@@ -147,13 +83,20 @@ var transporter = nodemailer.createTransport({
 	}
 });
 
-// upon enter.. just to test app is working.
+/* ------------------------------------------------------ RESTful GET/POST APIs below ------------------------------------------------------ */
+
+// upon enter.. just to test app is working. (for standard path)
 app.get('/', (req, res) => {
-	res.send("App is working fine but you are not supposed to enter here.... :D.")
+	res.send("App is working fine (for <b>standard</b>) but you are not supposed to enter here.... :D.")
+})
+
+// upon enter.. just to test app is working. (for /api/ path)
+app.get('/api/', (req, res) => {
+	res.send("App is working fine (for <b> /API/ </b>) but you are not supposed to enter here.... :D.")
 })
 
 // two factor authentication for signup
-app.post('/twoFactorAuthenticate', async (req, res) => {
+app.post('/api/twoFactorAuthenticate', async (req, res) => {
 
 	let action = req.body.action;
 	const userId = await retrieveUserId(req.body.email);
@@ -194,7 +137,7 @@ app.post('/twoFactorAuthenticate', async (req, res) => {
 })
 
 // signUp using bCrypt.
-app.post('/signUp', async (req, res) => {
+app.post('/api/signUp', async (req, res) => {
 	console.log('bcrypt called.');
 	let newUser = req.body;
 	console.log('body' + req.body.email);
@@ -237,7 +180,7 @@ app.post('/signUp', async (req, res) => {
 })
 
 // signin with Hash
-app.post('/signin', (req, res) => {
+app.post('/api/signin', (req, res) => {
 
 	console.log("trying to sign in")
 	let email = req.body.email;
@@ -291,7 +234,7 @@ app.post('/signin', (req, res) => {
 	});
 });
 
-app.post("/logOut", (req, res) => {
+app.post("/api/logOut", (req, res) => {
 	res.cookie('access_token', '', {maxAge: 0, httpOnly: true} )
 
 	
@@ -299,7 +242,7 @@ app.post("/logOut", (req, res) => {
 })
 
 //get banks
-app.get('/bankdetails', function (req, res) {
+app.get('/api/bankdetails', function (req, res) {
 	sql.connect(sqlConfig, function () {
 		var request = new sql.Request();
 		request.query('select * from dbo.bank where bankId = 2', function (error, results) {
@@ -316,7 +259,7 @@ app.get('/bankdetails', function (req, res) {
 
 
 //get user bank account details
-app.post('/userBankAccountDetails', authenticateToken, function (req, res) {
+app.post('/api/userBankAccountDetails', authenticateToken, function (req, res) {
 	userId = req.body.userId;
 
 	sql.connect(sqlConfig, function () {
@@ -339,7 +282,7 @@ app.post('/userBankAccountDetails', authenticateToken, function (req, res) {
 
 
 //add Bank Account for a particular user.
-app.post('/addBankAccount', authenticateToken, (req, res) => {
+app.post('/api/addBankAccount', authenticateToken, (req, res) => {
 
 	sql.connect(sqlConfig, function () {
 		var request = new sql.Request();
@@ -364,7 +307,7 @@ app.post('/addBankAccount', authenticateToken, (req, res) => {
 
 
 //Edit profile for a particular user.
-app.post('/editProfile', authenticateToken, (req, res) => {
+app.post('/api/editProfile', authenticateToken, (req, res) => {
 
 	sql.connect(sqlConfig, function () {
 		var request = new sql.Request();
@@ -389,7 +332,7 @@ app.post('/editProfile', authenticateToken, (req, res) => {
 
 // change password for a particular user for HASHed verison.
 // regenerate a new salt!
-app.post('/changePassword', authenticateToken, async (req, res) => {
+app.post('/api/changePassword', authenticateToken, async (req, res) => {
 	oldHashedPass = await retrievePassword(req.body.userId)
 	var oldPlainTextPw = req.body.oldPassword;
 	var newPlainTextPw = req.body.newPassword;
@@ -433,7 +376,7 @@ app.post('/changePassword', authenticateToken, async (req, res) => {
 
 // Reset password for users who forgot their password
 // POST method takes in email & phone number for verification before resetting to a random password
-app.post('/resetPassword', (req, res) => {
+app.post('/api/resetPassword', (req, res) => {
 	email = req.body.email;
 	contactNumber = req.body.contactNumber;
 
@@ -511,7 +454,7 @@ app.post('/resetPassword', (req, res) => {
 })
 
 //get account type based on bank id
-app.post('/fetchAccountType', authenticateToken, (req, res) => {
+app.post('/api/fetchAccountType', authenticateToken, (req, res) => {
 	bank_id = req.body.bankid;
 	console.log('bankid' + bank_id)
 	sql.connect(sqlConfig, function () {
@@ -533,7 +476,7 @@ app.post('/fetchAccountType', authenticateToken, (req, res) => {
 })
 
 //get the paramters for the graph
-app.post('/getParametersForGraph', (req, res) =>  {
+app.post('/api/getParametersForGraph', (req, res) =>  {
 	userId = req.body.userId;
     //console.log('userId' + userId)
     accountTypeid = req.body.accountTypeid;
@@ -567,7 +510,6 @@ function deleteFile(path) {
 // setting for url encoding
 app.use(bodyParser.urlencoded({ extended: false }))
 
-
 function retrieveUserId(email) {
 	return new promise(function (resolve, reject) {
 		console.log("enter retrieve user id function");
@@ -591,7 +533,6 @@ function retrieveUserId(email) {
 						resolve(0);
 					}
 				}
-
 			});
 		});
 	});
@@ -623,7 +564,6 @@ function retrievePassword(userId) {
 						resolve(0);
 					}
 				}
-
 			});
 		});
 	});
@@ -634,11 +574,9 @@ function retrievePassword(userId) {
 let uploadConfig = upload.fields([{name: 'bankStatement', maxCount: 1}, {name: 'creditCard', maxCount: 1}, {name: 'transactionHistory', maxCount: 1}]);
 
 //upload bank account statement client passes userId and accountTypeId
-app.post('/uploadBankStatement', authenticateToken, uploadConfig, async (req, res) => {
+app.post('/api/uploadBankStatement', authenticateToken, uploadConfig, async (req, res) => {
 
-	let dataBufferStatement = fs.readFileSync('./uploads/' + req.files['bankStatement'][0].originalname);
-
-		
+	let dataBufferStatement = fs.readFileSync('./uploads/' + req.files['bankStatement'][0].originalname);	
 	const options = {
 		pagerender: render_page,
 		version: 'v1.10.100'
@@ -682,15 +620,13 @@ app.post('/uploadBankStatement', authenticateToken, uploadConfig, async (req, re
 		});
 	}
 	//deleteFile("./uploads/")
-				
 })
 
 
 //upload bank account statement client passes userId and accountTypeId
-app.post('/updateParsedData', authenticateToken, (req, res) => {
+app.post('/api/updateParsedData', authenticateToken, (req, res) => {
 
 	result = req.body.parsedData
-
 	var dateAnalysed = DATE_FORMATER(new Date(), "yyyy-mm-dd HH:MM:ss");
 
 	//Update the Bank account details table
@@ -714,7 +650,6 @@ app.post('/updateParsedData', authenticateToken, (req, res) => {
 	});
 })
 
-
 function launchParseCard(options, dataBufferCard) {
 	return new promise(function (resolve, reject) {
 		PDFParser(dataBufferCard, options).then(async function (data) {
@@ -736,10 +671,8 @@ function launchParseTransactionHistory(options, filename)
 	});
 }
 
-
-
 //get recommendations for the userid and accounttypeid
-app.post('/fetchrecommendations', authenticateToken, (req, res) => {
+app.post('/api/fetchrecommendations', authenticateToken, (req, res) => {
 	userId = req.body.userId;
 	console.log('userId' + userId)
 	accountTypeid = req.body.accountTypeid;
@@ -754,7 +687,6 @@ app.post('/fetchrecommendations', authenticateToken, (req, res) => {
 			if (err) {
 				console.log("error occured");
 				res.status(400).send()
-
 			}
 			else {
 				res.status(200).send({ "recommendation": results.recordset })
@@ -763,10 +695,8 @@ app.post('/fetchrecommendations', authenticateToken, (req, res) => {
 	});
 })
 
-
-
 //add feedback for a particular session Id.
-app.post('/addFeedback', authenticateToken, (req, res) => {
+app.post('/api/addFeedback', authenticateToken, (req, res) => {
 
 	sql.connect(sqlConfig, function () {
 		var request = new sql.Request();
@@ -824,7 +754,5 @@ function recommendationEngine(userid, accountTypeid) {
 				//console.log(rows);
 			});
 		}
-
 	});
-
 }
