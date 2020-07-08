@@ -21,6 +21,7 @@ import { Line } from "react-chartjs-2";
 //import { VectorMap } from "react-jvectormap";
 
 import { api } from '../../api-config'
+import cookie from 'react-cookies'
 
 // reactstrap components
 import {
@@ -45,22 +46,23 @@ import {
     //Label
 } from "reactstrap";
 
-import Chart from './Chart'
+//import Chart from './Chart'
 
 // core components
 import PanelHeader from "components/PanelHeader/PanelHeader.jsx";
 
-/* import {
-    dashboardPanelChart,
+import {
+    //dashboardPanelChart,
     //dashboardActiveUsersChart,
     //dashboardSummerChart,
     //dashboardActiveCountriesCard
-} from "variables/charts.jsx"; */
+} from "variables/charts.jsx";
 
 /* import jacket from "assets/img/saint-laurent.jpg";
 import shirt from "assets/img/balmain.jpg";
 import swim from "assets/img/prada.jpg"; */
 
+//import { table_data } from "variables/general.jsx";
 
 import axios from 'axios'
 
@@ -87,6 +89,20 @@ import ProgressBar from 'react-bootstrap/ProgressBar'
 import { PDFDetails } from '../../models/PDFDetails'
 
 
+
+/* var mapData = {
+    AU: 760,
+    BR: 550,
+    CA: 120,
+    DE: 1300,
+    FR: 540,
+    GB: 690,
+    GE: 200,
+    IN: 200,
+    RO: 600,
+    RU: 300,
+    US: 2920
+}; */
 
 class BankAccountDetails extends React.Component {
     constructor(props) {
@@ -277,7 +293,7 @@ class BankAccountDetails extends React.Component {
         
 
         if (this.props.location.data) {
-            this.setState({ bankAccountDetails: this.props.location.data }, () => {
+            this.setState({ bankAccountDetails: this.props.location.data, JWT_Token: cookie.load('JWT_Token') }, () => {
                 /* (() => { this.retrievePreviousRecommendations() })
                 (() => { localStorage.setItem("bankAccountDetails", JSON.stringify(this.state.bankAccountDetails)) }) */
                 this.retrievePreviousRecommendations()
@@ -286,7 +302,7 @@ class BankAccountDetails extends React.Component {
             })
         } else {
             var bankAccountDetails = localStorage.getItem("bankAccountDetails")
-            this.setState({ bankAccountDetails: JSON.parse(bankAccountDetails) }, () => {
+            this.setState({ bankAccountDetails: JSON.parse(bankAccountDetails), JWT_Token: cookie.load('JWT_Token') }, () => {
                 this.retrievePreviousRecommendations()
                 this.retrieveChartDetails()
             })
@@ -301,14 +317,14 @@ class BankAccountDetails extends React.Component {
         axios({
             method: 'post',
             url: `${api}/getParametersForGraph`,
-            withCredentials: true,
+            headers: {
+                authorisation: `Bearer ${this.state.JWT_Token}`
+            },
             data: {
                 userId: this.state.bankAccountDetails.userId,
                 accountTypeid: this.state.bankAccountDetails.accountTypeId
             }
         }).then((response) => {
-
-            
             var recordSet = response.data.recordset
 
             var label = []
@@ -336,7 +352,7 @@ class BankAccountDetails extends React.Component {
 
             this.setState({
                 chartDetails
-            }, () => { console.log(this.state.chartDetails) })
+            })
         })
     }
 
@@ -561,8 +577,8 @@ class BankAccountDetails extends React.Component {
                     var d1 = new moment(startDate)
                     var d2 = new moment(endDate)
 
-                    console.log(d1)
-                    console.log(d2)
+                    /* console.log(d1)
+                    console.log(d2) */
 
                     let userInputPdfDetails = this.state.userInputPdfDetails
                     userInputPdfDetails.startDate = d1
@@ -622,7 +638,7 @@ class BankAccountDetails extends React.Component {
     }
 
     handleUserInputOnPdfDetails = (event) => {
-        console.log(event.target)
+       
 
 
         var userInputPdfDetails = this.state.userInputPdfDetails
@@ -633,7 +649,7 @@ class BankAccountDetails extends React.Component {
 
         this.setState({
             userInputPdfDetails
-        }, () => { console.log(this.state.userInputPdfDetails) })
+        })
     }
 
     handleDateTime = (moment, name) => {
@@ -641,8 +657,8 @@ class BankAccountDetails extends React.Component {
         var canUpdate = true
 
         if (name === "startDate") {
-            var startDate = moment.valueOf()
-            var endDate = this.state.userInputPdfDetails.endDate
+            const startDate = moment.valueOf()
+            const endDate = this.state.userInputPdfDetails.endDate
 
 
 
@@ -654,8 +670,8 @@ class BankAccountDetails extends React.Component {
             }
         } else {
 
-            var endDate = moment.valueOf()
-            var startDate = this.state.userInputPdfDetails.startDate
+            const endDate = moment.valueOf()
+            const startDate = this.state.userInputPdfDetails.startDate
 
 
 
@@ -671,7 +687,7 @@ class BankAccountDetails extends React.Component {
 
             this.setState({
                 userInputPdfDetails
-            }, () => { console.log(this.state.userInputPdfDetails) })
+            })
         }
 
 
@@ -688,7 +704,7 @@ class BankAccountDetails extends React.Component {
 
 
         Object.keys(userInputPdfDetails).forEach(function (key) {
-            console.log(userInputPdfDetails[key])
+           
             if (userInputPdfDetails[key] === "") {
                 if (!PdfDetails[key] || PdfDetails[key] === "") {
                     userInputPdfDetails[key] = 0
@@ -712,7 +728,7 @@ class BankAccountDetails extends React.Component {
         var statementDate = userInputPdfDetails.startDate + " TO " + userInputPdfDetails.endDate
         userInputPdfDetails.date = statementDate
 
-        console.log(userInputPdfDetails)
+        
 
 
 
@@ -1008,7 +1024,7 @@ class BankAccountDetails extends React.Component {
                         <Card className="card-pricing ">
                             <CardHeader>
 
-                                {"Your progress towards the max tier: " + 'S$' + this.state.currentProgress + " / S$" + this.state.maxProgress}
+                                {"Your progress towards the max tier: S$" + this.state.currentProgress + " / S$" + this.state.maxProgress}
 
                             </CardHeader>
                             <CardBody>
@@ -1035,7 +1051,7 @@ class BankAccountDetails extends React.Component {
 
                 </Row>
                 
-                {this.state.chartDetails.label.length > 0 ? (<Row>
+                {this.state.chartDetails.label.length > 1 ? (<Row>
                             <Col md={12}>
                                 <Card className="card-chart card-plain" >
                                     <CardHeader>
@@ -1062,7 +1078,7 @@ class BankAccountDetails extends React.Component {
                     <Col sm={6} >
                         <Card className="card-stats">
                             <CardHeader>
-                                <h5 className="card-category"></h5>
+                                {/* <h5 className="card-category"></h5> */}
                                 <CardTitle tag="h2" >Recommendations</CardTitle>
 
 
@@ -1077,18 +1093,19 @@ class BankAccountDetails extends React.Component {
                                         <div>
 
                                             {this.state.recommendation.map((recommendation) =>
-                                                <Table responsive className="table-shopping">
+                                                <Table responsive className="table-shopping" key={recommendation.recommendationId}>
                                                     <tbody>
-                                                        <Spring
+                                                       
+
+                                                                    <tr key={recommendation.recommendationId} >
+
+                                                                        <td >
+                                                                        <Spring
                                                             from={{ opacity: 0, marginTop: 500 }}
                                                             to={{ opacity: 1, marginTop: 0 }}
                                                         >
                                                             {props => (
                                                                 <div style={props}>
-
-                                                                    <tr key={recommendation.recommendationId} >
-
-                                                                        <td >
                                                                             {recommendation.isRecommCompleted ?
                                                                                 (
                                                                                     <div className="info info-horizontal">
@@ -1110,6 +1127,9 @@ class BankAccountDetails extends React.Component {
 
                                                                                 )
                                                                             }
+                                                                             </div>
+                                                                             )}
+                                                                             </Spring>
                                                                         </td>
 
                                                                         <td>
@@ -1117,16 +1137,17 @@ class BankAccountDetails extends React.Component {
                                                                             <div>
                                                                                 {recommendation.recommendation}
                                                                             </div>
+                                                                           
 
                                                                         </td>
                                                                     </tr>
 
-                                                                </div>
-                                                            )}
+                                                               
+                                                            
 
 
 
-                                                        </Spring>
+                                                       
                                                     </tbody>
 
                                                 </Table>
@@ -1186,7 +1207,7 @@ class BankAccountDetails extends React.Component {
                     <Col sm={6} >
                         <Card className="card-chart">
                             <CardHeader>
-                                <h5 className="card-category"></h5>
+                                {/* <h5 className="card-category"></h5> */}
 
                                 <CardTitle tag="h4">Upload financial statements</CardTitle>
                             </CardHeader>

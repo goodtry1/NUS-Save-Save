@@ -27,7 +27,7 @@ import {
 } from "reactstrap";
 
 // core components
-import PictureUpload from "components/CustomUpload/PictureUpload.jsx";
+//import PictureUpload from "components/CustomUpload/PictureUpload.jsx";
 
 class Step1 extends React.Component {
   constructor(props) {
@@ -40,7 +40,7 @@ class Step1 extends React.Component {
     };
 
     this.componentDidMount = () => {
-      console.log(this.props.otp)
+      //console.log(this.props.otp)
     }
 
   }

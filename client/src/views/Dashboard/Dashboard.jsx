@@ -83,7 +83,7 @@ class Dashboard extends React.Component {
   componentDidMount = () => {
     var user = localStorage.getItem('user')
     this.setState({ user: JSON.parse(user) }, () => {
-      //console.log("username " + JSON.stringify(this.state.user))
+     
     })
 
 
@@ -98,9 +98,6 @@ class Dashboard extends React.Component {
     axios({
       method: 'post',
       url: `${api}/userBankAccountDetails`,
-      headers: {
-        authorisation: `Bearer ${this.state.JWT_Token}`
-      },
       withCredentials: true,
       data: {
         userId: this.state.user.userId
@@ -111,7 +108,7 @@ class Dashboard extends React.Component {
         this.setState({ finishedLoading: true })
 
       } else {
-        //console.log("Failed to load user banks")
+        
       }
     }).catch((err) => {
       console.log(err.message)
@@ -126,7 +123,7 @@ class Dashboard extends React.Component {
   }
 
   //this is still WIP..
-  getBankProgress = (accountTypeId) => {
+  /* getBankProgress = (accountTypeId) => {
     var currentProgress = 0;
     var maxProgress = 0;
     var percentage = 0;
@@ -176,7 +173,7 @@ class Dashboard extends React.Component {
 
     })
     return 0
-  }
+  } */
 
   createTableData() {
     var tableRows = [];
@@ -226,7 +223,6 @@ class Dashboard extends React.Component {
       <>
 
         <PanelHeader
-          size="md"
           content={
             <div className="header text-center">
               <h2 className="title">Welcome, {this.state.user.firstName} </h2>
@@ -255,7 +251,7 @@ class Dashboard extends React.Component {
             <Col xs={12} md={12}>
               <Card className="card-chart">
                 <CardHeader>
-                  <h5 className="card-category"></h5>
+                 {/*  <h5 className="card-category"></h5> */}
                   <CardTitle tag="h2" >
                     My Bank Status
 

@@ -22,10 +22,10 @@ import ReactWizard from "react-bootstrap-wizard";
 import { Col } from "reactstrap";
 
 // core components
-import PanelHeader from "components/PanelHeader/PanelHeader.jsx";
+//import PanelHeader from "components/PanelHeader/PanelHeader.jsx";
 
 import Step1 from "../../Pages/Registration Stepper/Step1";
-import Step2 from "../../Pages/Registration Stepper/Step2";
+//import Step2 from "../../Pages/Registration Stepper/Step2";
 
 /* var steps = [
   {

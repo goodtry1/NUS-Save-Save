@@ -6,7 +6,7 @@ positors and monies and deposits denominated in Singapore dollars under the Supp
 tary Retirement Scheme are insured by the Singapore Deposit Insurance Corporation, 
 for up to S$75,000 in aggregate per depositor per Scheme member by law. Monies and deposits denominated in Singapore dollars under the CPF Investment Scheme and CPF Retirement Sum Scheme are aggregated and 
 separately insured up to S$75,000 for each depositor per Scheme member. Foreign currency deposits, dual currency investments, structured deposits and other investment products are not insured.
-2963\N\525\M
+2925\N\525\M
 1 6 0 0 2 2
 WANG NAN
 22 HAVELOCK ROAD
@@ -27,52 +27,62 @@ DateDateDescriptionChequeWithdrawalDepositBalance
 Value
 360 ACCOUNT
 Account No. 525852380001
-1  SEP 2019 TO 30 SEP 2019
-                8,839.35
+1  AUG 2019 TO 31 AUG 2019
+                8,691.81
 BALANCE B/F
-06 SEP                  800.00                8,039.3506 SEP
+01 AUG                    3.86                8,687.9501 AUG
+DEBIT PURCHASE
+26/07/19
+xx-8600 BUS/MRT 7535560
+S
+01 AUG                    2.79                8,685.1601 AUG
+DEBIT PURCHASE
+25/07/19
+xx-8600 BUS/MRT 7453204
+S
+01 AUG                  200.00                8,485.1601 AUG
 FAST PAYMENT
 0038100553
 to Wang Nan
 OTHR - Other
-06 SEP                   22.96                8,016.3906 SEP
+05 AUG                  400.00                8,085.1605 AUG
+FAST PAYMENT
+0038100553
+to Wang Nan
+OTHR - Other
+05 AUG                  900.00                7,185.1605 AUG
+FAST PAYMENT
+0038100553
+to Wang Nan
+OTHR - Other
+06 AUG                   22.96                7,162.2006 AUG
 IBG GIRO
 TAXS S9377668B
 IRAS
 ITX
-10 SEP                    7.47                8,023.8610 SEP
+12 AUG                  600.00                6,562.2013 AUG
+FAST PAYMENT
+0038100553
+to Wang Nan
+OTHR - Other
+13 AUG                    8.34                6,570.5413 AUG
 BONUS INTEREST
 360 SALARY BONUS
-11 SEP                1,200.00                6,823.8611 SEP
+23 AUG                    5.00                6,575.5423 AUG
+OCBC REBATE
+OCBC REBATE
+27 AUG                1,050.00                5,525.5427 AUG
 FAST PAYMENT
 0038100553
 to Wang Nan
 OTHR - Other
-27 SEP                  250.00                6,573.8627 SEP
-FAST PAYMENT
-0038100553
-to Wang Nan
-OTHR - Other
-27 SEP                3,356.50                9,930.3627 SEP
+27 AUG                3,313.50                8,839.0427 AUG
 GIRO - SALARY
 SALA
 PHILLIP FUTURES PTE
 SALARY
-30 SEP                    0.31                9,930.6730 SEP
+31 AUG                    0.31                8,839.3531 AUG
 INTEREST CREDIT
-                9,930.67
-BALANCE C/F
-Total Withdrawals/Deposits
-Total Interest Paid This Year
-Average Balance
-3,364.28                2,272.96
-                    1.78
-                7,772.97
-
-CHECK YOUR STATEMENT
-Please check this statement & advise us of any discrepancies within 14 days of receipt. If we do not hear from you,
-we will take this statement as correct and binding.
-For enquiries, please call our Customer Service Officers at 1800 363 3333.
 
 Deposit Insurance Scheme
 Singapore dollar deposits of non-bank de
@@ -343,15 +353,35 @@ STATEMENT OF ACCOUNT
 Page 2 of 2
 WANG NAN
 RNB05ESND\2
+Transaction
+DateDateDescriptionChequeWithdrawalDepositBalance
+Value
+360 ACCOUNT
+Account No. 525852380001
+1  AUG 2019 TO 31 AUG 2019
+                8,839.35
+BALANCE C/F
+Total Withdrawals/Deposits
+Total Interest Paid This Year
+Average Balance
+3,327.15                3,179.61
+                    1.47
+                7,337.54
+
+CHECK YOUR STATEMENT
+Please check this statement & advise us of any discrepancies within 14 days of receipt. If we do not hear from you,
+we will take this statement as correct and binding.
+For enquiries, please call our Customer Service Officers at 1800 363 3333.
 UPDATING YOUR PERSONAL PARTICULARS
 You may update your address and contact numbers via OCBC Online Banking or our ATMs. Alternatively, you may download and
 submit the ‘Change of address / contact details’ form available on ocbc.com/forms.
 OCBC PROMOTION & INFORMATION
-REVISION OF INTEREST RATES
-FOR FOREIGN CURRENCY
-ACCOUNTS
-From 1 November 2019, the interest rates for Global
-Savings Account, Premier Global Savings Account and
-Private Bank Global Savings Account will be revised.
-Visit www.ocbc.com/notices for more details.
+STILL USING THE ONLINE BANKING
+ACCESS CODE WE ASSIGNED
+YOU?
+Change it to protect your personal data. Log in to
+Online Banking > Customer Service > Online Banking
+settings> Change Access Code. Or log in via our OCBC
+Mobile Banking app > Settings > Online Banking settings
+> Change Access Code. Details at ocbc.com/accesscode
 For more information, visit any of our branches or log on to www.ocbc.com
