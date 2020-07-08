@@ -194,6 +194,7 @@ function parseTransactionHistory()
 			sumAverage = 0;
 			lastTransactionDay =0;
 			currentTransactionday = 0
+			lastDate=0
 			
 			for (var i =transactionStartIndex; i<transactionTableEnd; i++) {  
 				
@@ -212,6 +213,7 @@ function parseTransactionHistory()
 					
 					if(i == transactionStartIndex)
 					{
+						lastDate = currentTransactionday;
 						lastTransactionDay = currentTransactionday
 						balanceArray[lastTransactionDay]= result['currentMonthBalance'];
 					}
@@ -243,10 +245,16 @@ function parseTransactionHistory()
 			result['previousMonthBalance'] = parseFloat(balanceNow.toFixed(2))
 			var sum =0
 			
-			for (var i=1;i<=size_dict(balanceArray);i++)
+			
+			///console.log(Object.keys(balanceArray)[0])
+			//console.log(size_dict(balanceArray))
+			//console.log(lastDate)
+			
+			for (var i=Object.keys(balanceArray)[0];i<= lastDate;i++)
 			{
 				sum += balanceArray[i];
 			}
+			//console.log(sum)
 			result['averageDailyBalance'] = parseFloat((sum/size_dict(balanceArray)).toFixed(2)) ;			
 		}
 		resolve (result)
