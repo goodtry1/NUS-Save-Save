@@ -24,6 +24,10 @@ require('dotenv').config()
 const cookieParser = require('cookie-parser')
 app.use(cookieParser())
 
+//PDF parser
+var pdfUtil = require('pdf-to-text');
+//var pdf2table = require('pdf2table');
+
 
 var parser = require("./parser")
 
@@ -213,8 +217,8 @@ app.post('/signUp', async (req, res) => {
 			sql.connect(sqlConfig, function () {
 				var request = new sql.Request();
 				var joiningDate = DATE_FORMATER(new Date(), "yyyy-mm-dd HH:MM:ss");
-				let qu = `INSERT INTO dbo.[User](email, password, hashedPw, firstName, lastName, joiningDate, contactNumber) 
-						   VALUES ('` + req.body.email + `', '` + 12345 + `', '` + hash + `', '` + req.body.firstName + `', '` + req.body.lastName + `' , '` + joiningDate + `' , '` + req.body.contactNumber + `')`;
+				let qu = `INSERT INTO dbo.[User](email, password, hashedPw, firstName, lastName, joiningDate, contactNumber, twoFactorAuth) 
+						   VALUES ('` + req.body.email + `', '` + 12345 + `', '` + hash + `', '` + req.body.firstName + `', '` + req.body.lastName + `' , '` + joiningDate + `' , '` + req.body.contactNumber + `', '` + req.body.twoFactorAuth + `')`;
 
 				request.query(qu, function (error, recordset) {
 					if (error) {
@@ -369,8 +373,11 @@ app.post('/editProfile', authenticateToken, (req, res) => {
 				SET email = '` + req.body.email + `', firstName = '` + req.body.firstName + `', lastName = '` + req.body.lastName + `', contactNumber = '` + req.body.contactNumber + `',twoFactorAuth = '` + req.body.twoFactorAuth + `'
 				WHERE userId = '` + req.body.userId + `'`;
 
+				
+
 		request.query(qu, function (err, recordset) {
 			if (err) {
+				console.log(err)
 				res.status(400).send()
 			}
 			else {
@@ -624,13 +631,14 @@ function retrievePassword(userId) {
 
 
 //config for upload multiple files
-let uploadConfig = upload.fields([{ name: 'bankStatement', maxCount: 1 }, { name: 'creditCard', maxCount: 1 }]);
+let uploadConfig = upload.fields([{name: 'bankStatement', maxCount: 1}, {name: 'creditCard', maxCount: 1}, {name: 'transactionHistory', maxCount: 1}]);
 
 //upload bank account statement client passes userId and accountTypeId
 app.post('/uploadBankStatement', authenticateToken, uploadConfig, async (req, res) => {
 
 	let dataBufferStatement = fs.readFileSync('./uploads/' + req.files['bankStatement'][0].originalname);
 
+		
 	const options = {
 		pagerender: render_page,
 		version: 'v1.10.100'
@@ -639,24 +647,42 @@ app.post('/uploadBankStatement', authenticateToken, uploadConfig, async (req, re
 	let result = {}
 
 	let creditCardParseData = {}
-
-	PDFParser(dataBufferStatement, options).then(async function (data) {
-
-		fs.writeFileSync('./uploads/result.txt', data.text);
-		result = await parser.parseStatement(req.body.accountTypeId);
-
-		if (req.files['creditCard'] && req.files['creditCard'][0]) {
+	if(req.files['transactionHistory'] && req.files['transactionHistory'][0])
+	{
+		console.log("inside transaction History")
+		let dataBuffertransaction = fs.readFileSync('./uploads/' + req.files['transactionHistory'][0].originalname); 
+		let filename = './uploads/' + req.files['transactionHistory'][0].originalname
+		result = await launchParseTransactionHistory(options, filename );
+		if(req.files['creditCard'] && req.files['creditCard'][0])
+		{
 			console.log("inside credit card")
 			let dataBufferCard = fs.readFileSync('./uploads/' + req.files['creditCard'][0].originalname);
 			creditCardParseData = await launchParseCard(options, dataBufferCard);
 			result['creditCardSpend'] = creditCardParseData['creditCardSpend']
 		}
-		deleteFile("./uploads/")
+		console.log('transaction History parse data')
+		console.log(result)
+		res.status(200).send({"parsedData":result})
+	}
+	else
+	{
+		let dataBufferStatement = fs.readFileSync('./uploads/' + req.files['bankStatement'][0].originalname);
 
-		res.status(200).send({ "parsedData": result })
-
-	});
-
+		PDFParser(dataBufferStatement, options).then(async function (data) {
+			fs.writeFileSync('./uploads/result.txt', data.text);
+			result  = await parser.parseStatement(req.body.accountTypeId);
+			if(req.files['creditCard'] && req.files['creditCard'][0])
+			{
+				console.log("inside credit card")
+				let dataBufferCard = fs.readFileSync('./uploads/' + req.files['creditCard'][0].originalname); 
+				creditCardParseData = await launchParseCard(options, dataBufferCard );
+				result['creditCardSpend'] = creditCardParseData['creditCardSpend']
+			}
+			res.status(200).send({"parsedData":result})
+		});
+	}
+	//deleteFile("./uploads/")
+				
 })
 
 
@@ -698,6 +724,18 @@ function launchParseCard(options, dataBufferCard) {
 		});
 	});
 }
+
+function launchParseTransactionHistory(options, filename)
+{
+	return new promise(function(resolve, reject) {
+		pdfUtil.pdfToText(filename, async function(err, data) {
+			fs.writeFileSync('./uploads/resultTransactions.txt', data);
+			parseData  = await parser.parseTransactionHistory();
+			resolve (parseData);
+		});
+	});
+}
+
 
 
 //get recommendations for the userid and accounttypeid
@@ -753,24 +791,24 @@ app.post('/addFeedback', authenticateToken, (req, res) => {
 
 // default render callback
 function render_page(pageData) {
-	let render_options = {
-		normalizeWhitespace: true,
-		disableCombineTextItems: false
-	}
+  let render_options = {
+    normalizeWhitespace: false,
+    disableCombineTextItems: false
+  }
 
-	return pageData.getTextContent(render_options)
-		.then(function (textContent) {
-			let lastY, text = '';
-			for (let item of textContent.items) {
-				if (lastY == item.transform[5] || !lastY) {
-					text += item.str;
-				} else {
-					text += '\n' + item.str;
-				}
-				lastY = item.transform[5];
-			}
-			return text;
-		});
+  return pageData.getTextContent(render_options)
+    .then(function (textContent) {
+      let lastY, text = '';
+      for (let item of textContent.items) {
+        if (lastY == item.transform[5] || !lastY) {
+          text += item.str;
+        } else {
+          text += '\n' + item.str;
+        }
+        lastY = item.transform[5];
+      }
+      return text;
+    });
 }
 
 function recommendationEngine(userid, accountTypeid) {
@@ -790,6 +828,3 @@ function recommendationEngine(userid, accountTypeid) {
 	});
 
 }
-
-
-
