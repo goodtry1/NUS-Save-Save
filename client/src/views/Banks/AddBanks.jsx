@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { api } from '../../api-config'
+import cookie from 'react-cookies'
 
 // reactstrap components
 import {
@@ -65,7 +66,7 @@ export class AddBanks extends Component {
                 pathname: '/admin/myBanks' // your data array of objects
             })
         } else {
-            this.setState({ userAccounts: this.props.location.data })
+            this.setState({ userAccounts: this.props.location.data, JWT_Token: cookie.load('JWT_Token') }, () => { console.log(this.state.JWT_Token)})
         }
 
 
@@ -90,10 +91,29 @@ export class AddBanks extends Component {
 
 
 
+         axios({
+             method: 'get',
+             url: `${api}/bankDetails`,
+             headers: {
+                authorisation: `Bearer ${this.state.JWT_Token}`
+              }
+         }).then((res) => {
+            var banks = []
+
+            banks = res.data.banks
 
 
 
-        axios.get(`${api}/bankDetails`)
+            this.setState({ banks: banks })
+        })
+        .catch((err) => {
+        })
+        .finally(() => {
+            this.getAccountTypes()
+        })
+
+
+      /*   axios.get(`${api}/bankDetails`)
             .then((res) => {
                 var banks = []
 
@@ -107,7 +127,7 @@ export class AddBanks extends Component {
             })
             .finally(() => {
                 this.getAccountTypes()
-            })
+            }) */
 
 
     }
@@ -146,6 +166,9 @@ export class AddBanks extends Component {
         return axios({
             method: 'post',
             url: `${api}/fetchAccountType`,
+            headers: {
+                authorisation: `Bearer ${this.state.JWT_Token}`
+            },
             data: {
                 bankid: bankId
             }
@@ -181,6 +204,9 @@ export class AddBanks extends Component {
         axios({
             method: 'post',
             url: `${api}/addBankAccount`,
+            headers: {
+                authorisation: `Bearer ${this.state.JWT_Token}`
+            },
             data: {
                 userId: this.state.user.userId,
                 accountTypeId: this.state.selectedAccountTypeId,

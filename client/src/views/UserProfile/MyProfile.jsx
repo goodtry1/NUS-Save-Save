@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { api } from '../../api-config'
+import cookie from 'react-cookies'
 
 // reactstrap components
 import {
@@ -54,12 +55,16 @@ export class MyProfile extends Component {
 
     componentDidMount = () => {
         var user = localStorage.getItem('user')
-        this.setState({ user: JSON.parse(user) })
-        this.setState({ updatedUser: JSON.parse(user) })
-        this.setState({ hideEdit: true })
-        this.setState({ hideChangePw: true })
-        this.setState({ updateLoading: false })
-        this.setState({ changePwLoading: false })
+        this.setState({
+            user: JSON.parse(user),
+            updatedUser: JSON.parse(user),
+            hideEdit: true,
+            hideChangePw: true,
+            updateLoading: false,
+            changePwLoading: false,
+            JWT_Token: cookie.load('JWT_Token')
+        })
+       
 
     }
 
@@ -127,13 +132,13 @@ export class MyProfile extends Component {
                 this.setState({
                     newPasswordState: " has-success",
                     newPw: e.target.value
-                }, () => { console.log("pw regex passn newPw state is " + this.state.newPw); });
+                }, () => { /*console.log("pw regex passn newPw state is " + this.state.newPw); */});
 
             } else {
                 this.setState({
                     newPasswordState: " has-danger",
                     newPw: ""
-                }, () => { console.log("pw regex fail, newPw state is " + this.state.newPw); });
+                }, () => { /*console.log("pw regex fail, newPw state is " + this.state.newPw); */});
             }
         } else {
             this.setState({ [e.target.name]: e.target.value })
@@ -150,6 +155,9 @@ export class MyProfile extends Component {
         axios({
             method: 'post',
             url: `${api}/editProfile`,
+            headers: {
+                authorisation: `Bearer ${this.state.JWT_Token}`
+              },
             data: {
                 userId: this.state.updatedUser.userId,
                 email: this.state.updatedUser.email,
@@ -219,7 +227,6 @@ export class MyProfile extends Component {
             }, () => {
                 this.notify('br', 3)
             })
-
         }
         else {
             if (this.state.newPw !== this.state.retypeNewPw) {
@@ -236,6 +243,9 @@ export class MyProfile extends Component {
                 axios({
                     method: 'post',
                     url: `${api}/changePassword`,
+                    headers: {
+                        authorisation: `Bearer ${this.state.JWT_Token}`
+                      },
                     data: {
                         userId: this.state.updatedUser.userId,
                         oldPassword: this.state.oldPw,

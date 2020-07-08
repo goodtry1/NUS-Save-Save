@@ -189,24 +189,13 @@ class RegisterPage extends React.Component {
       this.setState({
         passwordState: " has-success"
       });
-      console.log("pw regex pass");
+      //console.log("pw regex pass");
     } else {
       this.setState({
         passwordState: " has-danger"
       });
-      console.log("pw regex fail");
+      //console.log("pw regex fail");
     }
-
-
-    /*if (e.target.value.length > 0) {
-      this.setState({
-        passwordState: " has-success"
-      });
-    } else {
-      this.setState({
-        passwordState: " has-danger"
-      });
-    } */
   }
 
   toggleToolTip = () => {

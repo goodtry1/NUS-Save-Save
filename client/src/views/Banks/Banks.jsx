@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 //import { Redirect } from 'react-router-dom';
 import { api } from '../../api-config'
+import cookie from 'react-cookies'
 
 // reactstrap components
 import {
@@ -40,7 +41,7 @@ export class Banks extends Component {
 
     componentDidMount = () => {
         var user = localStorage.getItem('user')
-        this.setState({ user: JSON.parse(user) })
+        this.setState({ user: JSON.parse(user), JWT_Token: cookie.load('JWT_Token') })
 
         setTimeout(() => {
             this.retrieveUserBanks()
@@ -55,6 +56,9 @@ export class Banks extends Component {
         axios({
             method: 'post',
             url: `${api}/userBankAccountDetails`,
+            headers: {
+                authorisation: `Bearer ${this.state.JWT_Token}`
+            },
             data: {
                 userId: this.state.user.userId
             }

@@ -16,6 +16,7 @@
 */
 /*eslint-disable*/
 import React from "react";
+import cookie from 'react-cookies'
 import { NavLink } from "react-router-dom";
 // used for making the prop types of this component
 import PropTypes from "prop-types";
@@ -74,6 +75,8 @@ class Sidebar extends React.Component {
     //localStorage.removeItem('isLoggedIn')
     localStorage.clear();
     this.setState({ user: null })
+
+    cookie.remove('JWT_Token', { path: '/'})
 
     this.props.history.push({
       pathname: '/auth/login-page'

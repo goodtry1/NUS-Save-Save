@@ -21,6 +21,7 @@ import React from "react";
 // import { VectorMap } from "react-jvectormap";
 
 import { api } from '../../api-config'
+import cookie from 'react-cookies'
 
 // reactstrap components
 import {
@@ -63,6 +64,7 @@ import "moment-timezone"
 
 //Axios
 import axios from 'axios';
+import TouchRipple from "@material-ui/core/ButtonBase/TouchRipple";
 
 var mapData = {
   AU: 760,
@@ -85,14 +87,15 @@ class Dashboard extends React.Component {
     this.state = {
       user: '',
       accounts: [],
-      finishedLoading: ''
+      finishedLoading: '',
+      JWT_Token: ''
       //redirectToAddBanks: false
     }
   }
 
   componentDidMount = () => {
     var user = localStorage.getItem('user')
-    this.setState({ user: JSON.parse(user) }, () => {
+    this.setState({ user: JSON.parse(user), JWT_Token: cookie.load('JWT_Token') }, () => {
       //console.log("username " + JSON.stringify(this.state.user))
     })
 
@@ -108,6 +111,9 @@ class Dashboard extends React.Component {
     axios({
       method: 'post',
       url: `${api}/userBankAccountDetails`,
+      headers: {
+        authorisation: `Bearer ${this.state.JWT_Token}`
+      },
       data: {
         userId: this.state.user.userId
       }

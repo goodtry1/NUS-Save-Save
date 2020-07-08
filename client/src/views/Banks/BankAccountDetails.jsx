@@ -21,6 +21,7 @@ import { Line } from "react-chartjs-2";
 //import { VectorMap } from "react-jvectormap";
 
 import { api } from '../../api-config'
+import cookie from 'react-cookies'
 
 // reactstrap components
 import {
@@ -178,8 +179,8 @@ class BankAccountDetails extends React.Component {
                         label: "Interest earned (S$)",
                         borderColor: chartColor,
                         pointBorderColor: chartColor,
-                        pointBackgroundColor: chartColor,
-                        pointHoverBackgroundColor: chartColor,
+                        pointBackgroundColor: "#2c2c2c",
+                        pointHoverBackgroundColor: "#2c2c2c",
                         pointHoverBorderColor: chartColor,
                         pointBorderWidth: 1,
                         pointHoverRadius: 7,
@@ -194,8 +195,8 @@ class BankAccountDetails extends React.Component {
                         label: "Interest you could have earned (S$)",
                         borderColor: "#00ff00",
                         pointBorderColor: "#00ff00",
-                        pointBackgroundColor: "#00ff00",
-                        pointHoverBackgroundColor: "#00ff00",
+                        pointBackgroundColor: "#2c2c2c",
+                        pointHoverBackgroundColor: "#2c2c2c",
                         pointHoverBorderColor: "#00ff00",
                         pointBorderWidth: 1,
                         pointHoverRadius: 7,
@@ -293,7 +294,7 @@ class BankAccountDetails extends React.Component {
         
 
         if (this.props.location.data) {
-            this.setState({ bankAccountDetails: this.props.location.data }, () => {
+            this.setState({ bankAccountDetails: this.props.location.data, JWT_Token: cookie.load('JWT_Token') }, () => {
                 /* (() => { this.retrievePreviousRecommendations() })
                 (() => { localStorage.setItem("bankAccountDetails", JSON.stringify(this.state.bankAccountDetails)) }) */
                 this.retrievePreviousRecommendations()
@@ -302,7 +303,7 @@ class BankAccountDetails extends React.Component {
             })
         } else {
             var bankAccountDetails = localStorage.getItem("bankAccountDetails")
-            this.setState({ bankAccountDetails: JSON.parse(bankAccountDetails) }, () => {
+            this.setState({ bankAccountDetails: JSON.parse(bankAccountDetails), JWT_Token: cookie.load('JWT_Token') }, () => {
                 this.retrievePreviousRecommendations()
                 this.retrieveChartDetails()
             })
@@ -317,6 +318,9 @@ class BankAccountDetails extends React.Component {
         axios({
             method: 'post',
             url: `${api}/getParametersForGraph`,
+            headers: {
+                authorisation: `Bearer ${this.state.JWT_Token}`
+            },
             data: {
                 userId: this.state.bankAccountDetails.userId,
                 accountTypeid: this.state.bankAccountDetails.accountTypeId
@@ -362,6 +366,9 @@ class BankAccountDetails extends React.Component {
         axios({
             method: 'post',
             url: `${api}/fetchrecommendations`,
+            headers: {
+                authorisation: `Bearer ${this.state.JWT_Token}`
+            },
             data: {
                 userId: this.state.bankAccountDetails.userId,
                 accountTypeid: this.state.bankAccountDetails.accountTypeId
@@ -548,64 +555,73 @@ class BankAccountDetails extends React.Component {
             this.setState({ ccStatement: '' })
             this.setState({ ccFileName: '' }) */
 
-            axios.post(`${api}/uploadBankStatement`, formData)
-                .then(res => {
-                    this.setState({
-                        bankStatementRenderLoading: false,
-                        bankStatement: '',
-                        singleFileName: '',
-                        ccStatement: '',
-                        ccFileName: ''
+            axios({
+                method: 'post',
+                url: `${api}/uploadBankStatement`,
+                headers: {
+                    authorisation: `Bearer ${this.state.JWT_Token}`
+                },
+                data: formData,
+
+            }).then(res => {
+                this.setState({
+                    bankStatementRenderLoading: false,
+                    bankStatement: '',
+                    singleFileName: '',
+                    ccStatement: '',
+                    ccFileName: ''
+                })
+
+
+                if (res.status === 200) {
+                    let parsedDate = res.data.parsedData.date.split("TO")
+                    var startDate = parsedDate[0].trim()
+                    var endDate = parsedDate[1].trim()
+
+
+                    var d1 = new moment(startDate)
+                    var d2 = new moment(endDate)
+
+                    console.log(d1)
+                    console.log(d2)
+
+                    let userInputPdfDetails = this.state.userInputPdfDetails
+                    userInputPdfDetails.startDate = d1
+                    userInputPdfDetails.endDate = d2
+                    this.setState({ userInputPdfDetails })
+
+
+
+
+                    let PdfDetails = new PDFDetails(res.data.parsedData.previousMonthBalance,
+                        res.data.parsedData.currentMonthBalance,
+                        res.data.parsedData.averageDailyBalance,
+                        d1,
+                        d2,
+                        res.data.parsedData.salary,
+                        res.data.parsedData.creditCardSpend)
+
+                    this.setState({ PdfDetails: PdfDetails })
+                    this.setState({ message: 'Your bank statement has been uploaded successfully' }, () => {
+                        setTimeout(() => {
+                            this.setState({ showPdfDetails: true })
+                        }, 2000);
+
+
                     })
+                    this.notify('br', 5)
+                    //this.setState({ recommendation: '' })
+                    this.closeFeedback()
+                    //this.retrievePreviousRecommendations()
+                } else {
+                    this.setState({ message: "Unknown error has occured. Please try again later", renderLoading: false }, () => { this.notify('br', 3) })
+                }
+            })
+            .catch(err => {
+                this.setState({ message: err.message, renderLoading: false }, () => { this.notify('br', 3) })
+            })
 
-
-                    if (res.status === 200) {
-                        let parsedDate = res.data.parsedData.date.split("TO")
-                        var startDate = parsedDate[0].trim()
-                        var endDate = parsedDate[1].trim()
-
-
-                        var d1 = new moment(startDate)
-                        var d2 = new moment(endDate)
-
-                        console.log(d1)
-                        console.log(d2)
-
-                        let userInputPdfDetails = this.state.userInputPdfDetails
-                        userInputPdfDetails.startDate = d1
-                        userInputPdfDetails.endDate = d2
-                        this.setState({ userInputPdfDetails })
-
-
-
-
-                        let PdfDetails = new PDFDetails(res.data.parsedData.previousMonthBalance,
-                            res.data.parsedData.currentMonthBalance,
-                            res.data.parsedData.averageDailyBalance,
-                            d1,
-                            d2,
-                            res.data.parsedData.salary,
-                            res.data.parsedData.creditCardSpend)
-
-                        this.setState({ PdfDetails: PdfDetails })
-                        this.setState({ message: 'Your bank statement has been uploaded successfully' }, () => {
-                            setTimeout(() => {
-                                this.setState({ showPdfDetails: true })
-                            }, 2000);
-
-
-                        })
-                        this.notify('br', 5)
-                        //this.setState({ recommendation: '' })
-                        this.closeFeedback()
-                        //this.retrievePreviousRecommendations()
-                    } else {
-                        this.setState({ message: "Unknown error has occured. Please try again later", renderLoading: false }, () => { this.notify('br', 3) })
-                    }
-                })
-                .catch(err => {
-                    this.setState({ message: err.message, renderLoading: false }, () => { this.notify('br', 3) })
-                })
+            
         }
     }
 
@@ -725,6 +741,9 @@ class BankAccountDetails extends React.Component {
         axios({
             method: 'post',
             url: `${api}/updateParsedData`,
+            headers: {
+                authorisation: `Bearer ${this.state.JWT_Token}`
+            },
             data: {
                 userId: this.state.bankAccountDetails.userId,
                 accountTypeId: this.state.bankAccountDetails.accountTypeId,
@@ -1038,8 +1057,8 @@ class BankAccountDetails extends React.Component {
                     </Col>
 
                 </Row>
-
-                <Row>
+                
+                {this.state.chartDetails.label.length > 1 ? (<Row>
                             <Col md={12}>
                                 <Card className="card-chart card-plain" >
                                     <CardHeader>
@@ -1059,7 +1078,9 @@ class BankAccountDetails extends React.Component {
                                     </CardBody>
                                 </Card>
                             </Col>
-                    </Row>
+                    </Row>) : (<div></div>)}
+
+                
                 <Row sm={12}>
                     <Col sm={6} >
                         <Card className="card-stats">
