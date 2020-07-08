@@ -542,7 +542,7 @@ function launchParseTransactionHistory(options, filename)
 {
 	return new promise(function(resolve, reject) {
 		pdfUtil.pdfToText(filename, async function(err, data) {
-			fs.writeFileSync('./uploads/resultTransactionsdummy.txt', data);
+			fs.writeFileSync('./uploads/resultTransactions.txt', data);
 			parseData  = await parser.parseTransactionHistory();
 			resolve (parseData);
 		});
