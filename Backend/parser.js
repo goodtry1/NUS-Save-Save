@@ -240,6 +240,11 @@ function parseTransactionHistory()
 				
 			}
 			
+			for (var j=lastTransactionDay-1; j>=1; j--)
+			{
+				balanceArray[j] = balanceNow;
+			}
+			
 			//console.log(balanceNow) 
 			//console.log(balanceArray)
 			result['previousMonthBalance'] = parseFloat(balanceNow.toFixed(2))
@@ -250,7 +255,7 @@ function parseTransactionHistory()
 			//console.log(size_dict(balanceArray))
 			//console.log(lastDate)
 			
-			for (var i=Object.keys(balanceArray)[0];i<= lastDate;i++)
+			for (var i=1;i<= lastDate;i++)
 			{
 				sum += balanceArray[i];
 			}
