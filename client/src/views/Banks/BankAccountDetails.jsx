@@ -121,6 +121,10 @@ class BankAccountDetails extends React.Component {
             ccFileName: "",
             ccFile: null,
             ccStatement: '',
+            /* transactionSelect: null, */
+            transactionHistoryFileName: "",
+            transactionHistory: "",
+
 
             message: '',
             feedbackDialogOpen: '',
@@ -417,6 +421,7 @@ class BankAccountDetails extends React.Component {
 
     singleFile = React.createRef();
     ccStatement = React.createRef();
+    transactionHistory = React.createRef();
 
     notify(place, color) {
         this.refs.notificationAlert.notificationAlert(CustomNotification.notify(place, color, this.state.message));
@@ -459,6 +464,14 @@ class BankAccountDetails extends React.Component {
                             ccFileName: ''
                         }, () => { this.notify('br', 4) }
                     )
+                } else if (id === "transactionHistory") {
+                    this.setState(
+                        {
+                            message: 'The file you\'ve uploaded is not a PDF file',
+                            transactionHistory: '',
+                            transactionHistoryFileName: ''
+                        }, () => { this.notify('br', 4) }
+                    )
                 }
 
 
@@ -496,6 +509,11 @@ class BankAccountDetails extends React.Component {
                     ccFileName: fileNames,
                     ccStatement: files[0]
                 });
+            } else if (id === "transactionHistory") {
+                this.setState({
+                    transactionHistoryFileName: fileNames,
+                    transactionHistory: files[0]
+                });
             }
         }
 
@@ -510,6 +528,15 @@ class BankAccountDetails extends React.Component {
                 singleFileName: ''
             }
         )
+    }
+
+    cleartTransactionHistory = () => {
+        this.setState(
+            {
+                transactionHistory: '',
+                transactionHistoryFileName: ''
+            }
+         )
     }
 
     clearCCStatement = () => {
@@ -545,6 +572,7 @@ class BankAccountDetails extends React.Component {
             formData.append('userId', this.state.bankAccountDetails.userId);
             formData.append('accountTypeId', this.state.bankAccountDetails.accountTypeId);
             formData.append('creditCard', this.state.ccStatement)
+            formData.append('transactionHistory', this.state.transactionHistory)
 
 
             /* this.setState({ bankStatement: '' })
@@ -623,6 +651,14 @@ class BankAccountDetails extends React.Component {
 
     colSizeBankUpload = () => {
         if (this.state.bankStatement) {
+            return 9
+        } else {
+            return 12
+        }
+    }
+
+    colSizeTransactionUpload = () => {
+        if (this.state.transactionHistory) {
             return 9
         } else {
             return 12
@@ -1251,7 +1287,44 @@ class BankAccountDetails extends React.Component {
                                     ) : (<div></div>)}
 
 
+                                    <Col sm='12'>
+                                        <h5>Transaction history</h5>
+                                    </Col>
 
+                                    <Col xs={this.colSizeTransactionUpload()}>
+
+                                        <FormGroup className="form-file-upload form-file-simple">
+                                            <Input
+                                                type="text"
+                                                className="inputFileVisible"
+                                                placeholder="Supplement your credit card statement"
+                                                onClick={e => this.handleFileInput(e, "transactionHistory")}
+                                                defaultValue={this.state.transactionHistoryFileName}
+                                            />
+                                            <input
+                                                type="file"
+                                                accept='.pdf'
+                                                className="inputFileHidden"
+                                                style={{ zIndex: -1 }}
+                                                ref={this.transactionHistory}
+                                                onChange={e => this.addFile(e, "transactionHistory", "transactionHistory")}
+                                            />
+
+
+                                        </FormGroup>
+
+                                    </Col>
+
+                                    {this.state.transactionHistory ? (
+                                        <div>
+
+                                            <Col xs="3">
+                                                <Button onClick={this.cleartTransactionHistory} color="danger" className="btn-round btn-icon" style={{ display: 'block,', margin: 'auto' }}>
+                                                    <i className="fa fa-times" />
+                                                </Button>
+                                            </Col>
+                                        </div>
+                                    ) : (<div></div>)}
 
 
                                     <Col sm='12'>
