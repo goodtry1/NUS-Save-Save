@@ -1033,7 +1033,7 @@ class BankAccountDetails extends React.Component {
 
                 </Row>
                 
-                {this.state.chartDetails.label.length > 1 ? (<Row>
+                {this.state.chartDetails.label.length > 0 ? (<Row>
                             <Col md={12}>
                                 <Card className="card-chart card-plain" >
                                     <CardHeader>

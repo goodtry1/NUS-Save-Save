@@ -325,6 +325,7 @@ class RegisterPage extends React.Component {
       firstName: this.state.firstName,
       lastName: this.state.lastName,
       contactNumber: this.state.number,
+      twoFactorAuth: 'false'
 
     };
 
