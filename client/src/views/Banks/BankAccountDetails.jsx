@@ -1057,8 +1057,8 @@ class BankAccountDetails extends React.Component {
                     </Col>
 
                 </Row>
-
-                <Row>
+                
+                {this.state.chartDetails.label.length > 1 ? (<Row>
                             <Col md={12}>
                                 <Card className="card-chart card-plain" >
                                     <CardHeader>
@@ -1078,7 +1078,9 @@ class BankAccountDetails extends React.Component {
                                     </CardBody>
                                 </Card>
                             </Col>
-                    </Row>
+                    </Row>) : (<div></div>)}
+
+                
                 <Row sm={12}>
                     <Col sm={6} >
                         <Card className="card-stats">
