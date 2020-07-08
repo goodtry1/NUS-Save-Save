@@ -21,7 +21,6 @@ import React from "react";
 // import { VectorMap } from "react-jvectormap";
 
 import { api } from '../../api-config'
-import cookie from 'react-cookies'
 
 // reactstrap components
 import {
@@ -95,7 +94,7 @@ class Dashboard extends React.Component {
 
   componentDidMount = () => {
     var user = localStorage.getItem('user')
-    this.setState({ user: JSON.parse(user), JWT_Token: cookie.load('JWT_Token') }, () => {
+    this.setState({ user: JSON.parse(user) }, () => {
       //console.log("username " + JSON.stringify(this.state.user))
     })
 

@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import { api } from '../../api-config'
-import cookie from 'react-cookies'
 
 // reactstrap components
 import {
@@ -66,7 +65,7 @@ export class AddBanks extends Component {
                 pathname: '/admin/myBanks' // your data array of objects
             })
         } else {
-            this.setState({ userAccounts: this.props.location.data, JWT_Token: cookie.load('JWT_Token') }, () => { console.log(this.state.JWT_Token)})
+            this.setState({ userAccounts: this.props.location.data })
         }
 
 

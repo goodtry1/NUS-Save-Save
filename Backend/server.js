@@ -261,7 +261,7 @@ app.post('/signin', (req, res) => {
 						}
 						else {
 
-							console.log("****** "+process.env.ACCESS_TOKEN_SECRET)
+							
 
 							var user = results.recordset[0]
 
@@ -272,7 +272,7 @@ app.post('/signin', (req, res) => {
 							})
 
 							console.log("login successful")
-							res.status(200).send({ "userDetails": results.recordset[0], accessToken: accessToken })
+							res.status(200).send({ "userDetails": results.recordset[0] })
 						}
 					})
 

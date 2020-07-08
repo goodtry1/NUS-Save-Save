@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 //import { Redirect } from 'react-router-dom';
 import { api } from '../../api-config'
-import cookie from 'react-cookies'
 
 // reactstrap components
 import {
@@ -41,7 +40,7 @@ export class Banks extends Component {
 
     componentDidMount = () => {
         var user = localStorage.getItem('user')
-        this.setState({ user: JSON.parse(user), JWT_Token: cookie.load('JWT_Token') })
+        this.setState({ user: JSON.parse(user) })
 
         setTimeout(() => {
             this.retrieveUserBanks()

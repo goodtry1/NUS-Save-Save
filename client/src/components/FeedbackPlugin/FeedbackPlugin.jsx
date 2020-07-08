@@ -34,7 +34,6 @@ import ReactStars from 'react-stars'
 //Axios
 import axios from 'axios'
 import { api } from '../../api-config'
-import cookie from 'react-cookies'
 
 //Sweet alert
 import SweetAlert from "react-bootstrap-sweetalert";
@@ -91,7 +90,7 @@ class FeedbackPlugin extends Component {
     }
 
     componentDidMount = () => {
-        this.setState({ recommendation: this.props.recommendation, totalRecommendationNum: this.props.recommendation.length, JWT_Token: cookie.load('JWT_Token') })
+        this.setState({ recommendation: this.props.recommendation, totalRecommendationNum: this.props.recommendation.length })
 
 
         /* setTimeout(() => {

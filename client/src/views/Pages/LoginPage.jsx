@@ -224,7 +224,7 @@ class LoginPage extends React.Component {
       if (response.status === 200) {
 
         var user = response.data.userDetails
-        var JWT_Token = response.data.accessToken
+       
 
         if (user.twoFactorAuth) {
           this.setState({ twoFA: true, user })
@@ -247,7 +247,7 @@ class LoginPage extends React.Component {
           })
 
         } else {
-          cookie.save('JWT_Token', JWT_Token, { path: '/'})
+         
           this.setState({ message: "Login Successful! Redirecting you now" })
           this.notify("tc", 5)
 

@@ -21,7 +21,6 @@ import { Line } from "react-chartjs-2";
 //import { VectorMap } from "react-jvectormap";
 
 import { api } from '../../api-config'
-import cookie from 'react-cookies'
 
 // reactstrap components
 import {
@@ -35,7 +34,7 @@ import {
     //  DropdownItem,
     // UncontrolledDropdown,
     Table,
-    Progress,
+    //Progress,
     Row,
     Col,
     FormGroup,
@@ -43,7 +42,7 @@ import {
     Button,
     //InputGroup,
     Form,
-    Label
+    //Label
 } from "reactstrap";
 
 import Chart from './Chart'
@@ -51,18 +50,17 @@ import Chart from './Chart'
 // core components
 import PanelHeader from "components/PanelHeader/PanelHeader.jsx";
 
-import {
+/* import {
     dashboardPanelChart,
     //dashboardActiveUsersChart,
     //dashboardSummerChart,
     //dashboardActiveCountriesCard
-} from "variables/charts.jsx";
+} from "variables/charts.jsx"; */
 
 /* import jacket from "assets/img/saint-laurent.jpg";
 import shirt from "assets/img/balmain.jpg";
 import swim from "assets/img/prada.jpg"; */
 
-import { table_data } from "variables/general.jsx";
 
 import axios from 'axios'
 
@@ -77,7 +75,6 @@ import FeedbackPlugin from '../../components/FeedbackPlugin/FeedbackPlugin'
 import { Spring } from 'react-spring/renderprops'
 
 //moment
-import Moment from 'react-moment'
 import moment from "moment";
 import "moment-timezone"
 
@@ -90,20 +87,6 @@ import ProgressBar from 'react-bootstrap/ProgressBar'
 import { PDFDetails } from '../../models/PDFDetails'
 
 
-
-/* var mapData = {
-    AU: 760,
-    BR: 550,
-    CA: 120,
-    DE: 1300,
-    FR: 540,
-    GB: 690,
-    GE: 200,
-    IN: 200,
-    RO: 600,
-    RU: 300,
-    US: 2920
-}; */
 
 class BankAccountDetails extends React.Component {
     constructor(props) {
@@ -294,7 +277,7 @@ class BankAccountDetails extends React.Component {
         
 
         if (this.props.location.data) {
-            this.setState({ bankAccountDetails: this.props.location.data, JWT_Token: cookie.load('JWT_Token') }, () => {
+            this.setState({ bankAccountDetails: this.props.location.data }, () => {
                 /* (() => { this.retrievePreviousRecommendations() })
                 (() => { localStorage.setItem("bankAccountDetails", JSON.stringify(this.state.bankAccountDetails)) }) */
                 this.retrievePreviousRecommendations()
@@ -303,7 +286,7 @@ class BankAccountDetails extends React.Component {
             })
         } else {
             var bankAccountDetails = localStorage.getItem("bankAccountDetails")
-            this.setState({ bankAccountDetails: JSON.parse(bankAccountDetails), JWT_Token: cookie.load('JWT_Token') }, () => {
+            this.setState({ bankAccountDetails: JSON.parse(bankAccountDetails) }, () => {
                 this.retrievePreviousRecommendations()
                 this.retrieveChartDetails()
             })
@@ -318,9 +301,7 @@ class BankAccountDetails extends React.Component {
         axios({
             method: 'post',
             url: `${api}/getParametersForGraph`,
-            headers: {
-                authorisation: `Bearer ${this.state.JWT_Token}`
-            },
+            withCredentials: true,
             data: {
                 userId: this.state.bankAccountDetails.userId,
                 accountTypeid: this.state.bankAccountDetails.accountTypeId

@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import { api } from '../../api-config'
-import cookie from 'react-cookies'
 
 // reactstrap components
 import {
@@ -61,8 +60,7 @@ export class MyProfile extends Component {
             hideEdit: true,
             hideChangePw: true,
             updateLoading: false,
-            changePwLoading: false,
-            JWT_Token: cookie.load('JWT_Token')
+            changePwLoading: false
         })
        
 
