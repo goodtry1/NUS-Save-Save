@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { api } from '../../api-config'
 
 // reactstrap components
 import {
@@ -10,7 +11,8 @@ import {
     Col,
     Form,
     Input,
-    FormGroup
+    FormGroup,
+    Tooltip
 } from "reactstrap";
 
 // core components
@@ -45,18 +47,22 @@ export class MyProfile extends Component {
             retypeNewPw: '',
             notifyMsg: '',
             updateLoading: '',
-            changePwLoading: ''
+            changePwLoading: '',
+            newPasswordState: ''
         }
     }
 
     componentDidMount = () => {
         var user = localStorage.getItem('user')
-        this.setState({ user: JSON.parse(user) })
-        this.setState({ updatedUser: JSON.parse(user) })
-        this.setState({ hideEdit: true })
-        this.setState({ hideChangePw: true })
-        this.setState({ updateLoading: false })
-        this.setState({ changePwLoading: false })
+        this.setState({
+            user: JSON.parse(user),
+            updatedUser: JSON.parse(user),
+            hideEdit: true,
+            hideChangePw: true,
+            updateLoading: false,
+            changePwLoading: false
+        })
+       
 
     }
 
@@ -70,19 +76,27 @@ export class MyProfile extends Component {
 
         var toggleChangePw = this.state.hideChangePw
         if (toggleChangePw === false) { //means changePw window is opened
-            this.setState({ hideChangePw: !toggleChangePw })
+            this.setState({
+                hideChangePw: !toggleChangePw,
+                newPasswordState: ''
+            })
         }
 
     }
 
     toggleChangePw = (e) => {
         var toggleChangePw = this.state.hideChangePw
-        this.setState({ hideChangePw: !toggleChangePw })
+        this.setState({
+            hideChangePw: !toggleChangePw,
+            newPasswordState: ''
+        })
 
         var toggleEdit = this.state.hideEdit
         if (toggleEdit === false) { //means editProfile window is opened
             this.setState({ hideEdit: !toggleEdit })
         }
+
+
     }
 
     toggleTwoFa = (e) => {
@@ -107,8 +121,26 @@ export class MyProfile extends Component {
     }
 
     handlePwUpdate = (e) => {
-        this.setState({ [e.target.name]: e.target.value })
+
         //console.log(key + "__" + value)
+
+        if (e.target.name === "newPw") {
+            var passRex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{8,15}$/;
+            if (passRex.test(e.target.value)) {
+                this.setState({
+                    newPasswordState: " has-success",
+                    newPw: e.target.value
+                }, () => { /*console.log("pw regex passn newPw state is " + this.state.newPw); */});
+
+            } else {
+                this.setState({
+                    newPasswordState: " has-danger",
+                    newPw: ""
+                }, () => { /*console.log("pw regex fail, newPw state is " + this.state.newPw); */});
+            }
+        } else {
+            this.setState({ [e.target.name]: e.target.value })
+        }
     }
 
     handleUpdateButton = (e) => {
@@ -120,7 +152,8 @@ export class MyProfile extends Component {
 
         axios({
             method: 'post',
-            url: 'http://localhost:5001/editProfile',
+            url: `${api}/editProfile`,
+            withCredentials: true,
             data: {
                 userId: this.state.updatedUser.userId,
                 email: this.state.updatedUser.email,
@@ -175,22 +208,29 @@ export class MyProfile extends Component {
         //console.log("ChangePw button called")
         this.setState({ changePwLoading: true })
 
-        if ((this.state.oldPw === '') || (this.state.newPw === '') || (this.state.retypeNewPw ==='')) {
+        if (this.state.newPasswordState == " has-danger") {
+            this.setState({
+                notifyMsg: "Error! New Password do not fulfil requirement. ",
+                changePwLoading: false
+            }, () => {
+                this.notify('br', 3)
+            })
+        } else if ((this.state.oldPw === '') || (this.state.newPw === '') || (this.state.retypeNewPw === '')) {
             //console.log("Error! One of the fields is empty.");
-            this.setState({ 
+            this.setState({
                 notifyMsg: "Error! One of the fields is empty. ",
                 changePwLoading: false
             }, () => {
                 this.notify('br', 3)
             })
-
-        } else {
+        }
+        else {
             if (this.state.newPw !== this.state.retypeNewPw) {
                 //console.log("Error! New passwords do not match.")
-                this.setState({ 
+                this.setState({
                     notifyMsg: "Error! New passwords do not match. ",
                     changePwLoading: false
-                 }, () => {
+                }, () => {
                     this.notify('br', 3)
                 })
 
@@ -198,7 +238,8 @@ export class MyProfile extends Component {
                 //console.log("Check correct.")
                 axios({
                     method: 'post',
-                    url: 'http://localhost:5001/changePassword',
+                    url: `${api}/changePassword`,
+                    withCredentials: true,
                     data: {
                         userId: this.state.updatedUser.userId,
                         oldPassword: this.state.oldPw,
@@ -212,10 +253,10 @@ export class MyProfile extends Component {
                         this.setState({ newPw: '' })
                         this.setState({ retypeNewPw: '' })
 
-                        this.setState({ 
+                        this.setState({
                             notifyMsg: "Success! Password changed successfully.",
                             changePwLoading: false
-                         }, () => {
+                        }, () => {
                             this.notify('br', 2)
 
                             this.toggleChangePw();
@@ -224,22 +265,22 @@ export class MyProfile extends Component {
 
 
 
-                    } else if (response.status === 206) {
-                        //console.log("Password do not match. Try again!")
-                        this.setState({ 
+                    } else {
+                        console.log(response.status)
+                        this.setState({
                             notifyMsg: "Error! Your old password do not match. Please try again!",
                             changePwLoading: false
-                         }, () => {
+                        }, () => {
                             this.notify('br', 3)
                         })
 
                     }
                 }).catch((err) => {
                     //console.log(err.message)
-                    this.setState({ 
+                    this.setState({
                         notifyMsg: "Unknown Error. Please contact admin!",
                         changePwLoading: false
-                     }, () => {
+                    }, () => {
                         this.notify('br', 3)
                     })
 
@@ -497,6 +538,7 @@ export class MyProfile extends Component {
                                                             <FormGroup>
                                                                 <label>New Password</label>
                                                                 <Input
+                                                                    id="newPassword"
                                                                     defaultValue={""}
                                                                     name="newPw"
                                                                     required={true}
@@ -504,6 +546,11 @@ export class MyProfile extends Component {
                                                                     type="password"
                                                                     onChange={this.handlePwUpdate}
                                                                 />
+                                                                <Tooltip placement="right" target="newPassword" isOpen={this.state.newPasswordState === " has-danger"} >
+                                                                    New Password must contain 8 to 15 characters which contain at least one lowercase letter,
+                                                                    one uppercase letter, one numeric digit, and one special character.
+                                                            </Tooltip>
+
                                                             </FormGroup>
                                                         </Col>
                                                     </Row>

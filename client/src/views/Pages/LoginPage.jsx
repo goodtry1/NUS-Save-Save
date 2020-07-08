@@ -15,6 +15,8 @@
 
 */
 import React from "react";
+import { api } from '../../api-config'
+import cookie from 'react-cookies'
 
 // reactstrap components
 import {
@@ -203,14 +205,17 @@ class LoginPage extends React.Component {
 
   loginViaServer = () => {
     
-
     axios({
       method: 'post',
-      url: 'http://localhost:5001/signin',
+      url: `${api}/signin`,
       data: {
         "email": this.state.email,
         "password": this.state.password
-      }
+      }, 
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      withCredentials: true
     }).then((response) => {
 
 
@@ -218,13 +223,14 @@ class LoginPage extends React.Component {
       if (response.status === 200) {
 
         var user = response.data.userDetails
+       
 
         if (user.twoFactorAuth) {
           this.setState({ twoFA: true, user })
 
           axios({
             method: 'post',
-            url: 'http://localhost:5001/twoFactorAuthenticate',
+            url: api + '/twoFactorAuthenticate',
             data: {
               email: this.state.email,
               action: "signIn"
@@ -240,6 +246,7 @@ class LoginPage extends React.Component {
           })
 
         } else {
+         
           this.setState({ message: "Login Successful! Redirecting you now" })
           this.notify("tc", 5)
 
@@ -425,8 +432,6 @@ class LoginPage extends React.Component {
                                 (this.state.emailFocus ? "input-group-focus" : "")
                               }
                             >
-                             
-
                               <InputGroupAddon addonType="prepend">
                                 <InputGroupText>
                                   <i className="now-ui-icons ui-1_email-85" />
@@ -443,6 +448,7 @@ class LoginPage extends React.Component {
                                 value={this.state.email}
                               />
                             </InputGroup>
+                            
                             <InputGroup
                               className={
                                 "no-border form-control-lg " +
@@ -465,6 +471,7 @@ class LoginPage extends React.Component {
                                 value={this.state.password}
                               />
                             </InputGroup>
+                           
 
                             
                           </CardBody>
@@ -484,21 +491,25 @@ class LoginPage extends React.Component {
                              
                             </Button> 
                             </div>)}
+
+                            {/* <div className="pull-left">
+                              <h6>
+                                  <a href="/auth/register-page" className="link footer-link">
+                              Create Account
+                                </a>
+                              </h6>
+                            </div> */}
+                            <div className="">
+                              <center>
+                              <h6>
+                                <a href="/auth/forgetPassword-page" className="link footer-link">
+                                  Forgot password
+                                </a>
+                              </h6>
+                              </center>
+                            </div>
                          
-                            <div className="pull-left">
-                              <h6>
-                                {/* <a href="/auth/register-page" className="link footer-link">
-                            Create Account
-                          </a> */}
-                              </h6>
-                            </div>
-                            <div className="pull-right">
-                              <h6>
-                                {/* <a href="#pablo" className="link footer-link">
-                            Need Help?
-                          </a> */}
-                              </h6>
-                            </div>
+                            
                           </CardFooter>
                         </Form>
                       </div>

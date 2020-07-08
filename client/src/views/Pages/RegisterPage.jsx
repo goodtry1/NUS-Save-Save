@@ -15,6 +15,7 @@
 
 */
 import React from "react";
+import { api } from '../../api-config'
 
 // reactstrap components
 import {
@@ -33,11 +34,12 @@ import {
   InputGroupText,
   Input,
   Label,
-  Button
+  Button,
+  Tooltip
 } from "reactstrap";
 
 // core components
-import bgImage from "assets/img/bg16.jpg";
+import bgImage from "assets/img/MBS_night.jpg";
 
 //Additional imports
 import NotificationAlert from "react-notification-alert";
@@ -80,7 +82,8 @@ class RegisterPage extends React.Component {
       openDialog: false,
       dialogFinish: false,
       code: '',
-      renderLoading: false
+      renderLoading: false,
+      accountToolTipState: false
     };
   }
   componentDidMount() {
@@ -179,15 +182,24 @@ class RegisterPage extends React.Component {
     this.setState({
       password: e.target.value
     });
-    if (e.target.value.length > 0) {
+
+    //8 to 15 characters which contain at least one lowercase letter, one uppercase letter, one numeric digit, and one special character
+    var passRex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{8,15}$/;
+    if (passRex.test(e.target.value)) {
       this.setState({
         passwordState: " has-success"
       });
+      //console.log("pw regex pass");
     } else {
       this.setState({
         passwordState: " has-danger"
       });
+      //console.log("pw regex fail");
     }
+  }
+
+  toggleToolTip = () => {
+    this.setState({ accountToolTipState: !this.state.accountToolTipState })
   }
 
   numberChange(e) {
@@ -265,21 +277,21 @@ class RegisterPage extends React.Component {
 
 
   handleSubmit = (event) => {
-    
+
 
     if (this.isValidated()) {
-      this.setState({renderLoading : true})
+      this.setState({ renderLoading: true })
       //this.registerViaServer()
 
       axios({
         method: 'post',
-        url: 'http://localhost:5001/twoFactorAuthenticate',
+        url: `${api}/twoFactorAuthenticate`,
         data: {
           "email": this.state.email,
           "action": "signUp"
         }
       }).then((response) => {
-        this.setState({ renderLoading: false})
+        this.setState({ renderLoading: false })
         if (response.status === 200) {
 
           // localStorage.setItem('code', response.data.otp)
@@ -291,7 +303,7 @@ class RegisterPage extends React.Component {
             () => { this.notify('br', 4) })
         }
       }).catch((err) => {
-        this.setState({message : "Unknown error has occured. Please try again later", renderLoading: false}, () => {this.notify('tc', 3)})
+        this.setState({ message: "An error has occured, please try again later", renderLoading: false }, () => { this.notify('tc', 3) })
       })
 
 
@@ -312,10 +324,12 @@ class RegisterPage extends React.Component {
       password: this.state.password,
       firstName: this.state.firstName,
       lastName: this.state.lastName,
-      contactNumber: this.state.number
+      contactNumber: this.state.number,
+      twoFactorAuth: 'false'
+
     };
 
-    fetch("http://localhost:5001/signUp", {
+    fetch(`${api}/signUp`, {
       method: "POST",
       body: JSON.stringify(values),
       headers: new Headers({
@@ -330,17 +344,17 @@ class RegisterPage extends React.Component {
           this.notify('tc', 5)
         } else {
 
-          this.setState({ message: 'An error has occured' })
+          this.setState({ message: 'An error has occured, please try again later' })
 
           // console.log("An error occured")
           // this.setState({ notificationColor: 4 })
           this.notify('tc', 4)
+
+
         }
 
-        //return response.json();
-
       }).catch((err) => {
-        this.setState({message : "Unknown error has occured. Please try again later", renderLoading: false}, () => {this.notify('tc', 3)})
+        this.setState({ message: "An error has occured, please try again later", renderLoading: false }, () => { this.notify('tc', 3) })
       }).then(() => {
         this.setState({
           email: '',
@@ -384,18 +398,18 @@ class RegisterPage extends React.Component {
   }
 
   renderLoading() {
-      return (
-        
+    return (
+
       <div>
         <center>
-        <Button color="primary"  disabled size="lg" className="mb-3 btn-round" block>
-              <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+          <Button color="primary" disabled size="lg" className="mb-3 btn-round" block>
+            <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
         Loading...
         </Button>
         </center>
       </div>
-      )
-    }
+    )
+  }
 
 
   render() {
@@ -437,7 +451,7 @@ class RegisterPage extends React.Component {
                       </p>
                     </div>
                   </div> */}
-                 {/*  <div className="info-area info-horizontal">
+                  {/*  <div className="info-area info-horizontal">
                     <div className="icon icon-info">
                       <i className="now-ui-icons users_single-02" />
                     </div>
@@ -483,7 +497,7 @@ class RegisterPage extends React.Component {
                             </InputGroupText>
                           </InputGroupAddon>
                           <Input
-                           /*  defaultValue={this.state.email} */
+                            /*  defaultValue={this.state.email} */
                             value={this.state.email}
                             type="text"
                             placeholder="Email (required)"
@@ -556,6 +570,7 @@ class RegisterPage extends React.Component {
                           </InputGroupAddon>
                           <Input
                             /* defaultValue={this.state.password} */
+                            id="password"
                             value={this.state.password}
                             type="password"
                             placeholder="Password (required)"
@@ -564,6 +579,16 @@ class RegisterPage extends React.Component {
                             onBlur={e => this.setState({ passwordFocus: false })}
                             onChange={e => this.passwordChange(e)}
                           />
+                          {this.state.passwordState === " has-danger" ? (
+                            
+                            <Tooltip placement="right" target="password" isOpen={this.state.passwordState === " has-danger"} >
+                              Password must contain 8 to 15 characters which contain at least one lowercase letter,
+                              one uppercase letter, one numeric digit, and one special character.
+                        </Tooltip>
+                        
+                          ) : (
+                              <div />
+                            )}
                         </InputGroup>
 
                         <InputGroup
@@ -625,19 +650,19 @@ class RegisterPage extends React.Component {
 
                       </CardBody>
                       <CardFooter className="text-center">
-                        {this.state.renderLoading? 
-                        (this.renderLoading()
+                        {this.state.renderLoading ?
+                          (this.renderLoading()
                           ) : (
-                          <Button
-                            color="primary"
-                            size="lg"
-                            block
-                            className="mb-3 btn-round"
-                          //href="#pablo"
-                          >
-                            Register
-                          </Button>)}
-                        
+                            <Button
+                              color="primary"
+                              size="lg"
+                              block
+                              className="mb-3 btn-round"
+                            //href="#pablo"
+                            >
+                              Register
+                            </Button>)}
+
                       </CardFooter>
                     </Card>
                   </Form>

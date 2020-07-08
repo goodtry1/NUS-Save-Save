@@ -33,6 +33,7 @@ import ReactStars from 'react-stars'
 
 //Axios
 import axios from 'axios'
+import { api } from '../../api-config'
 
 //Sweet alert
 import SweetAlert from "react-bootstrap-sweetalert";
@@ -111,6 +112,10 @@ class FeedbackPlugin extends Component {
         this.setState({ classes: "dropdown show" });
     }
 
+    closeFeedback() {
+        this.setState({ classes: "dropdown"})
+    }
+
     
     
 
@@ -148,7 +153,8 @@ class FeedbackPlugin extends Component {
 
             axios({
                 method: 'post',
-                url: 'http://localhost:5001/addFeedback',
+                url: `${api}/addFeedback`,
+                withCredentials: true,
                 data: {
                     recommendationId: recommendationId,
                     feedbackRating: rating,

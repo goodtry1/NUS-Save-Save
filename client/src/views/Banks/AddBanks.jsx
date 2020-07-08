@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import { api } from '../../api-config'
 
 // reactstrap components
 import {
@@ -89,10 +90,23 @@ export class AddBanks extends Component {
 
 
 
+         axios({
+             method: 'get',
+             url: `${api}/bankDetails`,
+             withCredentials: true,
+         }).then((res) => {
+            var banks = []
+            banks = res.data.banks
+            this.setState({ banks: banks })
+        })
+        .catch((err) => {
+        })
+        .finally(() => {
+            this.getAccountTypes()
+        })
 
 
-
-        axios.get('http://localhost:5001/bankDetails')
+      /*   axios.get(`${api}/bankDetails`)
             .then((res) => {
                 var banks = []
 
@@ -106,7 +120,7 @@ export class AddBanks extends Component {
             })
             .finally(() => {
                 this.getAccountTypes()
-            })
+            }) */
 
 
     }
@@ -144,7 +158,8 @@ export class AddBanks extends Component {
     getAccountTypesFromBankId = (bankId) => {
         return axios({
             method: 'post',
-            url: 'http://localhost:5001/fetchAccountType',
+            url: `${api}/fetchAccountType`,
+            withCredentials: true,
             data: {
                 bankid: bankId
             }
@@ -179,7 +194,8 @@ export class AddBanks extends Component {
 
         axios({
             method: 'post',
-            url: 'http://localhost:5001/addBankAccount',
+            url: `${api}/addBankAccount`,
+            withCredentials: true,
             data: {
                 userId: this.state.user.userId,
                 accountTypeId: this.state.selectedAccountTypeId,

@@ -16,6 +16,8 @@
 */
 /*eslint-disable*/
 import React from "react";
+import { api } from '../../api-config'
+
 import { NavLink } from "react-router-dom";
 // used for making the prop types of this component
 import PropTypes from "prop-types";
@@ -28,6 +30,9 @@ import { Nav, Collapse, Button } from "reactstrap";
 // core components
 import avatar from "assets/img/ryan.jpg";
 import logo from "logo-white.svg";
+
+//
+import axios from 'axios';
 
 var ps;
 
@@ -74,6 +79,12 @@ class Sidebar extends React.Component {
     //localStorage.removeItem('isLoggedIn')
     localStorage.clear();
     this.setState({ user: null })
+
+    axios({
+      method: 'post',
+      url: `${api}/logOut`,
+      withCredentials: true
+  })
 
     this.props.history.push({
       pathname: '/auth/login-page'
