@@ -155,9 +155,7 @@ class FeedbackPlugin extends Component {
             axios({
                 method: 'post',
                 url: `${api}/addFeedback`,
-                headers: {
-                    authorisation: `Bearer ${this.state.JWT_Token}`
-                },
+                withCredentials: true,
                 data: {
                     recommendationId: recommendationId,
                     feedbackRating: rating,

@@ -16,11 +16,13 @@ const secureRandomPw = require('secure-random-password');
 
 //cors
 var cors = require('cors');
-app.use(cors());
+app.use(cors({credentials: true, origin: 'http://localhost:3000'}));
 
-//JWT
+//JWT & cookie
 const jwt = require('jsonwebtoken')
 require('dotenv').config()
+const cookieParser = require('cookie-parser')
+app.use(cookieParser())
 
 
 var parser = require("./parser")
@@ -55,13 +57,14 @@ var server = app.listen(5001, function () {
 });
 
 function authenticateToken(req, res, next) {
-	const authHeader = req.headers['authorisation']
-	const token = authHeader && authHeader.split(' ')[1]
 
-	if (token === null) 
+	const accessToken = req.cookies.access_token
+	
+
+	if (accessToken === null) 
 		return res.sendStatus(401)
 
-	jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
+	jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
 		if (err) return res.sendStatus(403)
 
 		req.user = user
@@ -231,6 +234,8 @@ app.post('/signUp', async (req, res) => {
 
 // signin with Hash
 app.post('/signin', (req, res) => {
+
+	console.log("trying to sign in")
 	let email = req.body.email;
 	let password = req.body.password;
 	console.log('body ' + req.body.email + " " + req.body.password);
@@ -262,7 +267,9 @@ app.post('/signin', (req, res) => {
 
 							var accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET)
 
-
+							res.cookie('access_token', accessToken, {
+								httpOnly: true
+							})
 
 							console.log("login successful")
 							res.status(200).send({ "userDetails": results.recordset[0], accessToken: accessToken })

@@ -114,6 +114,7 @@ class Dashboard extends React.Component {
       headers: {
         authorisation: `Bearer ${this.state.JWT_Token}`
       },
+      withCredentials: true,
       data: {
         userId: this.state.user.userId
       }

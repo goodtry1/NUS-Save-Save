@@ -366,9 +366,7 @@ class BankAccountDetails extends React.Component {
         axios({
             method: 'post',
             url: `${api}/fetchrecommendations`,
-            headers: {
-                authorisation: `Bearer ${this.state.JWT_Token}`
-            },
+            withCredentials: true,
             data: {
                 userId: this.state.bankAccountDetails.userId,
                 accountTypeid: this.state.bankAccountDetails.accountTypeId
@@ -558,9 +556,7 @@ class BankAccountDetails extends React.Component {
             axios({
                 method: 'post',
                 url: `${api}/uploadBankStatement`,
-                headers: {
-                    authorisation: `Bearer ${this.state.JWT_Token}`
-                },
+                withCredentials: true,
                 data: formData,
 
             }).then(res => {
@@ -741,9 +737,7 @@ class BankAccountDetails extends React.Component {
         axios({
             method: 'post',
             url: `${api}/updateParsedData`,
-            headers: {
-                authorisation: `Bearer ${this.state.JWT_Token}`
-            },
+            withCredentials: true,
             data: {
                 userId: this.state.bankAccountDetails.userId,
                 accountTypeId: this.state.bankAccountDetails.accountTypeId,

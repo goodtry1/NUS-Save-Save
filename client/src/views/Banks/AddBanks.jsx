@@ -94,9 +94,7 @@ export class AddBanks extends Component {
          axios({
              method: 'get',
              url: `${api}/bankDetails`,
-             headers: {
-                authorisation: `Bearer ${this.state.JWT_Token}`
-              }
+             withCredentials: true,
          }).then((res) => {
             var banks = []
 
@@ -166,9 +164,7 @@ export class AddBanks extends Component {
         return axios({
             method: 'post',
             url: `${api}/fetchAccountType`,
-            headers: {
-                authorisation: `Bearer ${this.state.JWT_Token}`
-            },
+            withCredentials: true,
             data: {
                 bankid: bankId
             }
@@ -204,9 +200,7 @@ export class AddBanks extends Component {
         axios({
             method: 'post',
             url: `${api}/addBankAccount`,
-            headers: {
-                authorisation: `Bearer ${this.state.JWT_Token}`
-            },
+            withCredentials: true,
             data: {
                 userId: this.state.user.userId,
                 accountTypeId: this.state.selectedAccountTypeId,

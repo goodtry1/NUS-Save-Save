@@ -212,7 +212,11 @@ class LoginPage extends React.Component {
       data: {
         "email": this.state.email,
         "password": this.state.password
-      }
+      }, 
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      withCredentials: true
     }).then((response) => {
 
 
