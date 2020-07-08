@@ -108,7 +108,7 @@ let routes = [
         layout: "/admin"
       }
     ]
-  },
+  } /*,
   {
     collapse: true,
     path: "/pages",
@@ -137,7 +137,7 @@ let routes = [
         mini: "RS",
         component: RTL,
         layout: "/admin"
-      }, */
+      }, 
       {
         path: "/register-page",
         name: "Register Page",
@@ -177,7 +177,7 @@ let routes = [
         mini: "LSP",
         component: LockScreenPage,
         layout: "/auth"
-      } */
+      } 
     ]
   },
   {
@@ -355,7 +355,7 @@ let routes = [
     icon: "now-ui-icons media-1_album",
     component: Calendar,
     layout: "/admin"
-  }
+  } */
 ];
 
 export default routes;
