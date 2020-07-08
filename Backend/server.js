@@ -12,6 +12,8 @@ var promise = require('promise');
 const DATE_FORMATER = require( 'dateformat' );
 var nodemailer = require('nodemailer');
 var randomize = require('randomatic');
+var pdfUtil = require('pdf-to-text');
+var pdf2table = require('pdf2table');
 
 
 var parser = require("./parser")
@@ -442,13 +444,12 @@ function retrievePassword(userId)
 
 
 //config for upload multiple files
-let uploadConfig = upload.fields([{name: 'bankStatement', maxCount: 1}, {name: 'creditCard', maxCount: 1}]);
+let uploadConfig = upload.fields([{name: 'bankStatement', maxCount: 1}, {name: 'creditCard', maxCount: 1}, {name: 'transactionHistory', maxCount: 1}]);
 
 //upload bank account statement client passes userId and accountTypeId
 app.post('/uploadBankStatement', uploadConfig, async(req, res) => {
 
-	let dataBufferStatement = fs.readFileSync('./uploads/' + req.files['bankStatement'][0].originalname);
-	
+		
 	const options = {
 		pagerender: render_page,
 		version: 'v1.10.100'
@@ -457,12 +458,12 @@ app.post('/uploadBankStatement', uploadConfig, async(req, res) => {
     let result = {}
 	
 	let creditCardParseData = {}
-
-	PDFParser(dataBufferStatement, options).then(async function (data) {
-		
-		fs.writeFileSync('./uploads/result.txt', data.text);
-		result  = await parser.parseStatement(req.body.accountTypeId);
-	
+	if(req.files['transactionHistory'] && req.files['transactionHistory'][0])
+	{
+		console.log("inside transaction History")
+		let dataBuffertransaction = fs.readFileSync('./uploads/' + req.files['transactionHistory'][0].originalname); 
+		let filename = './uploads/' + req.files['transactionHistory'][0].originalname
+		result = await launchParseTransactionHistory(options, filename );
 		if(req.files['creditCard'] && req.files['creditCard'][0])
 		{
 			console.log("inside credit card")
@@ -470,12 +471,29 @@ app.post('/uploadBankStatement', uploadConfig, async(req, res) => {
 			creditCardParseData = await launchParseCard(options, dataBufferCard );
 			result['creditCardSpend'] = creditCardParseData['creditCardSpend']
 		}
-		deleteFile("./uploads/")
-		
+		console.log('transaction History parse data')
+		console.log(result)
 		res.status(200).send({"parsedData":result})
-		
-	});
-	
+	}
+	else
+	{
+		let dataBufferStatement = fs.readFileSync('./uploads/' + req.files['bankStatement'][0].originalname);
+
+		PDFParser(dataBufferStatement, options).then(async function (data) {
+			fs.writeFileSync('./uploads/result.txt', data.text);
+			result  = await parser.parseStatement(req.body.accountTypeId);
+			if(req.files['creditCard'] && req.files['creditCard'][0])
+			{
+				console.log("inside credit card")
+				let dataBufferCard = fs.readFileSync('./uploads/' + req.files['creditCard'][0].originalname); 
+				creditCardParseData = await launchParseCard(options, dataBufferCard );
+				result['creditCardSpend'] = creditCardParseData['creditCardSpend']
+			}
+			res.status(200).send({"parsedData":result})
+		});
+	}
+	//deleteFile("./uploads/")
+				
 })
 
 
@@ -519,6 +537,18 @@ function launchParseCard(options, dataBufferCard)
 		});
 	});
 }
+
+function launchParseTransactionHistory(options, filename)
+{
+	return new promise(function(resolve, reject) {
+		pdfUtil.pdfToText(filename, async function(err, data) {
+			fs.writeFileSync('./uploads/resultTransactionsdummy.txt', data);
+			parseData  = await parser.parseTransactionHistory();
+			resolve (parseData);
+		});
+	});
+}
+
 
 
 //get recommendations for the userid and accounttypeid
@@ -578,7 +608,7 @@ app.post('/addFeedback', (req, res) =>  {
 // default render callback
 function render_page(pageData) {
   let render_options = {
-    normalizeWhitespace: true,
+    normalizeWhitespace: false,
     disableCombineTextItems: false
   }
 
