@@ -163,7 +163,8 @@ function parseTransactionHistory()
 		if (line.includes('Available Balance')){
 		    indexMap.set('Available Balance', lineIndex);
 			let array = line.trim().split("  ").filter(function(value, index, arr){ return value !=  "";})
-			result['currentMonthBalance'] = parseFloat(array[1]);
+			//console.log(array[1].replace(/\s|,|/g, ''))
+			result['currentMonthBalance'] = parseFloat(array[1].replace(/\s|,|/g, ''));
 		}
 		if(line.includes('Transaction Date')) 
 		{
