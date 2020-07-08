@@ -272,7 +272,8 @@ app.post('/signin', (req, res) => {
 							var accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET)
 
 							res.cookie('access_token', accessToken, {
-								httpOnly: true
+								httpOnly: true,
+								/* secure: true */
 							})
 
 							console.log("login successful")
@@ -289,6 +290,13 @@ app.post('/signin', (req, res) => {
 		});
 	});
 });
+
+app.post("/logOut", (req, res) => {
+	res.cookie('access_token', '', {maxAge: 0, httpOnly: true} )
+
+	
+	res.status(200).send()
+})
 
 //get banks
 app.get('/bankdetails', function (req, res) {
@@ -525,7 +533,7 @@ app.post('/fetchAccountType', authenticateToken, (req, res) => {
 })
 
 //get the paramters for the graph
-app.post('/getParametersForGraph', authenticateToken, (req, res) =>  {
+app.post('/getParametersForGraph', (req, res) =>  {
 	userId = req.body.userId;
     //console.log('userId' + userId)
     accountTypeid = req.body.accountTypeid;

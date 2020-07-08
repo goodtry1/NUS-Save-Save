@@ -307,6 +307,8 @@ class BankAccountDetails extends React.Component {
                 accountTypeid: this.state.bankAccountDetails.accountTypeId
             }
         }).then((response) => {
+
+            
             var recordSet = response.data.recordset
 
             var label = []
@@ -334,7 +336,7 @@ class BankAccountDetails extends React.Component {
 
             this.setState({
                 chartDetails
-            })
+            }, () => { console.log(this.state.chartDetails) })
         })
     }
 
