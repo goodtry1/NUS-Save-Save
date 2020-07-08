@@ -127,9 +127,7 @@ export class MyProfile extends Component {
         axios({
             method: 'post',
             url: `${api}/editProfile`,
-            headers: {
-                authorisation: `Bearer ${this.state.JWT_Token}`
-              },
+            withCredentials: true,
             data: {
                 userId: this.state.updatedUser.userId,
                 email: this.state.updatedUser.email,
@@ -208,9 +206,7 @@ export class MyProfile extends Component {
                 axios({
                     method: 'post',
                     url: `${api}/changePassword`,
-                    headers: {
-                        authorisation: `Bearer ${this.state.JWT_Token}`
-                      },
+                    withCredentials: true,
                     data: {
                         userId: this.state.updatedUser.userId,
                         oldPassword: this.state.oldPw,

@@ -56,9 +56,7 @@ export class Banks extends Component {
         axios({
             method: 'post',
             url: `${api}/userBankAccountDetails`,
-            headers: {
-                authorisation: `Bearer ${this.state.JWT_Token}`
-            },
+            withCredentials: true,
             data: {
                 userId: this.state.user.userId
             }
