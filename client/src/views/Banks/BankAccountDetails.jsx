@@ -590,17 +590,20 @@ class BankAccountDetails extends React.Component {
 
                 if (res.status === 200) {
 
-                    var startDate = ''
-                    var endDate = ''
+                    var d1 = new moment()
+                    var d2 = new moment()
 
                     try {
+                        var startDate = ''
+                        var endDate = ''
+
                         let parsedDate = res.data.parsedData.date.split("TO")
                         startDate = parsedDate[0].trim()
                         endDate = parsedDate[1].trim()
     
     
-                        var d1 = new moment(startDate)
-                        var d2 = new moment(endDate)
+                        d1 = new moment(startDate)
+                        d2 = new moment(endDate)
                     } catch (err) {
                         
                     }
@@ -764,12 +767,21 @@ class BankAccountDetails extends React.Component {
 
         })
 
-        /* Processing Date */
-        var d1 = userInputPdfDetails.startDate.toString().split(" ")
-        userInputPdfDetails.startDate = d1[2] + " " + d1[1] + " " + d1[3]
+        var d1 = "";
+        var d2 = "";
 
-        var d2 = userInputPdfDetails.endDate.toString().split(" ")
-        userInputPdfDetails.endDate = d2[2] + " " + d2[1] + " " + d2[3]
+        try {
+            d1 = userInputPdfDetails.startDate.toString().split(" ")
+            userInputPdfDetails.startDate = d1[2] + " " + d1[1] + " " + d1[3]
+    
+            d2 = userInputPdfDetails.endDate.toString().split(" ")
+            userInputPdfDetails.endDate = d2[2] + " " + d2[1] + " " + d2[3]
+        } catch (err) {
+           
+        }
+
+        /* Processing Date */
+       
 
 
        /*  var statementDate = userInputPdfDetails.startDate + " TO " + userInputPdfDetails.endDate
@@ -802,7 +814,7 @@ class BankAccountDetails extends React.Component {
                     }, 4000);
                 })
         }).catch((err) => {
-            this.setState({ message: err.message },
+            this.setState({ message: err.message, bankStatementVerificationLoading: false },
                 () => { this.notify('br', 3) })
 
         })
