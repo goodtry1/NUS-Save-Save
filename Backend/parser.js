@@ -139,7 +139,7 @@ function parseCard()
 
 }
 
-function parseTransactionHistory()
+function parseTransactionHistoryOCBC360()
 {
 	
 	return new promise(async function(resolve, reject) {
@@ -267,10 +267,77 @@ function parseTransactionHistory()
 function size_dict(d){c=0; for (i in d) ++c; return c}
 
 
+function parseTransactionHistoryDBSMultiplier()
+{
+	return new promise(async function(resolve, reject) {
+	// record the index of each line in raw text data
+	let lineIndex = 1;
+
+	// map and index map
+	let textMap = new Map();
+	let indexMap = new Map();
+
+	// extracted information
+	let result = await initializeParseData();
+	totalWithdrawal = 0
+	totalDeposit = 0
+
+	let readInterface = readline.createInterface({
+		input: fs.createReadStream('./uploads/resultTransactions.txt')
+	});
+
+	readInterface.on('line', function (line) {
+		textMap.set(lineIndex, line);
+		
+
+		if (line.includes('Available Balance')){
+		    indexMap.set('Available Balance', lineIndex);
+			let array = line.trim().split(/\s+/).filter(function(value, index, arr){ return value !=  "";})
+			result['currentMonthBalance'] = parseFloat(array[2].replace('S$', '').replace(/\s|,|/g, ''));
+		}
+		
+		if (line.includes('Total')){
+			let array = line.trim().split(/\s+/).filter(function(value, index, arr){ return value !=  "";})
+			if(array.length == 3)
+			{
+				indexMap.set('totalWithdrawalsDeposits', lineIndex);
+				totalWithdrawal = parseFloat(array[1].replace('S$', '').replace(/\s|,|/g, ''));
+				totalDeposit = parseFloat(array[2].replace('S$', '').replace(/\s|,|/g, ''));
+				
+			}
+		}
+		if(line.includes('(Withdrawal)               (Deposit)')){
+			indexMap.set('TransactionTable', lineIndex+2);
+		}
+		
+		lineIndex++;
+    });
+
+
+	readInterface.on('close', function () {
+
+		resolve (result)
+		console.log(result)
+		result['previousMonthBalance'] = parseFloat((result['currentMonthBalance'] - totalDeposit + totalWithdrawal).toFixed(2))
+		if(indexMap.get('TransactionTable'))
+		{
+			let array = textMap.get(indexMap.get('TransactionTable')).trim().split("  ").filter(function(value, index, arr){ return value !=  "";});
+			console.log(array)
+			if(array.length == 3)
+			{
+				result['date'] = array[0]
+			}	
+		}
+	});
+  
+  });
+}
+
 module.exports = { 
     initializeParseData: initializeParseData,
     parseStatement: parseStatement,
 	parseCard:parseCard,
-	parseTransactionHistory:parseTransactionHistory
+	parseTransactionHistoryOCBC360:parseTransactionHistoryOCBC360,
+	parseTransactionHistoryDBSMultiplier:parseTransactionHistoryDBSMultiplier
 	
 }

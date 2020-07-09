@@ -463,7 +463,7 @@ app.post('/uploadBankStatement', uploadConfig, async(req, res) => {
 		console.log("inside transaction History")
 		let dataBuffertransaction = fs.readFileSync('./uploads/' + req.files['transactionHistory'][0].originalname); 
 		let filename = './uploads/' + req.files['transactionHistory'][0].originalname
-		result = await launchParseTransactionHistory(options, filename );
+		result = await launchParseTransactionHistory(options, filename,req.body.accountTypeId );
 		if(req.files['creditCard'] && req.files['creditCard'][0])
 		{
 			console.log("inside credit card")
@@ -538,12 +538,15 @@ function launchParseCard(options, dataBufferCard)
 	});
 }
 
-function launchParseTransactionHistory(options, filename)
+function launchParseTransactionHistory(options, filename, accountTypeId)
 {
 	return new promise(function(resolve, reject) {
 		pdfUtil.pdfToText(filename, async function(err, data) {
 			fs.writeFileSync('./uploads/resultTransactions.txt', data);
-			parseData  = await parser.parseTransactionHistory();
+			if(accountTypeId == 1)
+				parseData  = await parser.parseTransactionHistoryOCBC360();
+			else if(accountTypeId == 2)
+				parseData  = await parser.parseTransactionHistoryDBSMultiplier();
 			resolve (parseData);
 		});
 	});
