@@ -594,8 +594,6 @@ class BankAccountDetails extends React.Component {
                     var endDate = ''
 
                     try {
-
-                    } catch (err) {
                         let parsedDate = res.data.parsedData.date.split("TO")
                         startDate = parsedDate[0].trim()
                         endDate = parsedDate[1].trim()
@@ -603,6 +601,8 @@ class BankAccountDetails extends React.Component {
     
                         var d1 = new moment(startDate)
                         var d2 = new moment(endDate)
+                    } catch (err) {
+                        
                     }
                     
 
@@ -629,17 +629,20 @@ class BankAccountDetails extends React.Component {
                     this.setState({ message: 'Your bank statement has been uploaded successfully' }, () => {
                         setTimeout(() => {
                             this.setState({ showPdfDetails: true })
+
+                            try {
+                                this.closeFeedback()
+                            } catch (err) {
+
+                            }
+                            
                         }, 2000);
 
 
                     })
                     this.notify('br', 5)
                     //this.setState({ recommendation: '' })
-                    try {
-                        this.closeFeedback()
-                    } catch (err) {
-
-                    }
+                    
                     
                     //this.retrievePreviousRecommendations()
                 } else {
@@ -769,8 +772,8 @@ class BankAccountDetails extends React.Component {
         userInputPdfDetails.endDate = d2[2] + " " + d2[1] + " " + d2[3]
 
 
-        var statementDate = userInputPdfDetails.startDate + " TO " + userInputPdfDetails.endDate
-        userInputPdfDetails.date = statementDate
+       /*  var statementDate = userInputPdfDetails.startDate + " TO " + userInputPdfDetails.endDate
+        userInputPdfDetails.date = statementDate */
 
         
 
@@ -1100,7 +1103,7 @@ class BankAccountDetails extends React.Component {
 
                 </Row>
                 
-                {this.state.chartDetails.label.length > 1 ? (<Row>
+                {this.state.chartDetails.label.length > 0 ? (<Row>
                             <Col md={12}>
                                 <Card className="card-chart card-plain" >
                                     <CardHeader>
@@ -1262,7 +1265,7 @@ class BankAccountDetails extends React.Component {
 
                                 <CardTitle tag="h4">Upload financial statements<i id="info" className="now-ui-icons travel_info" />
                                 <Tooltip placement="right" target="info" isOpen={this.state.infoState} toggle={this.toggleToolTip}>
-                                    You must upload either your bank statement or transaction history, but your credit card statement is optional
+                                    You must either upload your bank statement or transaction history, but your credit card statement is optional
                                 </Tooltip></CardTitle>
                             </CardHeader>
                             <CardBody>
