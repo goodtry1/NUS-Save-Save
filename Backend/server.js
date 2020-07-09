@@ -16,7 +16,7 @@ const secureRandomPw = require('secure-random-password');
 
 //cors
 var cors = require('cors');
-app.use(cors({credentials: true, origin: 'http://localhost:3000'}));
+app.use(cors({credentials: true, origin: 'http://localhost:5000'}));
 
 //JWT & cookie
 const jwt = require('jsonwebtoken')

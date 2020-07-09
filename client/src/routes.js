@@ -108,7 +108,7 @@ let routes = [
         layout: "/admin"
       }
     ]
-  } /*,
+  },
   {
     collapse: true,
     path: "/pages",
@@ -137,7 +137,7 @@ let routes = [
         mini: "RS",
         component: RTL,
         layout: "/admin"
-      }, 
+      }, */
       {
         path: "/register-page",
         name: "Register Page",
@@ -177,9 +177,9 @@ let routes = [
         mini: "LSP",
         component: LockScreenPage,
         layout: "/auth"
-      } 
+      } */
     ]
-  },
+  } /*,
   {
     collapse: true,
     path: "/components",
