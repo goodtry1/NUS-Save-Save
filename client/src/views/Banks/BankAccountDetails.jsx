@@ -21,6 +21,7 @@ import { Line } from "react-chartjs-2";
 //import { VectorMap } from "react-jvectormap";
 
 import { api } from '../../api-config'
+import cookie from 'react-cookies'
 
 // reactstrap components
 import {
@@ -43,24 +44,26 @@ import {
     //InputGroup,
     Form,
     //Label
+    Tooltip
 } from "reactstrap";
 
-import Chart from './Chart'
+//import Chart from './Chart'
 
 // core components
 import PanelHeader from "components/PanelHeader/PanelHeader.jsx";
 
-/* import {
-    dashboardPanelChart,
+import {
+    //dashboardPanelChart,
     //dashboardActiveUsersChart,
     //dashboardSummerChart,
     //dashboardActiveCountriesCard
-} from "variables/charts.jsx"; */
+} from "variables/charts.jsx";
 
 /* import jacket from "assets/img/saint-laurent.jpg";
 import shirt from "assets/img/balmain.jpg";
 import swim from "assets/img/prada.jpg"; */
 
+//import { table_data } from "variables/general.jsx";
 
 import axios from 'axios'
 
@@ -88,6 +91,20 @@ import { PDFDetails } from '../../models/PDFDetails'
 
 
 
+/* var mapData = {
+    AU: 760,
+    BR: 550,
+    CA: 120,
+    DE: 1300,
+    FR: 540,
+    GB: 690,
+    GE: 200,
+    IN: 200,
+    RO: 600,
+    RU: 300,
+    US: 2920
+}; */
+
 class BankAccountDetails extends React.Component {
     constructor(props) {
         super(props);
@@ -96,6 +113,7 @@ class BankAccountDetails extends React.Component {
             bankAccountDetails: '',
             bankStatementRenderLoading: false,
             bankStatementVerificationLoading: false,
+            infoState: false,
 
             singleSelect: null,
             singleFileName: "",
@@ -105,6 +123,10 @@ class BankAccountDetails extends React.Component {
             ccFileName: "",
             ccFile: null,
             ccStatement: '',
+            /* transactionSelect: null, */
+            transactionHistoryFileName: "",
+            transactionHistory: "",
+
 
             message: '',
             feedbackDialogOpen: '',
@@ -277,7 +299,7 @@ class BankAccountDetails extends React.Component {
         
 
         if (this.props.location.data) {
-            this.setState({ bankAccountDetails: this.props.location.data }, () => {
+            this.setState({ bankAccountDetails: this.props.location.data, JWT_Token: cookie.load('JWT_Token') }, () => {
                 /* (() => { this.retrievePreviousRecommendations() })
                 (() => { localStorage.setItem("bankAccountDetails", JSON.stringify(this.state.bankAccountDetails)) }) */
                 this.retrievePreviousRecommendations()
@@ -286,7 +308,7 @@ class BankAccountDetails extends React.Component {
             })
         } else {
             var bankAccountDetails = localStorage.getItem("bankAccountDetails")
-            this.setState({ bankAccountDetails: JSON.parse(bankAccountDetails) }, () => {
+            this.setState({ bankAccountDetails: JSON.parse(bankAccountDetails), JWT_Token: cookie.load('JWT_Token') }, () => {
                 this.retrievePreviousRecommendations()
                 this.retrieveChartDetails()
             })
@@ -301,14 +323,14 @@ class BankAccountDetails extends React.Component {
         axios({
             method: 'post',
             url: `${api}/getParametersForGraph`,
-            withCredentials: true,
+            headers: {
+                authorisation: `Bearer ${this.state.JWT_Token}`
+            },
             data: {
                 userId: this.state.bankAccountDetails.userId,
                 accountTypeid: this.state.bankAccountDetails.accountTypeId
             }
         }).then((response) => {
-
-            
             var recordSet = response.data.recordset
 
             var label = []
@@ -336,7 +358,7 @@ class BankAccountDetails extends React.Component {
 
             this.setState({
                 chartDetails
-            }, () => { console.log(this.state.chartDetails) })
+            })
         })
     }
 
@@ -389,6 +411,7 @@ class BankAccountDetails extends React.Component {
 
     singleFile = React.createRef();
     ccStatement = React.createRef();
+    transactionHistory = React.createRef();
 
     notify(place, color) {
         this.refs.notificationAlert.notificationAlert(CustomNotification.notify(place, color, this.state.message));
@@ -431,6 +454,14 @@ class BankAccountDetails extends React.Component {
                             ccFileName: ''
                         }, () => { this.notify('br', 4) }
                     )
+                } else if (id === "transactionHistory") {
+                    this.setState(
+                        {
+                            message: 'The file you\'ve uploaded is not a PDF file',
+                            transactionHistory: '',
+                            transactionHistoryFileName: ''
+                        }, () => { this.notify('br', 4) }
+                    )
                 }
 
 
@@ -468,6 +499,11 @@ class BankAccountDetails extends React.Component {
                     ccFileName: fileNames,
                     ccStatement: files[0]
                 });
+            } else if (id === "transactionHistory") {
+                this.setState({
+                    transactionHistoryFileName: fileNames,
+                    transactionHistory: files[0]
+                });
             }
         }
 
@@ -484,6 +520,15 @@ class BankAccountDetails extends React.Component {
         )
     }
 
+    cleartTransactionHistory = () => {
+        this.setState(
+            {
+                transactionHistory: '',
+                transactionHistoryFileName: ''
+            }
+         )
+    }
+
     clearCCStatement = () => {
         this.setState(
             {
@@ -495,19 +540,7 @@ class BankAccountDetails extends React.Component {
 
     uploadBankStatement = () => {
 
-        if (!this.state.bankStatement) {
-            /* this.setState(
-                {
-                    message : 'You have not uploaded a bank statement'
-                },
-
-                function() {
-                   this.notify('br', 4)
-                }
-                   
-                ) */
-
-        } else {
+       
             this.setState({bankStatementRenderLoading : true})
 
 
@@ -517,6 +550,7 @@ class BankAccountDetails extends React.Component {
             formData.append('userId', this.state.bankAccountDetails.userId);
             formData.append('accountTypeId', this.state.bankAccountDetails.accountTypeId);
             formData.append('creditCard', this.state.ccStatement)
+            formData.append('transactionHistory', this.state.transactionHistory)
 
 
             /* this.setState({ bankStatement: '' })
@@ -536,20 +570,34 @@ class BankAccountDetails extends React.Component {
                     bankStatement: '',
                     singleFileName: '',
                     ccStatement: '',
-                    ccFileName: ''
+                    ccFileName: '',
+                    transactionHistory: '',
+                    transactionHistoryFileName: ''
                 })
 
                 if (res.status === 200) {
-                    let parsedDate = res.data.parsedData.date.split("TO")
-                    var startDate = parsedDate[0].trim()
-                    var endDate = parsedDate[1].trim()
 
+                    var d1 = new moment()
+                    var d2 = new moment()
 
-                    var d1 = new moment(startDate)
-                    var d2 = new moment(endDate)
+                    try {
+                        var startDate = ''
+                        var endDate = ''
 
-                    console.log(d1)
-                    console.log(d2)
+                        let parsedDate = res.data.parsedData.date.split("TO")
+                        startDate = parsedDate[0].trim()
+                        endDate = parsedDate[1].trim()
+    
+    
+                        d1 = new moment(startDate)
+                        d2 = new moment(endDate)
+                    } catch (err) {
+                        
+                    }
+                    
+
+                    /* console.log(d1)
+                    console.log(d2) */
 
                     let userInputPdfDetails = this.state.userInputPdfDetails
                     userInputPdfDetails.startDate = d1
@@ -571,13 +619,21 @@ class BankAccountDetails extends React.Component {
                     this.setState({ message: 'Your bank statement has been uploaded successfully' }, () => {
                         setTimeout(() => {
                             this.setState({ showPdfDetails: true })
+
+                            try {
+                                this.closeFeedback()
+                            } catch (err) {
+
+                            }
+                            
                         }, 2000);
 
 
                     })
                     this.notify('br', 5)
                     //this.setState({ recommendation: '' })
-                    this.closeFeedback()
+                    
+                    
                     //this.retrievePreviousRecommendations()
                 } else {
                     this.setState({ message: "Unknown error has occured. Please try again later", renderLoading: false }, () => { this.notify('br', 3) })
@@ -589,11 +645,19 @@ class BankAccountDetails extends React.Component {
 
             
         }
-    }
+    
 
 
     colSizeBankUpload = () => {
         if (this.state.bankStatement) {
+            return 9
+        } else {
+            return 12
+        }
+    }
+
+    colSizeTransactionUpload = () => {
+        if (this.state.transactionHistory) {
             return 9
         } else {
             return 12
@@ -609,7 +673,7 @@ class BankAccountDetails extends React.Component {
     }
 
     handleUserInputOnPdfDetails = (event) => {
-        console.log(event.target)
+       
 
 
         var userInputPdfDetails = this.state.userInputPdfDetails
@@ -620,7 +684,7 @@ class BankAccountDetails extends React.Component {
 
         this.setState({
             userInputPdfDetails
-        }, () => { console.log(this.state.userInputPdfDetails) })
+        })
     }
 
     handleDateTime = (moment, name) => {
@@ -628,8 +692,8 @@ class BankAccountDetails extends React.Component {
         var canUpdate = true
 
         if (name === "startDate") {
-            var startDate = moment.valueOf()
-            var endDate = this.state.userInputPdfDetails.endDate
+            const startDate = moment.valueOf()
+            const endDate = this.state.userInputPdfDetails.endDate
 
 
 
@@ -641,8 +705,8 @@ class BankAccountDetails extends React.Component {
             }
         } else {
 
-            var endDate = moment.valueOf()
-            var startDate = this.state.userInputPdfDetails.startDate
+            const endDate = moment.valueOf()
+            const startDate = this.state.userInputPdfDetails.startDate
 
 
 
@@ -658,7 +722,7 @@ class BankAccountDetails extends React.Component {
 
             this.setState({
                 userInputPdfDetails
-            }, () => { console.log(this.state.userInputPdfDetails) })
+            })
         }
 
 
@@ -668,6 +732,8 @@ class BankAccountDetails extends React.Component {
 
     checkPDFDetailsSubmit = (event) => {
         event.preventDefault();
+
+        
         this.setState({bankStatementVerificationLoading: true})
 
         var PdfDetails = this.state.PdfDetails
@@ -675,7 +741,7 @@ class BankAccountDetails extends React.Component {
 
 
         Object.keys(userInputPdfDetails).forEach(function (key) {
-            console.log(userInputPdfDetails[key])
+           
             if (userInputPdfDetails[key] === "") {
                 if (!PdfDetails[key] || PdfDetails[key] === "") {
                     userInputPdfDetails[key] = 0
@@ -688,18 +754,27 @@ class BankAccountDetails extends React.Component {
 
         })
 
+        var d1 = "";
+        var d2 = "";
+
+        try {
+            d1 = userInputPdfDetails.startDate.toString().split(" ")
+            userInputPdfDetails.startDate = d1[2] + " " + d1[1] + " " + d1[3]
+    
+            d2 = userInputPdfDetails.endDate.toString().split(" ")
+            userInputPdfDetails.endDate = d2[2] + " " + d2[1] + " " + d2[3]
+        } catch (err) {
+           
+        }
+
         /* Processing Date */
-        var d1 = userInputPdfDetails.startDate.toString().split(" ")
-        userInputPdfDetails.startDate = d1[2] + " " + d1[1] + " " + d1[3]
-
-        var d2 = userInputPdfDetails.endDate.toString().split(" ")
-        userInputPdfDetails.endDate = d2[2] + " " + d2[1] + " " + d2[3]
+       
 
 
-        var statementDate = userInputPdfDetails.startDate + " TO " + userInputPdfDetails.endDate
-        userInputPdfDetails.date = statementDate
+       /*  var statementDate = userInputPdfDetails.startDate + " TO " + userInputPdfDetails.endDate
+        userInputPdfDetails.date = statementDate */
 
-        console.log(userInputPdfDetails)
+        
 
 
 
@@ -722,10 +797,11 @@ class BankAccountDetails extends React.Component {
                     }, 2000);
                     setTimeout(() => {
                         this.retrievePreviousRecommendations()
+                        this.retrieveChartDetails()
                     }, 4000);
                 })
         }).catch((err) => {
-            this.setState({ message: err.message },
+            this.setState({ message: err.message, bankStatementVerificationLoading: false },
                 () => { this.notify('br', 3) })
 
         })
@@ -733,6 +809,10 @@ class BankAccountDetails extends React.Component {
 
     checkPDFDetailsCancel = () => {
         this.setState({ showPdfDetails: false })
+    }
+
+    toggleToolTip = () => {
+        this.setState({ infoState: !this.state.infoState })
     }
 
     //Render form to let user submit what the PDF parser parsed
@@ -995,7 +1075,7 @@ class BankAccountDetails extends React.Component {
                         <Card className="card-pricing ">
                             <CardHeader>
 
-                                {"Your progress towards the max tier: " + 'S$' + this.state.currentProgress + " / S$" + this.state.maxProgress}
+                                {"Your progress towards the max tier: S$" + this.state.currentProgress + " / S$" + this.state.maxProgress}
 
                             </CardHeader>
                             <CardBody>
@@ -1049,7 +1129,7 @@ class BankAccountDetails extends React.Component {
                     <Col sm={6} >
                         <Card className="card-stats">
                             <CardHeader>
-                                <h5 className="card-category"></h5>
+                                {/* <h5 className="card-category"></h5> */}
                                 <CardTitle tag="h2" >Recommendations</CardTitle>
 
 
@@ -1064,18 +1144,19 @@ class BankAccountDetails extends React.Component {
                                         <div>
 
                                             {this.state.recommendation.map((recommendation) =>
-                                                <Table responsive className="table-shopping">
+                                                <Table responsive className="table-shopping" key={recommendation.recommendationId}>
                                                     <tbody>
-                                                        <Spring
+                                                       
+
+                                                                    <tr key={recommendation.recommendationId} >
+
+                                                                        <td >
+                                                                        <Spring
                                                             from={{ opacity: 0, marginTop: 500 }}
                                                             to={{ opacity: 1, marginTop: 0 }}
                                                         >
                                                             {props => (
                                                                 <div style={props}>
-
-                                                                    <tr key={recommendation.recommendationId} >
-
-                                                                        <td >
                                                                             {recommendation.isRecommCompleted ?
                                                                                 (
                                                                                     <div className="info info-horizontal">
@@ -1097,6 +1178,9 @@ class BankAccountDetails extends React.Component {
 
                                                                                 )
                                                                             }
+                                                                             </div>
+                                                                             )}
+                                                                             </Spring>
                                                                         </td>
 
                                                                         <td>
@@ -1104,16 +1188,17 @@ class BankAccountDetails extends React.Component {
                                                                             <div>
                                                                                 {recommendation.recommendation}
                                                                             </div>
+                                                                           
 
                                                                         </td>
                                                                     </tr>
 
-                                                                </div>
-                                                            )}
+                                                               
+                                                            
 
 
 
-                                                        </Spring>
+                                                       
                                                     </tbody>
 
                                                 </Table>
@@ -1173,12 +1258,19 @@ class BankAccountDetails extends React.Component {
                     <Col sm={6} >
                         <Card className="card-chart">
                             <CardHeader>
-                                <h5 className="card-category"></h5>
+                                {/* <h5 className="card-category"></h5> */}
 
-                                <CardTitle tag="h4">Upload financial statements</CardTitle>
+                                
+
+                                <CardTitle tag="h4">Upload financial statements<i id="info" className="now-ui-icons travel_info" />
+                                <Tooltip placement="right" target="info" isOpen={this.state.infoState} toggle={this.toggleToolTip}>
+                                    You must either upload your bank statement or transaction history, but your credit card statement is optional
+                                </Tooltip></CardTitle>
                             </CardHeader>
                             <CardBody>
                                 <Row >
+
+                                    
                                     <Col sm='12'>
                                         <h5>Bank statement</h5>
                                     </Col>
@@ -1217,7 +1309,44 @@ class BankAccountDetails extends React.Component {
                                     ) : (<div></div>)}
 
 
+                                    <Col sm='12'>
+                                        <h5>Transaction history</h5>
+                                    </Col>
 
+                                    <Col xs={this.colSizeTransactionUpload()}>
+
+                                        <FormGroup className="form-file-upload form-file-simple">
+                                            <Input
+                                                type="text"
+                                                className="inputFileVisible"
+                                                placeholder="Transaction history is mandatory"
+                                                onClick={e => this.handleFileInput(e, "transactionHistory")}
+                                                defaultValue={this.state.transactionHistoryFileName}
+                                            />
+                                            <input
+                                                type="file"
+                                                accept='.pdf'
+                                                className="inputFileHidden"
+                                                style={{ zIndex: -1 }}
+                                                ref={this.transactionHistory}
+                                                onChange={e => this.addFile(e, "transactionHistory", "transactionHistory")}
+                                            />
+
+
+                                        </FormGroup>
+
+                                    </Col>
+
+                                    {this.state.transactionHistory ? (
+                                        <div>
+
+                                            <Col xs="3">
+                                                <Button onClick={this.cleartTransactionHistory} color="danger" className="btn-round btn-icon" style={{ display: 'block,', margin: 'auto' }}>
+                                                    <i className="fa fa-times" />
+                                                </Button>
+                                            </Col>
+                                        </div>
+                                    ) : (<div></div>)}
 
 
                                     <Col sm='12'>
@@ -1230,7 +1359,7 @@ class BankAccountDetails extends React.Component {
                                             <Input
                                                 type="text"
                                                 className="inputFileVisible"
-                                                placeholder="Supplement your credit card statement"
+                                                placeholder="Credit card statement is optional"
                                                 onClick={e => this.handleFileInput(e, "ccStatement")}
                                                 defaultValue={this.state.ccFileName}
                                             />
@@ -1267,7 +1396,7 @@ class BankAccountDetails extends React.Component {
 
 
                                 <div>
-                                    {this.state.bankStatement ?
+                                    {this.state.bankStatement || this.state.transactionHistory ?
                                         (
 
                                     this.state.bankStatementRenderLoading?

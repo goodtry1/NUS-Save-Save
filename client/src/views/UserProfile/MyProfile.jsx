@@ -208,7 +208,7 @@ export class MyProfile extends Component {
         //console.log("ChangePw button called")
         this.setState({ changePwLoading: true })
 
-        if (this.state.newPasswordState == " has-danger") {
+        if (this.state.newPasswordState === " has-danger") {
             this.setState({
                 notifyMsg: "Error! New Password do not fulfil requirement. ",
                 changePwLoading: false
@@ -266,7 +266,7 @@ export class MyProfile extends Component {
 
 
                     } else {
-                        console.log(response.status)
+                        //console.log(response.status)
                         this.setState({
                             notifyMsg: "Error! Your old password do not match. Please try again!",
                             changePwLoading: false
