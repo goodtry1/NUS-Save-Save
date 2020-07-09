@@ -44,6 +44,7 @@ import {
     //InputGroup,
     Form,
     //Label
+    Tooltip
 } from "reactstrap";
 
 //import Chart from './Chart'
@@ -112,6 +113,7 @@ class BankAccountDetails extends React.Component {
             bankAccountDetails: '',
             bankStatementRenderLoading: false,
             bankStatementVerificationLoading: false,
+            infoState: false,
 
             singleSelect: null,
             singleFileName: "",
@@ -550,19 +552,7 @@ class BankAccountDetails extends React.Component {
 
     uploadBankStatement = () => {
 
-        if (!this.state.bankStatement) {
-            /* this.setState(
-                {
-                    message : 'You have not uploaded a bank statement'
-                },
-
-                function() {
-                   this.notify('br', 4)
-                }
-                   
-                ) */
-
-        } else {
+       
             this.setState({bankStatementRenderLoading : true})
 
 
@@ -592,18 +582,29 @@ class BankAccountDetails extends React.Component {
                     bankStatement: '',
                     singleFileName: '',
                     ccStatement: '',
-                    ccFileName: ''
+                    ccFileName: '',
+                    transactionHistory: '',
+                    transactionHistoryFileName: ''
                 })
 
 
                 if (res.status === 200) {
-                    let parsedDate = res.data.parsedData.date.split("TO")
-                    var startDate = parsedDate[0].trim()
-                    var endDate = parsedDate[1].trim()
 
+                    var startDate = ''
+                    var endDate = ''
 
-                    var d1 = new moment(startDate)
-                    var d2 = new moment(endDate)
+                    try {
+
+                    } catch (err) {
+                        let parsedDate = res.data.parsedData.date.split("TO")
+                        startDate = parsedDate[0].trim()
+                        endDate = parsedDate[1].trim()
+    
+    
+                        var d1 = new moment(startDate)
+                        var d2 = new moment(endDate)
+                    }
+                    
 
                     /* console.log(d1)
                     console.log(d2) */
@@ -634,7 +635,12 @@ class BankAccountDetails extends React.Component {
                     })
                     this.notify('br', 5)
                     //this.setState({ recommendation: '' })
-                    this.closeFeedback()
+                    try {
+                        this.closeFeedback()
+                    } catch (err) {
+
+                    }
+                    
                     //this.retrievePreviousRecommendations()
                 } else {
                     this.setState({ message: "Unknown error has occured. Please try again later", renderLoading: false }, () => { this.notify('br', 3) })
@@ -646,7 +652,7 @@ class BankAccountDetails extends React.Component {
 
             
         }
-    }
+    
 
 
     colSizeBankUpload = () => {
@@ -733,6 +739,8 @@ class BankAccountDetails extends React.Component {
 
     checkPDFDetailsSubmit = (event) => {
         event.preventDefault();
+
+        
         this.setState({bankStatementVerificationLoading: true})
 
         var PdfDetails = this.state.PdfDetails
@@ -787,6 +795,7 @@ class BankAccountDetails extends React.Component {
                     }, 2000);
                     setTimeout(() => {
                         this.retrievePreviousRecommendations()
+                        this.retrieveChartDetails()
                     }, 4000);
                 })
         }).catch((err) => {
@@ -798,6 +807,10 @@ class BankAccountDetails extends React.Component {
 
     checkPDFDetailsCancel = () => {
         this.setState({ showPdfDetails: false })
+    }
+
+    toggleToolTip = () => {
+        this.setState({ infoState: !this.state.infoState })
     }
 
     //Render form to let user submit what the PDF parser parsed
@@ -1245,10 +1258,17 @@ class BankAccountDetails extends React.Component {
                             <CardHeader>
                                 {/* <h5 className="card-category"></h5> */}
 
-                                <CardTitle tag="h4">Upload financial statements</CardTitle>
+                                
+
+                                <CardTitle tag="h4">Upload financial statements<i id="info" className="now-ui-icons travel_info" />
+                                <Tooltip placement="right" target="info" isOpen={this.state.infoState} toggle={this.toggleToolTip}>
+                                    You must upload either your bank statement or transaction history, but your credit card statement is optional
+                                </Tooltip></CardTitle>
                             </CardHeader>
                             <CardBody>
                                 <Row >
+
+                                    
                                     <Col sm='12'>
                                         <h5>Bank statement</h5>
                                     </Col>
@@ -1297,7 +1317,7 @@ class BankAccountDetails extends React.Component {
                                             <Input
                                                 type="text"
                                                 className="inputFileVisible"
-                                                placeholder="Supplement your credit card statement"
+                                                placeholder="Transaction history is mandatory"
                                                 onClick={e => this.handleFileInput(e, "transactionHistory")}
                                                 defaultValue={this.state.transactionHistoryFileName}
                                             />
@@ -1337,7 +1357,7 @@ class BankAccountDetails extends React.Component {
                                             <Input
                                                 type="text"
                                                 className="inputFileVisible"
-                                                placeholder="Supplement your credit card statement"
+                                                placeholder="Credit card statement is optional"
                                                 onClick={e => this.handleFileInput(e, "ccStatement")}
                                                 defaultValue={this.state.ccFileName}
                                             />
@@ -1374,7 +1394,7 @@ class BankAccountDetails extends React.Component {
 
 
                                 <div>
-                                    {this.state.bankStatement ?
+                                    {this.state.bankStatement || this.state.transactionHistory ?
                                         (
 
                                     this.state.bankStatementRenderLoading?
