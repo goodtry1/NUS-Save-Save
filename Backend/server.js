@@ -566,7 +566,7 @@ function retrievePassword(userId) {
 let uploadConfig = upload.fields([{name: 'bankStatement', maxCount: 1}, {name: 'creditCard', maxCount: 1}, {name: 'transactionHistory', maxCount: 1}]);
 
 //upload bank account statement client passes userId and accountTypeId
-app.post('/api/uploadBankStatement', uploadConfig, async (req, res) => {
+app.post('/api/uploadBankStatement', authenticateToken , uploadConfig, async (req, res) => {
 
 	
 	const options = {
