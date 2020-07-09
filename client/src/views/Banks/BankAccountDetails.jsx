@@ -649,11 +649,11 @@ class BankAccountDetails extends React.Component {
                     
                     //this.retrievePreviousRecommendations()
                 } else {
-                    this.setState({ message: "Unknown error has occured. Please try again later", renderLoading: false }, () => { this.notify('br', 3) })
+                    this.setState({ message: "Unknown error has occured. Please try again later", bankStatementRenderLoading: false }, () => { this.notify('br', 3) })
                 }
             })
             .catch(err => {
-                this.setState({ message: err.message, renderLoading: false }, () => { this.notify('br', 3) })
+                this.setState({ message: err.message, bankStatementRenderLoading: false }, () => { this.notify('br', 3) })
             })
 
             
