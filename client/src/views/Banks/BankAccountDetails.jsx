@@ -149,14 +149,14 @@ class BankAccountDetails extends React.Component {
             },
 
             userInputPdfDetails: {
-                previousMonthBalance: '',
+                previousMonthBalance: 0,
                 startDate: '',
                 endDate: '',
-                salary: '',
-                currentMonthBalance: '',
-                creditCardSpend: '',
-                averageDailyBalance: '',
-                wealth: ''
+                salary: 0,
+                currentMonthBalance: 0,
+                creditCardSpend: 0,
+                averageDailyBalance: 0,
+                wealth: 0
             },
 
             chartDetails : {
@@ -769,7 +769,10 @@ class BankAccountDetails extends React.Component {
 
         var d1 = "";
         var d2 = "";
+        var d3 = "";
+        var d4 = "";
 
+        //Formatting moment into a string so it can be inserted into DB
         try {
             d1 = userInputPdfDetails.startDate.toString().split(" ")
             userInputPdfDetails.startDate = d1[2] + " " + d1[1] + " " + d1[3]
@@ -780,17 +783,24 @@ class BankAccountDetails extends React.Component {
            
         }
 
-        /* Processing Date */
-       
+        try {
+            var PdfDetails = this.state.PdfDetails
 
+            d3 = PdfDetails.startDate.toString().split(" ")
+            PdfDetails.startDate = d3[2] + " " + d3[1] + " " + d3[3]
+    
+            d4 = PdfDetails.endDate.toString().split(" ")
+            PdfDetails.endDate = d4[2] + " " + d4[1] + " " + d4[3]
 
-       /*  var statementDate = userInputPdfDetails.startDate + " TO " + userInputPdfDetails.endDate
-        userInputPdfDetails.date = statementDate */
+            this.setState({ PdfDetails })
+        } catch (err) {
+           
+        }
 
         
 
-
-
+        
+        
 
         axios({
             method: 'post',

@@ -628,6 +628,7 @@ app.post('/api/updateParsedData', authenticateToken, (req, res) => {
 
 	result = req.body.parsedData
 	userInput = req.body.userInput
+	console.log(userInput.startDate)
 	var dateAnalysed = DATE_FORMATER(new Date(), "yyyy-mm-dd HH:MM:ss");
 
 	//Update the Bank account details table
