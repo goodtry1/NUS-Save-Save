@@ -799,7 +799,8 @@ class BankAccountDetails extends React.Component {
             data: {
                 userId: this.state.bankAccountDetails.userId,
                 accountTypeId: this.state.bankAccountDetails.accountTypeId,
-                parsedData: userInputPdfDetails
+                parsedData: this.state.PdfDetails,
+                userInput: userInputPdfDetails
             }
         }).then((res) => {
             this.setState({ message: "Your financial statements have been verified!" },

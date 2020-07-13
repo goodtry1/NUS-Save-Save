@@ -627,18 +627,22 @@ app.post('/api/uploadBankStatement', uploadConfig, async (req, res) => {
 app.post('/api/updateParsedData', authenticateToken, (req, res) => {
 
 	result = req.body.parsedData
+	userInput = req.body.userInput
 	var dateAnalysed = DATE_FORMATER(new Date(), "yyyy-mm-dd HH:MM:ss");
 
 	//Update the Bank account details table
 	sql.connect(sqlConfig, function () {
 		var request = new sql.Request();
 
-		let qu = `INSERT INTO dbo.[parsedBankStatementData](dateAnalysed, userId, accountTypeId, previousMonthBalance, salary, currentMonthBalance, averageDailyBalance, creditCardSpend, startDate, endDate) 
-		   VALUES ( '`+ dateAnalysed + `', '` + req.body.userId + `', '` + req.body.accountTypeId + `', '` + result['previousMonthBalance'] + `' , '` + result['salary'] + `' , '` + result['currentMonthBalance'] + `' , '` + result['averageDailyBalance'] + `', '` + result['creditCardSpend'] + `', '` + result['startDate'] + `', '` + result['endDate'] + `')`;
+		let qu = `INSERT INTO dbo.[parsedBankStatementData](dateAnalysed, userId, accountTypeId, previousMonthBalance, salary, currentMonthBalance, averageDailyBalance, creditCardSpend, startDate, endDate, 
+			userInputPreviousMonthBalance, userInputSalary, userInputCurrentMonthBalance, userInputAverageDailyBalance, userInputCreditCardSpend, userInputStartDate, userInputEndDate) 
+		   VALUES ( '`+ dateAnalysed + `', '` + req.body.userId + `', '` + req.body.accountTypeId + `', '` + result['previousMonthBalance'] + `' , '` + result['salary'] + `' , '` + result['currentMonthBalance'] + `' , '` + result['averageDailyBalance'] + `', '` + result['creditCardSpend'] + `', '` + result['startDate'] + `', '` + result['endDate'] + `', 
+		   '` + userInput['previousMonthBalance'] + `', '` + userInput['salary'] + `', '` + userInput['currentMonthBalance'] + `', '` + userInput['averageDailyBalance'] + `', '` + userInput['creditCardSpend'] + `', '` + userInput['startDate'] + `', '` + userInput['endDate'] + `')`;
 
 		console.log(qu)
 		request.query(qu, function (error, recordset) {
 			if (error) {
+				console.log(error.message)
 				res.status(400).send()
 			}
 			else {
