@@ -138,7 +138,7 @@ class BankAccountDetails extends React.Component {
 
             showPdfDetails: false,
             PdfDetails: {
-                previousMonthBalance: 0,
+                previousMonthBalance: '',
                 startDate: '',
                 endDate: '',
                 salary: 0,
@@ -149,13 +149,13 @@ class BankAccountDetails extends React.Component {
             },
 
             userInputPdfDetails: {
-                previousMonthBalance: 0,
+                previousMonthBalance: '',
                 startDate: '',
                 endDate: '',
-                salary: 0,
-                currentMonthBalance: 0,
-                creditCardSpend: 0,
-                averageDailyBalance: 0,
+                salary: '',
+                currentMonthBalance: '',
+                creditCardSpend: '',
+                averageDailyBalance: '',
                 wealth: 0
             },
 
@@ -626,7 +626,7 @@ class BankAccountDetails extends React.Component {
                         d1,
                         d2,
                         res.data.parsedData.salary,
-                        res.data.parsedData.creditCardSpend)
+                        res.data.parsedData.creditCardSpend? res.data.parsedData.creditCardSpend: 0)
 
                     this.setState({ PdfDetails: PdfDetails })
                     this.setState({ message: 'Your bank statement has been uploaded successfully' }, () => {
@@ -797,10 +797,6 @@ class BankAccountDetails extends React.Component {
            
         }
 
-        
-
-        
-        
 
         axios({
             method: 'post',
