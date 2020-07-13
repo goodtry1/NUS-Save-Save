@@ -1,0 +1,205 @@
+                                                           2925\N\525\M                                               Information
+                                                                         As part of our efforts to be a more environmentally-friendly bank, all our account
+           160022
+                                                                                        statements will now be printed on both sides of the page.
+WANG NAN
+22 HAVELOCK ROAD                                                                           STATEMENT OF ACCOUNT
+#07-673
+BUKIT HO SWEE COURT                                                                                                                                      Page 1 of 2
+SINGAPORE 160022                                                                                                                       For enquiries, please call
+                                                                                                       our Customer Service Officers at 1800 363 3333
+
+                                                                                                               OCBC PAYA LEBAR SQUARE BRANCH
+
+360 ACCOUNT                                                                                            1 AUG 2019 TO 31 AUG 2019
+
+Account No. 525852380001
+
+Transaction Value
+
+Date                      Date    Description              Cheque        Withdrawal           Deposit        Balance
+                                                                                        3.86                           8,691.81
+01 AUG                    01 AUG  BALANCE B/F                                           2.79                           8,687.95
+01 AUG                    01 AUG
+01 AUG                    01 AUG  DEBIT PURCHASE                                     200.00                                                                                                       8,685.16
+05 AUG                    05 AUG  26/07/19                                           400.00
+05 AUG                    05 AUG  xx-8600 BUS/MRT 7535560                            900.00                                                                                                       8,485.16
+06 AUG                    06 AUG  S
+12 AUG                    13 AUG                                                       22.96                                                                                                      8,085.16
+13 AUG                    13 AUG  DEBIT PURCHASE                                     600.00
+23 AUG                    23 AUG  25/07/19                                                                                                                                                        7,185.16
+27 AUG                    27 AUG  xx-8600 BUS/MRT 7453204                         1,050.00
+27 AUG                    27 AUG  S                                                                                                                                                               7,162.20
+31 AUG                    31 AUG
+                                  FAST PAYMENT                                                                                                                                                    6,562.20
+                                  0038100553
+                                  to Wang Nan                                                          8.34                                                                                       6,570.54
+                                  OTHR - Other
+                                                                                                       5.00                                                                                       6,575.54
+                                  FAST PAYMENT
+                                  0038100553                                                                                                                                                      5,525.54
+                                  to Wang Nan
+                                  OTHR - Other                                                3,313.50                                                                                            8,839.04
+
+                                  FAST PAYMENT                                                         0.31                                                                                       8,839.35
+                                  0038100553
+                                  to Wang Nan
+                                  OTHR - Other
+
+                                  IBG GIRO
+                                  TAXS S9377668B
+                                  IRAS
+                                  ITX
+
+                                  FAST PAYMENT
+                                  0038100553
+                                  to Wang Nan
+                                  OTHR - Other
+
+                                  BONUS INTEREST
+                                  360 SALARY BONUS
+
+                                  OCBC REBATE
+                                  OCBC REBATE
+
+                                  FAST PAYMENT
+                                  0038100553
+                                  to Wang Nan
+                                  OTHR - Other
+
+                                  GIRO - SALARY
+                                  SALA
+                                  PHILLIP FUTURES PTE
+                                  SALARY
+
+                                  INTEREST CREDIT
+
+Deposit Insurance Scheme                                                                                     RNB05ESND\1
+
+Singapore dollar deposits of non-bank depositors and monies and deposits denominated in Singapore dollars under the Supplementary Retirement Scheme are insured by the Singapore Deposit Insurance Corporation,
+
+for up to S$75,000 in aggregate per depositor per Scheme member by law. Monies and deposits denominated in Singapore dollars under the CPF Investment Scheme and CPF Retirement Sum Scheme are aggregated and
+
+separately insured up to S$75,000 for each depositor per Scheme member. Foreign currency deposits, dual currency investments, structured deposits and other investment products are not insured.
+TRANSACTION CODE  DESCRIPTION                         账户          INT                Interest                               利息
+                                                      关闭账户        I/COLLN            Inward Collection                      进口托收
+A/C               Account                             海外自动柜员机     IBG                Inter-Bank GIRO                        财路
+A/C CLOSED        Account Closed                      自动柜员机付款     INB                Internet Banking                       网络银行
+ATM O             ATM Overseas                        自动柜员机转账     INB TRANSFER       Internet Banking Transfer              网络银行转账
+ATM PAYMENT       Automated Teller Machine Payment    外币          INS                Insurance                              保险
+ATM TRANSFER      Automated Teller Machine Transfer   调整          L/C                Letter of Credit                       信用证
+ACU               Foreign Currency                    预付款         L CHQ              Late Cheque                            逾期支票
+ADJ               Adjustment                          修改          MER                Merchant                               信用卡特约商家
+ADV               Advance                             自动长期指示      NEGN               Negotiation                            信用证议付
+AMD               Amendment                           银行费用        NETS               NETS                                   电子转账网络系统
+ASI               Automated Standing Instruction      余款          NOM                Nominee                                信托人
+BANK CHARGES      Bank Charges                        本票          O/COLLN            Outward Collection                     出口托收
+BAL               Balance                             支票存入        PAYMENT-MAS        MEPS Payment                           货币管理(MAS)电子付款系统-付款
+C/Order           Cashier's Order                     现金卡         PER LOAN           Personal Loan                          个人贷款
+CHQ DP            Cheque Deposit                      中央托收私人有限公司  PHN TRANSFER       PhoneBank Transfer                     电话银行转账
+CC                Cash Card                           佣金          POS                Point of Sale                          销售终端
+CDP               Central Depository                  外币兌換        POST               Postage                                邮费
+COM               Commission                          货方/存货       PREM               Premium                                保险费
+CONV              Conversion                          维萨电子付款      PS                 Power Supply                           能源供应公司
+CR                Credit                              电子汇款撤消      REIMB              Reimbursement                          偿付
+CRVISA            VISA Electron Credit                股息          RTN GIRO           Return GIRO                            退回财路
+CANC TT           Telegraphic Transfer Cancellation   借方/付出       RTN CHQ            Return Cheque                          退回支票
+DIV               Dividend                            即期汇票        RECEIPTS-MAS       MEPS Receipts                          货币管理局电子付款系统-存入
+DR                Debit                               维萨电子        SEC                Security                               证券
+DD                Demand Draft                        直接财路付款      SGD                Singapore Dollar                       新币
+DVE               VISA Electron Purchases             直接财路存款      SATM               Shared ATM                             供享自动柜员机
+DDB               Direct Debit                        电子购股付款      ST                 SingTel                                新电信
+DCR               Direct Credit                       易式储蓄户口      SER CHARGE         Service Charge                         服务费
+EPS               Electronic Payment of Shares        易式账户固定费用    SHR                Share NETS                             供享电子转账网络系统
+ES                EasiSave                            电子股票认购      T/R                Trust Receipt                          信托收据
+ES FIXED FEE      EasiSave Fixed Fee                  出口贷款        TT                 Telegraphic Transfer                   电子付款
+ESA               Electronic Share Application        外币          TRAN CHARGE        Transactoin Charge                     交易费用
+EXPORT LOAN       Export Loan                         房屋贷款        TRADE FINANCE      Trade Finance                          货易融资
+FCY               Foreign Currency                    进口贷款        TRANSFER           Transfer                               转账
+HSE LOAN          House Loan
+IMPORT LOAN       Import Loan
+
+Contact for Consumer Banking:                                     Contact for Business Banking:
+
+Phone Bank:                       1800 363 3333                   Commercial Service Centre: 6538 1111
+
+Email Addresss:                   contactus@ocbc.com              Email Address:     Bizinteract@ocbc.com
+
+APPLICATIONS FOR INDIVIDUALS
+
+Application for Banking Services                      ATM Card                       PHONE/INTERNET/MOBILE BANKING
+                                                      Apply at any OCBC Bank Branch
+                                                                                     Three easy ways to apply:-
+                                                                                     1. Apply at any OCBC ATM with your ATM Card and PIN.
+
+                                                                                              Select 'Other Services'
+                                                                                              Select 'Phone Banking Application' or
+                                                                                              'Internet Banking/Mobile Banking Application';
+                                                                                        or
+                                                                                     2. Download and complete the following forms available at www.ocbc.com, and
+                                                                                        mail it back to the address stated on the form
+                                                                                              Phone Banking Services Form (Personal)
+                                                                                              Internet / Mobile Banking Services Form (Personal)
+                                                                                        or
+                                                                                     3. Apply at any OCBC Branch.
+
+eBANKING APPLICATIONS FOR CORPORATES                  ATM Card                       PHONE BANKING                          INTERNET BANKING
+   Application for Access                             Apply at any OCBC Bank Branch
+                                                                                     Download and complete the Business     Download and complete the
+                                                                                     PhoneBanking and eAlerts@ocbc          Velocity@ocbc Application Form
+                                                                                     Application Form available at          available at www.ocbc.com, and
+                                                                                     www.ocbc.com, and mail it back to the  mail it back to the address stated
+                                                                                     address stated on the form.            on the form.
+
+Deposit Insurance Scheme
+
+Singapore dollar deposits of non-bank depositors and monies and deposits denominated in Singapore dollars under the Supplementary Retirement Scheme are insured by the Singapore Deposit Insurance Corporation,
+for up to S$75,000 in aggregate per depositor per Scheme member by law. Monies and deposits denominated in Singapore dollars under the CPF Investment Scheme and CPF Retirement Sum Scheme are aggregated and
+separately insured up to S$75,000 for each depositor per Scheme member. Foreign currency deposits, dual currency investments, structured deposits and other investment products are not insured.
+WANG NAN                                                                                  STATEMENT OF ACCOUNT
+
+                                                                                                                                            Page 2 of 2
+
+360 ACCOUNT                                                                               1 AUG 2019 TO 31 AUG 2019
+
+Account No. 525852380001
+
+Transaction Value
+
+Date                      Date  Description                    Cheque  Withdrawal         Deposit                      Balance
+                                                                                3,179.61                                         8,839.35
+                                BALANCE C/F                                                    3,327.15
+                                                                                                     1.47
+                                Total Withdrawals/Deposits
+                                Total Interest Paid This Year                                  7,337.54
+                                Average Balance
+
+CHECK YOUR STATEMENT
+
+  Please check this statement & advise us of any discrepancies within 14 days of receipt. If we do not hear from you,
+  we will take this statement as correct and binding.
+  For enquiries, please call our Customer Service Officers at 1800 363 3333.
+
+UPDATING YOUR PERSONAL PARTICULARS
+
+You may update your address and contact numbers via OCBC Online Banking or our ATMs. Alternatively, you may download and
+submit the ‘Change of address / contact details’ form available on ocbc.com/forms.
+
+OCBC PROMOTION & INFORMATION
+
+STILL USING THE ONLINE BANKING                                 Change it to protect your personal data. Log in to
+ACCESS CODE WE ASSIGNED                                        Online Banking > Customer Service > Online Banking
+YOU?                                                           settings> Change Access Code. Or log in via our OCBC
+                                                               Mobile Banking app > Settings > Online Banking settings
+                                                               > Change Access Code. Details at ocbc.com/accesscode
+
+                                                               For more information, visit any of our branches or log on to www.ocbc.com
+
+Deposit Insurance Scheme                                                                                   RNB05ESND\2
+
+Singapore dollar deposits of non-bank depositors and monies and deposits denominated in Singapore dollars under the Supplementary Retirement Scheme are insured by the Singapore Deposit Insurance Corporation,
+
+for up to S$75,000 in aggregate per depositor per Scheme member by law. Monies and deposits denominated in Singapore dollars under the CPF Investment Scheme and CPF Retirement Sum Scheme are aggregated and
+
+separately insured up to S$75,000 for each depositor per Scheme member. Foreign currency deposits, dual currency investments, structured deposits and other investment products are not insured.
+
