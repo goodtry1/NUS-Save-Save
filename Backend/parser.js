@@ -18,7 +18,7 @@ function initializeParseData()
 }
 
 
-function parseStatement(parsestatement)
+function parseBankStatementOCBC360()
 {
 	
   return new promise(async function(resolve, reject) {
@@ -73,7 +73,6 @@ function parseStatement(parsestatement)
     lineIndex++;
   });
 
-
   readInterface.on('close', function () {
     // set this month's total withdraws/deposits, total interests this year and this month's average daily balance
 	if(indexMap.get('totalWithdrawalsDeposits'))
@@ -89,6 +88,70 @@ function parseStatement(parsestatement)
 	
   });
   });
+}
+
+
+/*
+  salary - done
+creditcard
+homeloan
+insurance
+investment
+startDate - done
+endDate
+currentMonthBalance - done
+*/
+function parseBankStatementDBSMultiplier()
+{
+    return new promise(async function (resolve, reject) {
+        // record the index of each line in raw text data
+        let lineIndex = 1;
+
+        // map and index map
+        let textMap = new Map();
+        let indexMap = new Map();
+
+        let result = await initializeParseData();
+
+        // extracted information
+        let readInterface = readline.createInterface({
+            input: fs.createReadStream('./uploads/result.txt')
+        });
+
+        readInterface.on('line', function (line) {
+            textMap.set(lineIndex, line);
+
+            // get current month balance
+            if (line.includes('TOTAL DEPOSITS')) {
+                indexMap.set('currentMonthBalance', lineIndex);
+				let array = line.trim().split(/\s+/);
+                result['currentMonthBalance'] = parseFloat(array[4].replace(/\s|,|/g, ''));
+            }
+			
+			// get date
+            if (line.includes('ACCOUNT SUMMARY') ){
+
+                indexMap.set('date', lineIndex);
+                let array = line.trim().split(/\s+/);
+                result['date'] = array[5].concat(" ",array[6], " ", array[7]);
+            }
+
+            // try to find salary credit
+            if (line.includes('GIRO Salary')) {
+                indexMap.set('salary', lineIndex);
+				let array = line.trim().split(/\s+/);
+                result['salary'] = parseFloat(array[4].replace(/\s|,|/g, ''));
+            }
+
+            lineIndex++;
+        });
+
+        readInterface.on('close', function () {
+            resolve(result)
+            console.log(result)
+
+        });
+    });
 }
 
 function parseCard()
@@ -163,7 +226,6 @@ function parseTransactionHistoryOCBC360()
 		if (line.includes('Available Balance')){
 		    indexMap.set('Available Balance', lineIndex);
 			let array = line.trim().split("  ").filter(function(value, index, arr){ return value !=  "";})
-			//console.log(array[1].replace(/\s|,|/g, ''))
 			result['currentMonthBalance'] = parseFloat(array[1].replace(/\s|,|/g, ''));
 		}
 		if(line.includes('Transaction Date')) 
@@ -323,10 +385,7 @@ function parseTransactionHistoryDBSMultiplier()
 		{
 			let array = textMap.get(indexMap.get('TransactionTable')).trim().split("  ").filter(function(value, index, arr){ return value !=  "";});
 			console.log(array)
-			if(array.length == 3)
-			{
-				result['date'] = array[0]
-			}	
+			result['date'] = array[0]
 		}
 	});
   
@@ -335,9 +394,9 @@ function parseTransactionHistoryDBSMultiplier()
 
 module.exports = { 
     initializeParseData: initializeParseData,
-    parseStatement: parseStatement,
+    parseBankStatementOCBC360: parseBankStatementOCBC360,
+    parseBankStatementDBSMultiplier: parseBankStatementDBSMultiplier,
 	parseCard:parseCard,
 	parseTransactionHistoryOCBC360:parseTransactionHistoryOCBC360,
 	parseTransactionHistoryDBSMultiplier:parseTransactionHistoryDBSMultiplier
-	
 }

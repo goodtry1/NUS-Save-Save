@@ -601,24 +601,23 @@ app.post('/api/uploadBankStatement', uploadConfig, async (req, res) => {
 		console.log('transaction History parse data')
 		console.log(result)
 		res.status(200).send({"parsedData":result})
-	}
-	else
-	{
-		let dataBufferStatement = fs.readFileSync('./uploads/' + req.files['bankStatement'][0].originalname);
-
-		PDFParser(dataBufferStatement, options).then(async function (data) {
-			fs.writeFileSync('./uploads/result.txt', data.text);
-			result  = await parser.parseStatement(req.body.accountTypeId);
-			if(req.files['creditCard'] && req.files['creditCard'][0])
-			{
-				console.log("inside credit card")
-				let dataBufferCard = fs.readFileSync('./uploads/' + req.files['creditCard'][0].originalname); 
-				creditCardParseData = await launchParseCard(options, dataBufferCard );
-				result['creditCardSpend'] = creditCardParseData['creditCardSpend']
-			}
-			res.status(200).send({"parsedData":result})
-		});
-	}
+    }
+    else 
+    {
+        console.log("inside bankStatement History")
+        let dataBuffertransaction = fs.readFileSync('./uploads/' + req.files['bankStatement'][0].originalname);
+        let filename = './uploads/' + req.files['bankStatement'][0].originalname
+        result = await launchParseBankStatement(options, filename, req.body.accountTypeId);
+        if (req.files['creditCard'] && req.files['creditCard'][0]) {
+            console.log("inside credit card")
+            let dataBufferCard = fs.readFileSync('./uploads/' + req.files['creditCard'][0].originalname);
+            creditCardParseData = await launchParseCard(options, dataBufferCard);
+            result['creditCardSpend'] = creditCardParseData['creditCardSpend']
+        }
+        console.log('Bank statement parse data')
+        console.log(result)
+        res.status(200).send({ "parsedData": result })
+    }
 	//deleteFile("./uploads/")
 })
 
@@ -665,6 +664,30 @@ function launchParseCard(options, dataBufferCard) {
 	});
 }
 
+function launchParseBankStatement(options, filename, accountTypeId) {
+    return new promise(function (resolve, reject) {
+		console.log("inside launch parse bank stmt")
+        let dataBufferStatement = fs.readFileSync(filename);
+		if (accountTypeId == 1)
+		{
+			PDFParser(dataBufferStatement, options).then(async function (data) {
+				fs.writeFileSync('./uploads/result.txt', data.text);
+				result = await parser.parseBankStatementOCBC360();
+				resolve(result);
+			});
+		}
+        else if (accountTypeId == 2)
+		{
+			pdfUtil.pdfToText(filename, async function(err, data) {
+				fs.writeFileSync('./uploads/result.txt', data);
+				result = await parser.parseBankStatementDBSMultiplier();
+				resolve(result);
+			});
+		}
+    });
+}
+
+
 function launchParseTransactionHistory(options, filename, accountTypeId)
 {
 	return new promise(function(resolve, reject) {
@@ -678,6 +701,7 @@ function launchParseTransactionHistory(options, filename, accountTypeId)
 		});
 	});
 }
+
 
 //get recommendations for the userid and accounttypeid
 app.post('/api/fetchrecommendations', authenticateToken, (req, res) => {
@@ -705,7 +729,6 @@ app.post('/api/fetchrecommendations', authenticateToken, (req, res) => {
 
 //add feedback for a particular session Id.
 app.post('/api/addFeedback', authenticateToken, (req, res) => {
-
 	sql.connect(sqlConfig, function () {
 		var request = new sql.Request();
 
