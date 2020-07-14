@@ -258,7 +258,8 @@ class FeedbackPlugin extends Component {
                 {this.state.alert}
                 <div className={this.state.classes}>
                     <div onClick={this.handleClick}>
-                        <i className="fa fa-cog fa-2x" />
+                       {/*  <i className="fa fa-comment fa-2x" aria-hidden="true" style={{color: "white"}}/> */}
+                       <i className="fa fa-edit fa-2x" aria-hidden="true" style={{color: "white"}}/>
                     </div>
                     <ul className="dropdown-menu show">
                         <li className="header-title">

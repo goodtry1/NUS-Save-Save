@@ -593,6 +593,8 @@ class RegisterPage extends React.Component {
                             )}
                         </InputGroup>
 
+                        
+
                         <InputGroup
                           className={
                             "form-control-lg" +
