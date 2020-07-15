@@ -501,14 +501,18 @@ class LoginPage extends React.Component {
                             <div className="">
                               <center>
                               <h6>
-                                <a href="/auth/forgetPassword-page" className="link footer-link">
-                                  Forgot password
+                              <a href="/auth/register-page" className="link footer-link">
+                              Create Account
                                 </a>
+                                                            
+                              </h6>
+                              <h6>
+                              <a href="/auth/forgetPassword-page" className="link footer-link">
+                                  Forgot password
+                                </a>  
                               </h6>
                               </center>
                             </div>
-                         
-                            
                           </CardFooter>
                         </Form>
                       </div>
