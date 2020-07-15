@@ -761,7 +761,7 @@ class BankAccountDetails extends React.Component {
         }
 
         try {
-            var PdfDetails = this.state.PdfDetails
+            PdfDetails = this.state.PdfDetails
 
             d3 = PdfDetails.startDate.toString().split(" ")
             PdfDetails.startDate = d3[2] + " " + d3[1] + " " + d3[3]

@@ -259,7 +259,9 @@ class FeedbackPlugin extends Component {
                 <div className={this.state.classes}>
                     <div onClick={this.handleClick}>
                        {/*  <i className="fa fa-comment fa-2x" aria-hidden="true" style={{color: "white"}}/> */}
-                       <i className="fa fa-edit fa-2x" aria-hidden="true" style={{color: "white"}}/>
+                       {/* <i className="fa fa-edit fa-2x" aria-hidden="true" style={{color: "white"}}/> */}
+                       {/* <i class="fas fa-pencil-alt"></i> */}
+                       <i class="far fa-comment-dots fa-2x" style={{color: "white"}}></i>
                     </div>
                     <ul className="dropdown-menu show">
                         <li className="header-title">
