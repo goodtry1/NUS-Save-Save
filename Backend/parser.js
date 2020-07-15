@@ -18,7 +18,7 @@ function initializeParseData()
 }
 
 
-function parseBankStatementOCBC360()
+function parseBankStatementOCBC360(filename)
 {
 	
   return new promise(async function(resolve, reject) {
@@ -33,7 +33,7 @@ function parseBankStatementOCBC360()
 
   // extracted information
   let readInterface = readline.createInterface({
-    input: fs.createReadStream('./uploads/result.txt')
+    input: fs.createReadStream(filename)
   });
 
   readInterface.on('line', function (line) {
@@ -101,7 +101,7 @@ startDate - done
 endDate
 currentMonthBalance - done
 */
-function parseBankStatementDBSMultiplier()
+function parseBankStatementDBSMultiplier(filename)
 {
     return new promise(async function (resolve, reject) {
         // record the index of each line in raw text data
@@ -115,7 +115,7 @@ function parseBankStatementDBSMultiplier()
 
         // extracted information
         let readInterface = readline.createInterface({
-            input: fs.createReadStream('./uploads/result.txt')
+            input: fs.createReadStream(filename)
         });
 
         readInterface.on('line', function (line) {
@@ -154,7 +154,7 @@ function parseBankStatementDBSMultiplier()
     });
 }
 
-function parseCard()
+function parseCard(filename)
 {
 	
 	return new promise(function(resolve, reject) {
@@ -170,7 +170,7 @@ function parseCard()
 	result['creditCardSpend']= 0;
 
 	let readInterface = readline.createInterface({
-		input: fs.createReadStream('./uploads/resultCard.txt')
+		input: fs.createReadStream(filename)
 	});
 
 	readInterface.on('line', function (line) {
@@ -202,7 +202,7 @@ function parseCard()
 
 }
 
-function parseTransactionHistoryOCBC360()
+function parseTransactionHistoryOCBC360(filename)
 {
 	
 	return new promise(async function(resolve, reject) {
@@ -218,7 +218,7 @@ function parseTransactionHistoryOCBC360()
 	
 	// extracted information
 	let readInterface = readline.createInterface({
-		input: fs.createReadStream('./uploads/resultTransactions.txt')
+		input: fs.createReadStream(filename)
 	});
 
 	readInterface.on('line', function (line) {
@@ -329,7 +329,7 @@ function parseTransactionHistoryOCBC360()
 function size_dict(d){c=0; for (i in d) ++c; return c}
 
 
-function parseTransactionHistoryDBSMultiplier()
+function parseTransactionHistoryDBSMultiplier(filename)
 {
 	return new promise(async function(resolve, reject) {
 	// record the index of each line in raw text data
@@ -345,7 +345,7 @@ function parseTransactionHistoryDBSMultiplier()
 	totalDeposit = 0
 
 	let readInterface = readline.createInterface({
-		input: fs.createReadStream('./uploads/resultTransactions.txt')
+		input: fs.createReadStream(filename)
 	});
 
 	readInterface.on('line', function (line) {

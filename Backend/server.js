@@ -207,9 +207,6 @@ app.post('/api/signin', (req, res) => {
 							res.status(204).send()
 						}
 						else {
-
-							
-
 							var user = results.recordset[0]
 
 							var accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET)
@@ -657,8 +654,9 @@ app.post('/api/updateParsedData', authenticateToken, (req, res) => {
 function launchParseCard(options, dataBufferCard) {
 	return new promise(function (resolve, reject) {
 		PDFParser(dataBufferCard, options).then(async function (data) {
-			fs.writeFileSync('./uploads/resultCard.txt', data.text);
-			creditCardParseData = await parser.parseCard();
+			var random = randomize('0', 6);
+			var filename = './uploads/resultCard' + String(random) + '.txt'
+			creditCardParseData = await parser.parseCard(filename);
 			resolve(creditCardParseData);
 		});
 	});
@@ -666,21 +664,24 @@ function launchParseCard(options, dataBufferCard) {
 
 function launchParseBankStatement(options, filename, accountTypeId) {
     return new promise(function (resolve, reject) {
-		console.log("inside launch parse bank stmt")
         let dataBufferStatement = fs.readFileSync(filename);
 		if (accountTypeId == 1)
 		{
 			PDFParser(dataBufferStatement, options).then(async function (data) {
-				fs.writeFileSync('./uploads/result.txt', data.text);
-				result = await parser.parseBankStatementOCBC360();
+				var random = randomize('0', 6);
+				var filename = './uploads/result' + String(random) + '.txt'
+				fs.writeFileSync(filename, data.text);
+				result = await parser.parseBankStatementOCBC360(filename);
 				resolve(result);
 			});
 		}
         else if (accountTypeId == 2)
 		{
 			pdfUtil.pdfToText(filename, async function(err, data) {
-				fs.writeFileSync('./uploads/result.txt', data);
-				result = await parser.parseBankStatementDBSMultiplier();
+				var random = randomize('0', 6);
+				var filename = './uploads/result' + String(random) + '.txt'
+				fs.writeFileSync(filename, data);
+				result = await parser.parseBankStatementDBSMultiplier(filename);
 				resolve(result);
 			});
 		}
@@ -692,11 +693,13 @@ function launchParseTransactionHistory(options, filename, accountTypeId)
 {
 	return new promise(function(resolve, reject) {
 		pdfUtil.pdfToText(filename, async function(err, data) {
-			fs.writeFileSync('./uploads/resultTransactions.txt', data);
+			var random = randomize('0', 6);
+			var filename = './uploads/resultTransactions' + String(random) + '.txt'
+			fs.writeFileSync(filename, data);
 			if(accountTypeId == 1)
-				parseData  = await parser.parseTransactionHistoryOCBC360();
+				parseData  = await parser.parseTransactionHistoryOCBC360(filename);
 			else if(accountTypeId == 2)
-				parseData  = await parser.parseTransactionHistoryDBSMultiplier();
+				parseData  = await parser.parseTransactionHistoryDBSMultiplier(filename);
 			resolve (parseData);
 		});
 	});
