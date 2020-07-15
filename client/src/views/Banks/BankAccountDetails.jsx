@@ -87,7 +87,7 @@ import Datetime from "react-datetime";
 import ProgressBar from 'react-bootstrap/ProgressBar'
 
 //PDFDetails model
-import { PDFDetails } from '../../models/PDFDetails'
+//import { PDFDetails } from '../../models/PDFDetails'
 
 
 
@@ -139,17 +139,15 @@ class BankAccountDetails extends React.Component {
 
             showPdfDetails: false,
             PdfDetails: {
-                previousMonthBalance: '',
                 startDate: '',
-                endDate: '',
-                salary: 0,
-                currentMonthBalance: 0,
-                creditCardSpend: 0,
-                averageDailyBalance: 0,
-                wealth: 0
+                endDate: ''
             },
 
             userInputPdfDetails: {
+                startDate: '',
+                endDate: ''
+            },
+            /* {
                 previousMonthBalance: '',
                 startDate: '',
                 endDate: '',
@@ -158,7 +156,7 @@ class BankAccountDetails extends React.Component {
                 creditCardSpend: '',
                 averageDailyBalance: '',
                 wealth: 0
-            },
+            } */
 
             chartDetails : {
                 label: [],
@@ -591,6 +589,30 @@ class BankAccountDetails extends React.Component {
 
                 if (res.status === 200) {
 
+
+                    /* Retrieve all the attributes required from the parsedData object */
+                    let parsedData = res.data.parsedData
+                    let PdfDetails = this.state.PdfDetails
+                    let userInputPdfDetails = this.state.userInputPdfDetails
+
+                    Object.keys(parsedData).forEach(function (key) {
+                        
+                    if (key === 'date') {
+
+                    } else {
+
+                        PdfDetails[key] = parsedData[key]
+                        userInputPdfDetails[key] = ''  
+                       
+                    }
+
+                      
+                                
+                    })
+
+
+
+
                     var d1 = new moment()
                     var d2 = new moment()
 
@@ -610,27 +632,30 @@ class BankAccountDetails extends React.Component {
                     }
                     
 
-                    /* console.log(d1)
-                    console.log(d2) */
-
-                    let userInputPdfDetails = this.state.userInputPdfDetails
+                    
+                    PdfDetails.startDate = d1
+                    PdfDetails.endDate = d2
+                    this.setState({ PdfDetails }, () => {
+                        console.log(this.state.PdfDetails)
+                    })
+                    
                     userInputPdfDetails.startDate = d1
                     userInputPdfDetails.endDate = d2
                     this.setState({ userInputPdfDetails })
 
+                    
 
 
-
-                    let PdfDetails = new PDFDetails(res.data.parsedData.previousMonthBalance,
+                   /*  let PdfDetails = new PDFDetails(res.data.parsedData.previousMonthBalance,
                         res.data.parsedData.currentMonthBalance,
                         res.data.parsedData.averageDailyBalance,
                         d1,
                         d2,
                         res.data.parsedData.salary,
-                        res.data.parsedData.creditCardSpend? res.data.parsedData.creditCardSpend: 0)
+                        res.data.parsedData.creditCardSpend? res.data.parsedData.creditCardSpend: 0) */
 
-                    this.setState({ PdfDetails: PdfDetails })
-                    this.setState({ message: 'Your bank statement has been uploaded successfully' }, () => {
+                    
+                    this.setState({ /* PdfDetails ,userInputPdfDetails , */message: 'Your bank statement has been uploaded successfully' }, () => {
                         setTimeout(() => {
                             
                             this.setState({ showPdfDetails: true })
@@ -729,6 +754,9 @@ class BankAccountDetails extends React.Component {
         var PdfDetails = this.state.PdfDetails
         var userInputPdfDetails = this.state.userInputPdfDetails
 
+        //temp adding creditCardSpend attribute to avoid 'undefined' error from server
+        PdfDetails.creditCardSpend = 0
+        userInputPdfDetails.creditCardSpend = 0
 
         Object.keys(userInputPdfDetails).forEach(function (key) {
            
@@ -817,6 +845,31 @@ class BankAccountDetails extends React.Component {
         this.setState({ verifyInfoState: !this.state.verifyInfoState})
     }
 
+    //I got this regex from stackoverflow to transform the variable name to cap each first letter 
+    //and a space in between each word from camelCase
+    formatString = (string) => {
+        var result = string                         // "ToGetYourGEDInTimeASongAboutThe26ABCsIsOfTheEssenceButAPersonalIDCardForUser456InRoom26AContainingABC26TimesIsNotAsEasyAs123ForC3POOrR2D2Or2R2D"
+            .replace(/([a-z])([A-Z][a-z])/g, "$1 $2")           // "To Get YourGEDIn TimeASong About The26ABCs IsOf The Essence ButAPersonalIDCard For User456In Room26AContainingABC26Times IsNot AsEasy As123ForC3POOrR2D2Or2R2D"
+            .replace(/([A-Z][a-z])([A-Z])/g, "$1 $2")           // "To Get YourGEDIn TimeASong About The26ABCs Is Of The Essence ButAPersonalIDCard For User456In Room26AContainingABC26Times Is Not As Easy As123ForC3POOr R2D2Or2R2D"
+            .replace(/([a-z])([A-Z]+[a-z])/g, "$1 $2")          // "To Get Your GEDIn Time ASong About The26ABCs Is Of The Essence But APersonal IDCard For User456In Room26AContainingABC26Times Is Not As Easy As123ForC3POOr R2D2Or2R2D"
+            .replace(/([A-Z]+)([A-Z][a-z][a-z])/g, "$1 $2")     // "To Get Your GEDIn Time A Song About The26ABCs Is Of The Essence But A Personal ID Card For User456In Room26A ContainingABC26Times Is Not As Easy As123ForC3POOr R2D2Or2R2D"
+            .replace(/([a-z]+)([A-Z0-9]+)/g, "$1 $2")           // "To Get Your GEDIn Time A Song About The 26ABCs Is Of The Essence But A Personal ID Card For User 456In Room 26A Containing ABC26Times Is Not As Easy As 123For C3POOr R2D2Or 2R2D"
+            
+            // Note: the next regex includes a special case to exclude plurals of acronyms, e.g. "ABCs"
+            .replace(/([A-Z]+)([A-Z][a-rt-z][a-z]*)/g, "$1 $2") // "To Get Your GED In Time A Song About The 26ABCs Is Of The Essence But A Personal ID Card For User 456In Room 26A Containing ABC26Times Is Not As Easy As 123For C3PO Or R2D2Or 2R2D"
+            .replace(/([0-9])([A-Z][a-z]+)/g, "$1 $2")          // "To Get Your GED In Time A Song About The 26ABCs Is Of The Essence But A Personal ID Card For User 456In Room 26A Containing ABC 26Times Is Not As Easy As 123For C3PO Or R2D2Or 2R2D"  
+
+            // Note: the next two regexes use {2,} instead of + to add space on phrases like Room26A and 26ABCs but not on phrases like R2D2 and C3PO"
+            .replace(/([A-Z]{2,})([0-9]{2,})/g, "$1 $2")        // "To Get Your GED In Time A Song About The 26ABCs Is Of The Essence But A Personal ID Card For User 456 In Room 26A Containing ABC 26 Times Is Not As Easy As 123 For C3PO Or R2D2 Or 2R2D"
+            .replace(/([0-9]{2,})([A-Z]{2,})/g, "$1 $2")        // "To Get Your GED In Time A Song About The 26 ABCs Is Of The Essence But A Personal ID Card For User 456 In Room 26A Containing ABC 26 Times Is Not As Easy As 123 For C3PO Or R2D2 Or 2R2D"
+            .trim();
+
+
+        // capitalize the first letter
+        return result.charAt(0).toUpperCase() + result.slice(1);
+    }
+
+    
    
 
     //Render form to let user submit what the PDF parser parsed
@@ -870,7 +923,7 @@ class BankAccountDetails extends React.Component {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
+                                <tr>
                                         <td>
                                             Start Date
                                         </td>
@@ -903,9 +956,9 @@ class BankAccountDetails extends React.Component {
                                             </Col>
                                         </td>
                                         
-                                    </tr>
+                                        </tr>
 
-                                    <tr>
+                                        <tr>
                                         <td>
                                             End Date
                                         </td>
@@ -928,16 +981,56 @@ class BankAccountDetails extends React.Component {
                                                         timeFormat={false}
 
 
-                                                        value={moment(this.state.userInputPdfDetails.startDate)
+                                                        value={moment(this.state.userInputPdfDetails.endDate)
                                                             .tz("Singapore")
                                                             .format('DD/MM/YYYY')}
-                                                        onChange={moment => this.handleDateTime(moment, 'startDate')}
+                                                        onChange={moment => this.handleDateTime(moment, 'endDate')}
                                                     />
                                             </Col>
                                         </td>
                                     </tr>
 
-                                    <tr>
+                                        {this.state.PdfDetails && Object.keys(this.state.PdfDetails).map((key) => (
+                                            key !== 'startDate' && key !== 'endDate'? 
+                                            (
+                                                <tr key={key}>
+                                                    <td>
+                                                        {this.formatString(key)}
+                                                    </td>
+
+                                                    <td>
+                                                        {this.state.PdfDetails[key]}
+                                                    </td>
+
+                                                    <td>
+                                                        <Col sm="6">
+                                                            <Input
+                                                                    name={key}
+                                                                    type="number"
+                                                                    min="0.00"
+                                                                    max="1000000"
+                                                                    step="100"
+                                                                    placeholder={this.state.PdfDetails[key]}
+                                                                    onChange={this.handleUserInputOnPdfDetails}
+                                                                    width=""
+                                                                />
+                                                        </Col>
+                                                    </td>
+                                                </tr>
+                                            ) : (React.Fragment)
+                                            
+                                        ))}
+                                    
+                                      
+                                   
+                                   
+
+                                    
+
+                                    
+                                    
+
+                                   {/*  <tr>
                                         <td>
                                             This month's current balance         
                                         </td>
@@ -1061,7 +1154,7 @@ class BankAccountDetails extends React.Component {
                                             </Col>
                                         </td>
 
-                                    </tr>
+                                    </tr> */}
                                    
                                 </tbody>
 
