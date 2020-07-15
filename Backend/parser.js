@@ -4,7 +4,7 @@ var parser = new express.Router();
 const readline = require('readline');
 const fs = require('fs');
 
-function initializeParseData()
+function initializeParseDataOCBC()
 {
 	return new promise(function(resolve, reject) {
 		let result = {}
@@ -13,6 +13,23 @@ function initializeParseData()
 		result['averageDailyBalance'] =0;
 		result['date'] = 0;
 		result['salary']  = 0;
+		result['creditCardSpend'] = 0;
+		resolve (result);
+  });
+}
+
+function initializeParseDataDBS()
+{
+	return new promise(function(resolve, reject) {
+		let result = {}
+		result['previousMonthBalance'] = 0;
+		result['currentMonthBalance'] = 0;
+		result['date'] = 0;
+		result['salary']  = 0;
+		result['creditCardSpend'] = 0;
+		result['homeLoan']  = 0;
+		result['insurance']  = 0;
+		result['investment']  = 0;
 		resolve (result);
   });
 }
@@ -29,7 +46,7 @@ function parseBankStatementOCBC360(filename)
   let textMap = new Map();
   let indexMap = new Map();
 
-  let result = await initializeParseData();
+  let result = await initializeParseDataOCBC();
 
   // extracted information
   let readInterface = readline.createInterface({
@@ -111,7 +128,7 @@ function parseBankStatementDBSMultiplier(filename)
         let textMap = new Map();
         let indexMap = new Map();
 
-        let result = await initializeParseData();
+        let result = await initializeParseDataDBS();
 
         // extracted information
         let readInterface = readline.createInterface({
@@ -214,7 +231,7 @@ function parseTransactionHistoryOCBC360(filename)
 	let indexMap = new Map();
 	let transactionStartIndex = 0;
 
-	let result = await initializeParseData();
+	let result = await initializeParseDataOCBC();
 	
 	// extracted information
 	let readInterface = readline.createInterface({
@@ -340,9 +357,11 @@ function parseTransactionHistoryDBSMultiplier(filename)
 	let indexMap = new Map();
 
 	// extracted information
-	let result = await initializeParseData();
+	let result = await initializeParseDataDBS();
 	totalWithdrawal = 0
 	totalDeposit = 0
+	giroPay = {}
+	i=0
 
 	let readInterface = readline.createInterface({
 		input: fs.createReadStream(filename)
@@ -371,6 +390,10 @@ function parseTransactionHistoryDBSMultiplier(filename)
 		if(line.includes('(Withdrawal)               (Deposit)')){
 			indexMap.set('TransactionTable', lineIndex+2);
 		}
+		if(line.includes('Payments or Collections via GIRO')){
+			indexMap.set('giroPay', lineIndex);
+			giroPay[i++] = lineIndex;
+		}
 		
 		lineIndex++;
     });
@@ -380,6 +403,7 @@ function parseTransactionHistoryDBSMultiplier(filename)
 
 		resolve (result)
 		console.log(result)
+		console.log(giroPay)
 		result['previousMonthBalance'] = parseFloat((result['currentMonthBalance'] - totalDeposit + totalWithdrawal).toFixed(2))
 		if(indexMap.get('TransactionTable'))
 		{
@@ -393,7 +417,7 @@ function parseTransactionHistoryDBSMultiplier(filename)
 }
 
 module.exports = { 
-    initializeParseData: initializeParseData,
+    initializeParseDataOCBS: initializeParseDataOCBC,
     parseBankStatementOCBC360: parseBankStatementOCBC360,
     parseBankStatementDBSMultiplier: parseBankStatementDBSMultiplier,
 	parseCard:parseCard,

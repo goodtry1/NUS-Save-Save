@@ -584,7 +584,6 @@ app.post('/api/uploadBankStatement', uploadConfig, async (req, res) => {
 	let creditCardParseData = {}
 	if(req.files['transactionHistory'] && req.files['transactionHistory'][0])
 	{
-		console.log("inside transaction History")
 		let dataBuffertransaction = fs.readFileSync('./uploads/' + req.files['transactionHistory'][0].originalname); 
 		let filename = './uploads/' + req.files['transactionHistory'][0].originalname
 		result = await launchParseTransactionHistory(options, filename,req.body.accountTypeId );
@@ -601,7 +600,6 @@ app.post('/api/uploadBankStatement', uploadConfig, async (req, res) => {
     }
     else 
     {
-        console.log("inside bankStatement History")
         let dataBuffertransaction = fs.readFileSync('./uploads/' + req.files['bankStatement'][0].originalname);
         let filename = './uploads/' + req.files['bankStatement'][0].originalname
         result = await launchParseBankStatement(options, filename, req.body.accountTypeId);
@@ -656,6 +654,7 @@ function launchParseCard(options, dataBufferCard) {
 		PDFParser(dataBufferCard, options).then(async function (data) {
 			var random = randomize('0', 6);
 			var filename = './uploads/resultCard' + String(random) + '.txt'
+			fs.writeFileSync(filename, data.text);
 			creditCardParseData = await parser.parseCard(filename);
 			resolve(creditCardParseData);
 		});
