@@ -62,15 +62,21 @@ export class MyProfile extends Component {
         })
     }
 
+    /**
+     * Custom method that will create and render a notification  based on the given input
+     * @param {*} place - Position of the notification 
+     * @param {*} color - Color of notification. Success/Danger/Warning etc
+     */
     notify(place, color) {
         this.refs.notificationAlert.notificationAlert(CustomNotification.notify(place, color, this.state.notifyMsg));
     }
 
-    /*
+    /** 
      * Toggle out the EditProfile card.
      * If `hideChangePw` is set to false, it means that the ChangePw card is opened, hence it will close before opening the EditProfile card.
      * Set `hideEdit` from true to false (If you are opening it) OR false to true (If you are closing it)
-    */
+     * @param {*} e - Event that trigger when user click the 'Edit' button'
+     */
     toggleEdit = (e) => {
         var toggleEdit = this.state.hideEdit
         this.setState({ hideEdit: !toggleEdit });
@@ -84,10 +90,11 @@ export class MyProfile extends Component {
         }
     }
 
-    /* 
+    /** 
      * Toggle out the Change password card
      * If `hideEdit` is set to false, it means that the EditProfile card is opened, hence it will close it before opening the ChangePw card.
      * Set `hideChangePw` from true to false (If you are opening it) OR false to true (If you are closing it)
+     * @param {*} e - Event that trigger when user click the 'Change password' button'
     */
     toggleChangePw = (e) => {
         var toggleChangePw = this.state.hideChangePw
@@ -102,14 +109,20 @@ export class MyProfile extends Component {
         }
     }
 
-    // Toggle 2FA for edit profile as needed.
+    /**  
+     * Toggle 2FA for edit profile as needed.
+     * @param {*} e - Event that trigger when user click the 2FA option 
+     */
     toggleTwoFa = (e) => {
         var tempUpdatedUser = this.state.updatedUser
         tempUpdatedUser.twoFAAuth = !(tempUpdatedUser.twoFAAuth)
         this.setState({ updatedUser: tempUpdatedUser })
     }
 
-    // Bind all user’s input to the relevant states
+    /**
+     * Bind all user’s input to the relevant states
+     * @param {*} e - Event that trigger on every changes in the 'Edit Profile' input form 
+     */ 
     handleUpdate = (e) => {
         var tempUpdatedUser = this.state.updatedUser
         var field = e.target.name
@@ -118,7 +131,10 @@ export class MyProfile extends Component {
         this.setState({ updatedUser: tempUpdatedUser })
     }
 
-    // Bind all user’s input to the relevant password states
+    /**
+     * Bind all user’s input to the relevant password states
+     * @param {*} e - Event that trigger on every changes in the 'Change Password' input form 
+     */ 
     handlePwUpdate = (e) => {
         if (e.target.name === "newPw") {
             var passRex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{8,15}$/;
@@ -139,7 +155,10 @@ export class MyProfile extends Component {
         }
     }
 
-    // Perform RESTful API call to the backend when the user clicks the update button.
+    /**
+     * Perform RESTful API call to the backend when the user clicks the update button when editing Profile.
+     * @param {*} e - event action that triggers RESTful API call to backend when User click (onClick) the Edit Profile button.
+     */
     handleUpdateButton = (e) => {
         var updatedUser = this.state.updatedUser;
         this.setState({ updateLoading: true })
@@ -184,10 +203,11 @@ export class MyProfile extends Component {
             })
         })
     }
-
-    /* 
-     * Perform RESTful API call to the backend when the user clicks the change password button.
-     * In the backend, if the old password matches, then send success message, else error message
+ 
+   /**
+    * Perform RESTful API call to the backend when the user clicks the change password button.
+    * In the backend, if the old password matches, then send success message, else error message
+    * @param {*} e - event action that triggers RESTful API call to backend when User click (onClick) the change password button.
     */
     handlePwUpdateButton = (e) => {
         this.setState({ changePwLoading: true })
@@ -205,8 +225,7 @@ export class MyProfile extends Component {
             }, () => {
                 this.notify('br', 3)
             })
-        }
-        else {
+        } else {
             if (this.state.newPw !== this.state.retypeNewPw) {
                 this.setState({
                     notifyMsg: "Error! New passwords do not match. ",
@@ -236,8 +255,7 @@ export class MyProfile extends Component {
                             this.notify('br', 2)
                             this.toggleChangePw();
                         })
-                    }
-                    else {
+                    } else {
                         this.setState({
                             notifyMsg: "Error! Your old password do not match. Please try again!",
                             changePwLoading: false
