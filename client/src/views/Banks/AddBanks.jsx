@@ -54,11 +54,19 @@ export class AddBanks extends Component {
         }
     }
 
+    /**
+     * puts the user object from localStorage into the state before page loads
+     */
     componentWillMount = () => {
         var user = localStorage.getItem('user')
         this.setState({ user: JSON.parse(user) })
     }
 
+    /**
+     * takes the list of banks pushed in from Banks.jsx
+     * if the list of banks aren't available, meaning that user refreshes the page, redirect back to Banks.jsx
+     * if the list of banks are available, fetch all the banks from the RESTful api and set those banks in the state
+     */
     componentDidMount = () => {
         if (!this.props.location.data) {
             this.props.history.push({
@@ -129,6 +137,9 @@ export class AddBanks extends Component {
 
     }
 
+    /**
+     * gets account types for each of the banks in the list of banks in the state
+     */
     getAccountTypes = async () => {
 
         var transformedBanks = []
@@ -152,6 +163,12 @@ export class AddBanks extends Component {
 
     }
 
+    /**
+     * takes in a few parameters and returns a bank object
+     * @param {*} bankId - id of the bank
+     * @param {*} bankName - name of the bank
+     * @param {*} accountTypes - list of account types under this bank 
+     */
     transformBank = (bankId, bankName, accountTypes) => {
 
         var bank = new Bank(bankId, bankName, accountTypes)
@@ -159,6 +176,11 @@ export class AddBanks extends Component {
         return bank
     }
 
+    /**
+     * retrieves the account types from RESTful api using bankId
+     * returns a promise
+     * @param {*} bankId - id of the bank
+     */
     getAccountTypesFromBankId = (bankId) => {
         return axios({
             method: 'post',
@@ -171,6 +193,11 @@ export class AddBanks extends Component {
         })
     }
 
+    /**
+     * sets the bank a user clicks on in the state, and the account types that corresponds to that bank in the state
+     * @param {*} e - event triggering this function
+     * @param {*} bank - bank user clicks on
+     */
     bankOnClick = (e, bank) => {
 
         this.setState({ selectedBank: bank })
@@ -181,11 +208,20 @@ export class AddBanks extends Component {
 
     }
 
+    /**
+     * sets the account that the user clicks on
+     * @param {*} e - event triggering this function
+     * @param {*} account - account user clicks on
+     */
     accountTypeOnClick = (e, account) => {
         this.setState({ selectedAccountTypeId: account.accountTypeId })
         this.setState({ selectedAccountType: account })
     }
 
+    /**
+     * user clicks "clear" to remove the banks and account types he previously selected
+     * @param {*} e - event triggering this function
+     */
     clearSelectionOnClick = (e) => {
         this.setState({ selectedBank: '' })
         this.setState({ selectedBankId: '' })
@@ -194,6 +230,11 @@ export class AddBanks extends Component {
         this.setState({ accountTypes: [] })
     }
 
+    /**
+     * user clicks on create
+     * sends data to RESTful api to create the account under this user
+     * @param {*} e - event triggering this function
+     */
     createAccountOnClick = (e) => {
 
         axios({
@@ -227,6 +268,10 @@ export class AddBanks extends Component {
 
     }
 
+    /**
+     * checks if user has already registered for this bank account
+     * @param {*} accountId - bank account Id
+     */
     checkAccountExists(accountId) {
         for (var i = 0; i < this.state.userAccounts.length; i++) {
 
@@ -239,14 +284,25 @@ export class AddBanks extends Component {
         return false
     }
 
+    /**
+     * toggles the state of the tooltip when it's hovered
+     */
     toggleToolTip = () => {
         this.setState({ accountToolTipState: !this.state.accountToolTipState })
     }
 
+    /**
+     * notification based on the place and color
+     * @param {*} place - place of notification
+     * @param {*} color - color of notification
+     */
     notify(place, color) {
         this.refs.notificationAlert.notificationAlert(CustomNotification.notify(place, color, this.state.message));
     }
 
+    /**
+     * determines whether to renderLoading() or renderAddBanks() based on whether the banks have been loaded
+     */
     render() {
 
         return (
@@ -257,6 +313,9 @@ export class AddBanks extends Component {
 
     }
 
+    /**
+     * render loading screen
+     */
     renderLoading() {
         return (
             <div>
@@ -271,7 +330,9 @@ export class AddBanks extends Component {
     }
 
 
-
+    /**
+     * render add bank account
+     */
     renderAddBanks() {
         return (
             <div>

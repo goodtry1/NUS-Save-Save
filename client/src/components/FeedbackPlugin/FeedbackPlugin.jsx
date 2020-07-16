@@ -58,6 +58,11 @@ class FeedbackPlugin extends Component {
         
     }
 
+    /**
+     * sets the star for a specific recommendation
+     * @param {*} Id - recommendation id
+     * @param {*} nextValue - value of stars 0-5
+     */
     onStarClick(Id, nextValue) {
 
         var recommendations = this.state.recommendation
@@ -72,6 +77,10 @@ class FeedbackPlugin extends Component {
         this.setState({ recommendation : recommendations})
     }
 
+    /**
+     * sets the string feedback to the recommendation
+     * @param {*} event - the event triggering this function
+     */
     onFeedbackStringChange = (event) => {
 
         var Id = event.target.id
@@ -89,6 +98,9 @@ class FeedbackPlugin extends Component {
         this.setState({ recommendation : recommendations})
     }
 
+    /**
+     * sets the recommendation passed down from the parent via props to the state of this component 
+     */
     componentDidMount = () => {
         this.setState({ recommendation: this.props.recommendation, totalRecommendationNum: this.props.recommendation.length })
 
@@ -98,6 +110,9 @@ class FeedbackPlugin extends Component {
       }, 10000); */
     }
 
+    /**
+     * shows feedback plugin for the first time
+     */
     handleClick = () => {
         if (this.state.classes === "dropdown") {
             this.setState({ classes: "dropdown show" });
@@ -108,27 +123,42 @@ class FeedbackPlugin extends Component {
        
     }
 
+    /**
+     * shows popout asking for feedback
+     */
     askforFeedback() {
         this.setState({ classes: "dropdown show" });
     }
 
+    /**
+     * closes popout
+     */
     closeFeedback() {
         this.setState({ classes: "dropdown"})
     }
 
     
     
-
+    /**
+     * user clicks on "Leave your feedback"
+     * opens up the feedback dialog to display feedback form for recommendations
+     */
     handleClickOpen = () => {
         this.setState({ feedbackDialogOpen: true })
     }
 
+    /**
+     * user closes the feedback dialog
+     */
     handleClose = () => {
         this.setState({ feedbackDialogOpen: false })
     }
 
    
-
+    /**
+     * user submits feedback
+     * data is sent to server via RESTful api
+     */
     submitFeedback = () => {
 
         this.setState({ submitButtonLoad : true})
@@ -199,6 +229,9 @@ class FeedbackPlugin extends Component {
        
     }
 
+    /**
+     * show success alert when RESTful api call is successful
+     */
     successAlert = () => {
         this.setState({
           alert: (
@@ -216,6 +249,9 @@ class FeedbackPlugin extends Component {
         });
       }
 
+      /**
+       * show failure alert when RESTful api call is unsuccessful
+       */
       failureAlert() {
         this.setState({
           alert: (
@@ -233,13 +269,18 @@ class FeedbackPlugin extends Component {
         });
       }
 
+      /**
+       * hide sweet alert
+       */
       hideAlert() {
         this.setState({
           alert: null
         });
       }
 
-    
+    /**
+     * render loading button
+     */
     renderLoading() {
         return (
     
@@ -251,6 +292,9 @@ class FeedbackPlugin extends Component {
           </div>
         )}
     
+    /**
+     * render feedback plugin and feedback form
+     */
     render() {
         return (
             

@@ -86,13 +86,26 @@ class RegisterPage extends React.Component {
       accountToolTipState: false
     };
   }
+
+  /**
+   * default function by Creative Tim
+   */
   componentDidMount() {
     document.body.classList.add("register-page");
   }
+
+  /**
+   * default function by Creative Tim
+   */
   componentWillUnmount() {
     document.body.classList.remove("register-page");
   }
 
+  /**
+   * 
+   * @param {*} place - place of notification
+   * @param {*} color - color of notification
+   */
   notify(place, color) {
     //var color = 5;
     var type;
@@ -132,6 +145,10 @@ class RegisterPage extends React.Component {
     this.refs.notificationAlert.notificationAlert(options);
   }
 
+  /**
+   * checks for user email input and changes the state accordingly based on whether it's valid or not
+   * @param {*} e - event triggering this function
+   */
   emailChange(e) {
     this.setState({
       email: e.target.value
@@ -148,6 +165,10 @@ class RegisterPage extends React.Component {
     }
   }
 
+   /**
+   * checks for user first name input and changes the state accordingly based on whether it's valid or not
+   * @param {*} e - event triggering this function
+   */
   firstNameChange(e) {
     this.setState({
       firstName: e.target.value
@@ -163,6 +184,10 @@ class RegisterPage extends React.Component {
     }
   }
 
+   /**
+   * checks for user last name input and changes the state accordingly based on whether it's valid or not
+   * @param {*} e - event triggering this function
+   */
   lastNameChange(e) {
     this.setState({
       lastName: e.target.value
@@ -178,6 +203,10 @@ class RegisterPage extends React.Component {
     }
   }
 
+   /**
+   * checks for user password input and changes the state accordingly based on whether it's valid or not
+   * @param {*} e - event triggering this function
+   */
   passwordChange(e) {
     this.setState({
       password: e.target.value
@@ -198,10 +227,17 @@ class RegisterPage extends React.Component {
     }
   }
 
+  /**
+   * tooltip for password strength
+   */
   toggleToolTip = () => {
     this.setState({ accountToolTipState: !this.state.accountToolTipState })
   }
 
+   /**
+   * checks for user number input and changes the state accordingly based on whether it's valid or not
+   * @param {*} e - event triggering this function
+   */
   numberChange(e) {
     this.setState({
       number: e.target.value
@@ -217,6 +253,9 @@ class RegisterPage extends React.Component {
     }
   }
 
+  /**
+   * checks if all of the input are valid
+   */
   isValidated() {
     if (this.state.firstNameState !== " has-success") {
       this.setState({
@@ -267,15 +306,19 @@ class RegisterPage extends React.Component {
     return true;
   }
 
-  handleUserInput = (event) => {
+ 
+ /*  handleUserInput = (event) => {
     this.setState({
       [event.target.name]: event.target.value,
     });
-  };
+  }; */
 
 
 
-
+  /**
+   * when user clicks on "Register"
+   * @param {*} event - event triggering this function
+   */
   handleSubmit = (event) => {
 
 
@@ -315,6 +358,9 @@ class RegisterPage extends React.Component {
     event.preventDefault();
   }
 
+  /**
+   * submit details to server via RESTful api
+   */
   registerViaServer = () => {
 
 
@@ -382,15 +428,23 @@ class RegisterPage extends React.Component {
   } */
 
 
-  //Dialog
+  /**
+   * open OTP dialog
+   */
   openDialog = () => {
     this.setState({ openDialog: true })
   }
 
+  /**
+   * close OTP dialog
+   */
   closeDialog = () => {
     this.setState({ openDialog: false })
   }
 
+  /**
+   * when user completes OTP check
+   */
   completedDialog = () => {
     this.setState({
       dialogFinish: true,
@@ -399,6 +453,9 @@ class RegisterPage extends React.Component {
 
   }
 
+  /**
+   * render loading button
+   */
   renderLoading() {
     return (
 
@@ -413,7 +470,9 @@ class RegisterPage extends React.Component {
     )
   }
 
-
+  /**
+   * render register page
+   */
   render() {
     return (
       <>

@@ -113,9 +113,12 @@ class BankAccountDetails extends React.Component {
             bankAccountDetails: '',
             bankStatementRenderLoading: false,
             bankStatementVerificationLoading: false,
-            infoState: false,
-            verifyInfoState: false,
+            infoState: false, //tooltip
+            verifyInfoState: false, //tooltip
 
+            /**
+             * file upload states for bank statement, credit card and transaction history
+             */
             singleSelect: null,
             singleFileName: "",
             singleFile: null,
@@ -137,12 +140,16 @@ class BankAccountDetails extends React.Component {
             maxProgress: '',
             percentage: 0,
 
+            
             showPdfDetails: false,
+
+            //placeholder object for parsed data, the attributes will be increased in the functions
             PdfDetails: {
                 startDate: '',
                 endDate: ''
             },
 
+            //placeholder object for user input data, the attributes will be increased in the functions
             userInputPdfDetails: {
                 startDate: '',
                 endDate: ''
@@ -158,6 +165,7 @@ class BankAccountDetails extends React.Component {
                 wealth: 0
             } */
 
+            //settings for chart
             chartDetails : {
                 label: [],
                 interestEarned: [],
@@ -286,19 +294,31 @@ class BankAccountDetails extends React.Component {
         }
     }
 
+    /**
+     * triggers askForFeedback() function in FeedbackPlugin.jsx
+     */
     askforFeedback = () => {
         this.refs.feedbackPlugin.askforFeedback()
     }
 
+    /**
+     * triggers closeFeedBack() function in FeedbackPlugin.jsx
+     */
     closeFeedback = () => {
         this.refs.feedbackPlugin.closeFeedback()
     }
 
+    /**
+     * when page loads, 2 scenarios happen
+     * 1. user came from Dashboard.jsx or Banks.jsx and the specific bank account is pushed from there. The bank account will be set onto the state
+     * 2. use refreshes the page, the bank specific bank account is fetched from the localStorage
+     * it will proceed to retrieve previous recommendations and chart information
+     */
     componentDidMount = () => {
        
 
         if (this.props.location.data) {
-            this.setState({ bankAccountDetails: this.props.location.data, JWT_Token: cookie.load('JWT_Token') }, () => {
+            this.setState({ bankAccountDetails: this.props.location.data}, () => {
                 /* (() => { this.retrievePreviousRecommendations() })
                 (() => { localStorage.setItem("bankAccountDetails", JSON.stringify(this.state.bankAccountDetails)) }) */
                 this.retrievePreviousRecommendations()
@@ -307,7 +327,7 @@ class BankAccountDetails extends React.Component {
             })
         } else {
             var bankAccountDetails = localStorage.getItem("bankAccountDetails")
-            this.setState({ bankAccountDetails: JSON.parse(bankAccountDetails), JWT_Token: cookie.load('JWT_Token') }, () => {
+            this.setState({ bankAccountDetails: JSON.parse(bankAccountDetails)}, () => {
                 this.retrievePreviousRecommendations()
                 this.retrieveChartDetails()
             })
@@ -318,13 +338,14 @@ class BankAccountDetails extends React.Component {
 
     }
 
+    /**
+     * retrieves the chart information of a user bank account
+     */
     retrieveChartDetails = () => {
         axios({
             method: 'post',
             url: `${api}/getParametersForGraph`,
-            headers: {
-                authorisation: `Bearer ${this.state.JWT_Token}`
-            },
+            withCredentials: true,
             data: {
                 userId: this.state.bankAccountDetails.userId,
                 accountTypeid: this.state.bankAccountDetails.accountTypeId
@@ -361,6 +382,10 @@ class BankAccountDetails extends React.Component {
         })
     }
 
+    /**
+     * retrieves latest recommendations of a user bank account
+     * the percentage for the current tier and max tier is calculated here
+     */
     retrievePreviousRecommendations = () => {
         this.setState({ currentProgress: 0 })
         this.setState({ maxProgress: 0 })
@@ -420,19 +445,41 @@ class BankAccountDetails extends React.Component {
         })
     }
 
-    singleFile = React.createRef();
-    ccStatement = React.createRef();
-    transactionHistory = React.createRef();
+    
 
+    /**
+     * 
+     * @param {*} place - place to notify
+     * @param {*} color - color of notification
+     */
     notify(place, color) {
         this.refs.notificationAlert.notificationAlert(CustomNotification.notify(place, color, this.state.message));
     }
 
+    /**
+     * creates references for the 3 input file upload
+     * these are necessary to hide the input file upload button, and to let the custom upload button reference this
+     */
+    singleFile = React.createRef();
+    ccStatement = React.createRef();
+    transactionHistory = React.createRef();
+
+    /**
+     * clicks on the element based on the type
+     * the type is either singleFile, ccStatement, or transactionHistory reference created earlier on
+     * @param {*} e - event triggering this function
+     * @param {*} type - referencing element
+     */
     handleFileInput = (e, type) => {
         this[type].current.click(e);
     };
 
-
+    /**
+     * checks if the file uploaded is a PDF and sets it onto the state
+     * @param {*} e - event triggering this function
+     * @param {*} type - the file type set by the input upload element
+     * @param {*} id - id of the element
+     */
     addFile = (e, type, id) => {
 
         let fileNames = "";
@@ -522,6 +569,9 @@ class BankAccountDetails extends React.Component {
 
     };
 
+    /**
+     * removes the bank statement from the state
+     */
     clearBankStatement = () => {
         this.setState(
             {
@@ -531,6 +581,9 @@ class BankAccountDetails extends React.Component {
         )
     }
 
+    /**
+     * removes the transaction history from the state
+     */
     cleartTransactionHistory = () => {
         this.setState(
             {
@@ -540,6 +593,9 @@ class BankAccountDetails extends React.Component {
          )
     }
 
+    /**
+     * removes the credit card statement from the state
+     */
     clearCCStatement = () => {
         this.setState(
             {
@@ -549,6 +605,10 @@ class BankAccountDetails extends React.Component {
         )
     }
 
+    /**
+     * user clicks on submit
+     * sends form data to RESTful api and transforms parsedData dynamically into fields for user to verify
+     */
     uploadBankStatement = () => {
 
        
@@ -686,7 +746,10 @@ class BankAccountDetails extends React.Component {
             
         }
     
-
+    /**
+     * sets the state of userInputPdfDetails whenever they type an input
+     * @param {*} event - event triggering this function
+     */
     handleUserInputOnPdfDetails = (event) => {
        
 
@@ -702,6 +765,11 @@ class BankAccountDetails extends React.Component {
         })
     }
 
+    /**
+     * special event handler to take care of user input dates
+     * @param {*} moment - date retrieved from calendar element
+     * @param {*} name - name of the element
+     */
     handleDateTime = (moment, name) => {
 
         var canUpdate = true
@@ -745,6 +813,10 @@ class BankAccountDetails extends React.Component {
 
     }
 
+    /**
+     * submits the data after user verification via RESTful api
+     * @param {*} event - event triggering this function
+     */
     checkPDFDetailsSubmit = (event) => {
         event.preventDefault();
 
@@ -833,35 +905,49 @@ class BankAccountDetails extends React.Component {
         })
     }
 
+    /**
+     * user closes the verification page
+     */
     checkPDFDetailsCancel = () => {
         this.setState({ showPdfDetails: false })
     }
 
+    /**
+     * changes state when user toggles tooltip
+     * this tooltip is at "Upload financial statements"
+     */
     toggleToolTip = () => {
         this.setState({ infoState: !this.state.infoState })
     }
 
+    /**
+     * changes syaye when user toggles tooltip
+     * this tooltip is at "Verification"
+     */
     toggleVerifyInfoToolTip = () => {
         this.setState({ verifyInfoState: !this.state.verifyInfoState})
     }
 
-    //I got this regex from stackoverflow to transform the variable name to cap each first letter 
-    //and a space in between each word from camelCase
+    /**
+     * I got this regex from stackoverflow to transform the variable name to cap each first letter 
+     * and a space in between each word from camelCase
+     * @param {*} string - input string
+     */
     formatString = (string) => {
-        var result = string                         // "ToGetYourGEDInTimeASongAboutThe26ABCsIsOfTheEssenceButAPersonalIDCardForUser456InRoom26AContainingABC26TimesIsNotAsEasyAs123ForC3POOrR2D2Or2R2D"
-            .replace(/([a-z])([A-Z][a-z])/g, "$1 $2")           // "To Get YourGEDIn TimeASong About The26ABCs IsOf The Essence ButAPersonalIDCard For User456In Room26AContainingABC26Times IsNot AsEasy As123ForC3POOrR2D2Or2R2D"
-            .replace(/([A-Z][a-z])([A-Z])/g, "$1 $2")           // "To Get YourGEDIn TimeASong About The26ABCs Is Of The Essence ButAPersonalIDCard For User456In Room26AContainingABC26Times Is Not As Easy As123ForC3POOr R2D2Or2R2D"
-            .replace(/([a-z])([A-Z]+[a-z])/g, "$1 $2")          // "To Get Your GEDIn Time ASong About The26ABCs Is Of The Essence But APersonal IDCard For User456In Room26AContainingABC26Times Is Not As Easy As123ForC3POOr R2D2Or2R2D"
-            .replace(/([A-Z]+)([A-Z][a-z][a-z])/g, "$1 $2")     // "To Get Your GEDIn Time A Song About The26ABCs Is Of The Essence But A Personal ID Card For User456In Room26A ContainingABC26Times Is Not As Easy As123ForC3POOr R2D2Or2R2D"
-            .replace(/([a-z]+)([A-Z0-9]+)/g, "$1 $2")           // "To Get Your GEDIn Time A Song About The 26ABCs Is Of The Essence But A Personal ID Card For User 456In Room 26A Containing ABC26Times Is Not As Easy As 123For C3POOr R2D2Or 2R2D"
+        var result = string                         
+            .replace(/([a-z])([A-Z][a-z])/g, "$1 $2")           
+            .replace(/([A-Z][a-z])([A-Z])/g, "$1 $2")           
+            .replace(/([a-z])([A-Z]+[a-z])/g, "$1 $2")          
+            .replace(/([A-Z]+)([A-Z][a-z][a-z])/g, "$1 $2")     
+            .replace(/([a-z]+)([A-Z0-9]+)/g, "$1 $2")           
             
             // Note: the next regex includes a special case to exclude plurals of acronyms, e.g. "ABCs"
-            .replace(/([A-Z]+)([A-Z][a-rt-z][a-z]*)/g, "$1 $2") // "To Get Your GED In Time A Song About The 26ABCs Is Of The Essence But A Personal ID Card For User 456In Room 26A Containing ABC26Times Is Not As Easy As 123For C3PO Or R2D2Or 2R2D"
-            .replace(/([0-9])([A-Z][a-z]+)/g, "$1 $2")          // "To Get Your GED In Time A Song About The 26ABCs Is Of The Essence But A Personal ID Card For User 456In Room 26A Containing ABC 26Times Is Not As Easy As 123For C3PO Or R2D2Or 2R2D"  
+            .replace(/([A-Z]+)([A-Z][a-rt-z][a-z]*)/g, "$1 $2") 
+            .replace(/([0-9])([A-Z][a-z]+)/g, "$1 $2")           
 
             // Note: the next two regexes use {2,} instead of + to add space on phrases like Room26A and 26ABCs but not on phrases like R2D2 and C3PO"
-            .replace(/([A-Z]{2,})([0-9]{2,})/g, "$1 $2")        // "To Get Your GED In Time A Song About The 26ABCs Is Of The Essence But A Personal ID Card For User 456 In Room 26A Containing ABC 26 Times Is Not As Easy As 123 For C3PO Or R2D2 Or 2R2D"
-            .replace(/([0-9]{2,})([A-Z]{2,})/g, "$1 $2")        // "To Get Your GED In Time A Song About The 26 ABCs Is Of The Essence But A Personal ID Card For User 456 In Room 26A Containing ABC 26 Times Is Not As Easy As 123 For C3PO Or R2D2 Or 2R2D"
+            .replace(/([A-Z]{2,})([0-9]{2,})/g, "$1 $2")        
+            .replace(/([0-9]{2,})([A-Z]{2,})/g, "$1 $2")        
             .trim();
 
 
@@ -871,8 +957,9 @@ class BankAccountDetails extends React.Component {
 
     
    
-
-    //Render form to let user submit what the PDF parser parsed
+    /**
+     * Render form to let user submit what the PDF parser parsed
+     */
     renderCheckPDFDetails = () => {
         return (
             <>
@@ -1383,7 +1470,9 @@ class BankAccountDetails extends React.Component {
         )
     }
 
-    //Render recommendations and card to upload financial statements
+    /**
+     * Render recommendations and card to upload financial statements
+     */
     renderNormal = () => {
         return (
             <>
@@ -1810,7 +1899,9 @@ class BankAccountDetails extends React.Component {
 
 
 
-
+    /**
+     * determines whether to renderNormal() or renderCheckPDFDetails() based on what the user clicks
+     */
     render() {
         return (
             <>

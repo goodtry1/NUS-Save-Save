@@ -476,7 +476,7 @@ app.post('/api/fetchAccountType', authenticateToken, (req, res) => {
 })
 
 //get the paramters for the graph
-app.post('/api/getParametersForGraph', (req, res) =>  {
+app.post('/api/getParametersForGraph', authenticateToken, (req, res) =>  {
 	userId = req.body.userId;
     //console.log('userId' + userId)
     accountTypeid = req.body.accountTypeid;
