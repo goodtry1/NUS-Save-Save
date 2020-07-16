@@ -629,11 +629,21 @@ app.post('/api/updateParsedData', authenticateToken, (req, res) => {
 	sql.connect(sqlConfig, function () {
 		var request = new sql.Request();
 
-		let qu = `INSERT INTO dbo.[parsedBankStatementData](dateAnalysed, userId, accountTypeId, previousMonthBalance, salary, currentMonthBalance, averageDailyBalance, creditCardSpend, startDate, endDate, 
+		if(req.body.accountTypeId == 2)
+		{
+			let qu = `INSERT INTO dbo.[parsedBankStatementData](dateAnalysed, userId, accountTypeId, previousMonthBalance, salary, currentMonthBalance, averageDailyBalance, creditCardSpend, startDate, endDate, 
 			userInputPreviousMonthBalance, userInputSalary, userInputCurrentMonthBalance, userInputAverageDailyBalance, userInputCreditCardSpend, userInputStartDate, userInputEndDate) 
 		   VALUES ( '`+ dateAnalysed + `', '` + req.body.userId + `', '` + req.body.accountTypeId + `', '` + result['previousMonthBalance'] + `' , '` + result['salary'] + `' , '` + result['currentMonthBalance'] + `' , '` + result['averageDailyBalance'] + `', '` + result['creditCardSpend'] + `', '` + result['startDate'] + `', '` + result['endDate'] + `', 
 		   '` + userInput['previousMonthBalance'] + `', '` + userInput['salary'] + `', '` + userInput['currentMonthBalance'] + `', '` + userInput['averageDailyBalance'] + `', '` + userInput['creditCardSpend'] + `', '` + userInput['startDate'] + `', '` + userInput['endDate'] + `')`;
-
+		}
+		else if(req.body.accountTypeId == 1)
+		{
+			let qu = `INSERT INTO dbo.[parsedBankStatementData](dateAnalysed, userId, accountTypeId, previousMonthBalance, salary, currentMonthBalance, creditCardSpend, startDate, endDate, insurance, investments, homeLoan, 
+			userInputPreviousMonthBalance, userInputSalary, userInputCurrentMonthBalance, userInputCreditCardSpend, userInputStartDate, userInputEndDate, userInputInsurance, userInputInvestments, userInputHomeLoan) 
+		   VALUES ( '`+ dateAnalysed + `', '` + req.body.userId + `', '` + req.body.accountTypeId + `', '` + result['previousMonthBalance'] + `' , '` + result['salary'] + `' , '` + result['currentMonthBalance'] + `' , '` + result['creditCardSpend'] + `', '` + result['startDate'] + `', '` + result['endDate'] + `', '` + result['insurance'] + `', '` + result['investments'] + `','` + result['homeLoan'] + `',
+		   '` + userInput['previousMonthBalance'] + `', '` + userInput['salary'] + `', '` + userInput['currentMonthBalance'] + `', '` + `', '` + userInput['creditCardSpend'] + `', '` + userInput['startDate'] + `', '` + userInput['endDate'] + `','` + userInput['insurance'] + `', '` + userInput['investments'] + `','` + userInput['homeLoan'] + `')`;
+		
+		}
 		console.log(qu)
 		request.query(qu, function (error, recordset) {
 			if (error) {
@@ -664,7 +674,7 @@ function launchParseCard(options, dataBufferCard) {
 function launchParseBankStatement(options, filename, accountTypeId) {
     return new promise(function (resolve, reject) {
         let dataBufferStatement = fs.readFileSync(filename);
-		if (accountTypeId == 1)
+		if (accountTypeId == 2)
 		{
 			PDFParser(dataBufferStatement, options).then(async function (data) {
 				var random = randomize('0', 6);
@@ -674,7 +684,7 @@ function launchParseBankStatement(options, filename, accountTypeId) {
 				resolve(result);
 			});
 		}
-        else if (accountTypeId == 2)
+        else if (accountTypeId == 1)
 		{
 			pdfUtil.pdfToText(filename, async function(err, data) {
 				var random = randomize('0', 6);
@@ -695,9 +705,9 @@ function launchParseTransactionHistory(options, filename, accountTypeId)
 			var random = randomize('0', 6);
 			var filename = './uploads/resultTransactions' + String(random) + '.txt'
 			fs.writeFileSync(filename, data);
-			if(accountTypeId == 1)
+			if(accountTypeId == 2)
 				parseData  = await parser.parseTransactionHistoryOCBC360(filename);
-			else if(accountTypeId == 2)
+			else if(accountTypeId == 1)
 				parseData  = await parser.parseTransactionHistoryDBSMultiplier(filename);
 			resolve (parseData);
 		});

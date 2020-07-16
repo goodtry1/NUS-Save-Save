@@ -29,7 +29,7 @@ function initializeParseDataDBS()
 		result['creditCardSpend'] = 0;
 		result['homeLoan']  = 0;
 		result['insurance']  = 0;
-		result['investment']  = 0;
+		result['investments']  = 0;
 		resolve (result);
   });
 }
