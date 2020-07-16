@@ -71,6 +71,8 @@ class RegisterPage extends React.Component {
       emailState: "",
       password: '',
       passwordState: '',
+      reTypePassword: '',
+      reTypePasswordState: '',
       firstName: '',
       firstNameState: '',
       lastNameState: '',
@@ -210,6 +212,20 @@ class RegisterPage extends React.Component {
   passwordChange(e) {
     this.setState({
       password: e.target.value
+    }, () => {
+      if (this.state.reTypePassword === this.state.password) {
+
+
+
+        this.setState({
+          reTypePasswordState: " has-success"
+        });
+      } else {
+        this.setState({
+          reTypePasswordState: " has-danger"
+        });
+      }
+
     });
 
     //8 to 15 characters which contain at least one lowercase letter, one uppercase letter, one numeric digit, and one special character
@@ -218,13 +234,28 @@ class RegisterPage extends React.Component {
       this.setState({
         passwordState: " has-success"
       });
-      //console.log("pw regex pass");
     } else {
       this.setState({
         passwordState: " has-danger"
       });
-      //console.log("pw regex fail");
     }
+  }
+
+  
+  reTypePasswordChange(e) {
+    this.setState({
+      reTypePassword: e.target.value
+    }, () => {
+      if (this.state.reTypePassword === this.state.password) {
+        this.setState({
+          reTypePasswordState: " has-success"
+        });
+      } else {
+        this.setState({
+          reTypePasswordState: " has-danger"
+        });
+      }
+    });
   }
 
   /**
@@ -641,18 +672,45 @@ class RegisterPage extends React.Component {
                             onChange={e => this.passwordChange(e)}
                           />
                           {this.state.passwordState === " has-danger" ? (
-                            
+
                             <Tooltip placement="right" target="password" isOpen={this.state.passwordState === " has-danger"} >
                               Password must contain 8 to 15 characters which contain at least one lowercase letter,
                               one uppercase letter, one numeric digit, and one special character.
-                        </Tooltip>
-                        
+                            </Tooltip>
+
                           ) : (
                               <div />
                             )}
                         </InputGroup>
 
-                        
+                        <InputGroup
+                          className={
+                            "form-control-lg" +
+                            (this.state.reTypePasswordState ? this.state.reTypePasswordState : "") +
+                            (this.state.reTypePasswordFocus ? " input-group-focus" : "")
+                          }
+                        >
+                          <InputGroupAddon addonType="prepend">
+                            <InputGroupText>
+                              <i className="now-ui-icons objects_key-25" />
+                            </InputGroupText>
+                          </InputGroupAddon>
+                          <Input
+                            /* defaultValue={this.state.password} */
+                            id="reTypePassword"
+                            value={this.state.reTypePassword}
+                            type="password"
+                            placeholder="Retype Password (required)"
+                            name="reTypepassword"
+                            onFocus={e => this.setState({ reTypePasswordFocus: true })}
+                            onBlur={e => this.setState({ reTypePasswordFocus: false })}
+                            onChange={e => this.reTypePasswordChange(e)}
+                          />
+                          <Tooltip placement="right" target="reTypePassword" isOpen={(this.state.passwordState === " has-success") && (this.state.reTypePasswordState === " has-danger")} >
+                            Passwords do not match!
+                            </Tooltip>
+
+                        </InputGroup>
 
                         <InputGroup
                           className={
