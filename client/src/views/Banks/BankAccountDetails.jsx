@@ -827,8 +827,8 @@ class BankAccountDetails extends React.Component {
         var userInputPdfDetails = this.state.userInputPdfDetails
 
         //temp adding creditCardSpend attribute to avoid 'undefined' error from server
-        PdfDetails.creditCardSpend = 0
-        userInputPdfDetails.creditCardSpend = 0
+        /* PdfDetails.creditCardSpend = 0
+        userInputPdfDetails.creditCardSpend = 0 */
 
         Object.keys(userInputPdfDetails).forEach(function (key) {
            
