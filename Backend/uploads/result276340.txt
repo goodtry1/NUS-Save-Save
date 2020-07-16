@@ -1,0 +1,67 @@
+09/07/2020
+
+                                                    This is a print preview page
+
+                                                               Close this window.
+
+View Transaction History
+
+09 Jul 2020 10:42 AM Singapore
+
+       Modify Search
+
+DBS Multiplier Account 123-345678-1                                                       Total Balance: S$12,345.15
+
+Account Balance (as at 09 Jul 2020, 10:42 AM)
+
+Currency                                            SGD - Singapore Dollar Hold Balance
+
+ Available Balance                                  S$12,345.15 Half Day                                           S$0.00
+ Total Balance                                      S$12,345.15 1 Day                                              S$0.00
+ Overdraft Limit                                                                                                   S$0.00
+                                                           S$0.00 2 Days
+Transaction History (as at 09 Jul 2020, 10:42 AM )                                                         Transaction Codes
+
+                                                                                                           Download  Print
+
+Date         Value  Code Reference No.                                                              Debit               Credit
+             Date                                                                         (Withdrawal)               (Deposit)
+
+18 Jun 2020                                    ADV Advice                                 S$700.00
+                                                        TRF 123-456789-1 : I-BANK
+                                                        unodadhu
+
+17 Jun 2020                                    GR Payments or Collections via GIRO                         S$3,000.00
+                                                        PAY XYZ EMPLOYEE Singapore
+                                                        123456789
+
+12 Jun 2020                                    POS Point-of-Sale Transaction                                         S$7.27
+03 Jun 2020                                             BAT LAZADA SINGAPORE SI NG
+                                                        10JUN 1234-1234-1234-1234         S$1,800.00
+
+                                               ADV Advice
+                                                        TRF 123-12345-1 : I-BANK
+                                                        June Month Rent
+
+03 Jun 2020                                    POS Point-of-Sale Transaction              S$39.87
+                                                        BAT SHOPEE - SINGAPORE SI NG
+                                                        29MAY 1234-1234-1234-1234
+
+02 Jun 2020                                    POS Point-of-Sale Transaction              S$20.90
+02 Jun 2020                                             BAT GRAB *123456789-1-123 SI      S$22.21
+01 Jun 2020                                             NG 01JUN 1234-1234-1234-1234
+                                                                                                                     S$20.00
+                                               POS Point-of-Sale Transaction
+                                                        BAT LAZADA SINGAPORE SI NG
+                                                        29MAY 1234-1234-1234-1234
+
+                                               ADV Advice
+                                                        ICT Incoming PayNow Ref
+                                                        1234567
+                                                        From: LIM QINGYAN
+                                                        OTHR Fintech Lab Lunch
+
+                                                                                   Total  S$2,582.98       S$3,027.27
+
+                                                                                                                                1/1
+

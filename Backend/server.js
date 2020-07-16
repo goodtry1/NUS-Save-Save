@@ -242,7 +242,7 @@ app.post("/api/logOut", (req, res) => {
 app.get('/api/bankdetails', function (req, res) {
 	sql.connect(sqlConfig, function () {
 		var request = new sql.Request();
-		request.query('select * from dbo.bank where bankId = 2', function (error, results) {
+		request.query('select * from dbo.bank', function (error, results) {
 			if (error) {
 				console.log("error occured");
 				res.status(400).send()
@@ -570,7 +570,7 @@ function retrievePassword(userId) {
 let uploadConfig = upload.fields([{ name: 'bankStatement', maxCount: 1 }, { name: 'creditCard', maxCount: 1 }, { name: 'transactionHistory', maxCount: 1 }]);
 
 //upload bank account statement client passes userId and accountTypeId
-app.post('/api/uploadBankStatement', uploadConfig, authenticateToken, async (req, res) => {
+app.post('/api/uploadBankStatement', uploadConfig/* , authenticateToken */, async (req, res) => {
 
 
 	const options = {
