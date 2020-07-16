@@ -411,6 +411,20 @@ function parseTransactionHistoryDBSMultiplier(filename)
 			console.log(array)
 			result['date'] = array[0]
 		}
+		
+		for (var count =0; count<i; count++)
+		{
+			var index  = giroPay[count];
+			let line =  textMap.get(index+1);
+			if(line.includes('PAY'))
+			{
+				let array = textMap.get(index).trim().split("  ").filter(function(value, index, arr){ return value !=  "";});
+				console.log(array)
+				result['salary'] = parseFloat(array[2].replace('S$', '').replace(/\s|,|/g, ''));
+			}
+			
+		}
+		
 	});
   
   });
