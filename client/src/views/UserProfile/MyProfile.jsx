@@ -32,6 +32,10 @@ import { Spring } from 'react-spring/renderprops'
 
 import { User } from '../../models/User'
 
+import moment from "moment";
+
+import "moment-timezone"
+
 export class MyProfile extends Component {
     constructor(props) {
         super(props);
@@ -305,7 +309,9 @@ export class MyProfile extends Component {
                                     </div>
                                     <p className="description text-center">
                                         {this.state.user.contactNo} <br />
-                                        {this.state.user.joinDate}
+                                        {moment(this.state.user.joinDate)
+                  .tz("Singapore")
+                  .format('DD-MMMM-YYYY')}
 
                                     </p>
                                 </CardBody>
@@ -373,7 +379,9 @@ export class MyProfile extends Component {
                                                             <FormGroup>
                                                                 <label>Joined Date (disabled)</label>
                                                                 <Input
-                                                                    defaultValue={this.state.updatedUser.joinDate}
+                                                                    defaultValue={moment(this.state.user.joinDate)
+                                                                        .tz("Singapore")
+                                                                        .format('DD-MMMM-YYYY')}
                                                                     disabled
                                                                     placeholder="Company"
                                                                     type="text"
