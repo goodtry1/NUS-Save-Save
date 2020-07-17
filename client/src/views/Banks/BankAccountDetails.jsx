@@ -87,7 +87,7 @@ import Datetime from "react-datetime";
 import ProgressBar from 'react-bootstrap/ProgressBar'
 
 //PDFDetails model
-import { PDFDetails } from '../../models/PDFDetails'
+//import { PDFDetails } from '../../models/PDFDetails'
 
 
 
@@ -113,8 +113,12 @@ class BankAccountDetails extends React.Component {
             bankAccountDetails: '',
             bankStatementRenderLoading: false,
             bankStatementVerificationLoading: false,
-            infoState: false,
+            infoState: false, //tooltip
+            verifyInfoState: false, //tooltip
 
+            /**
+             * file upload states for bank statement, credit card and transaction history
+             */
             singleSelect: null,
             singleFileName: "",
             singleFile: null,
@@ -136,19 +140,21 @@ class BankAccountDetails extends React.Component {
             maxProgress: '',
             percentage: 0,
 
+            
             showPdfDetails: false,
+
+            //placeholder object for parsed data, the attributes will be increased in the functions
             PdfDetails: {
-                previousMonthBalance: 0,
                 startDate: '',
-                endDate: '',
-                salary: 0,
-                currentMonthBalance: 0,
-                creditCardSpend: 0,
-                averageDailyBalance: 0,
-                wealth: 0
+                endDate: ''
             },
 
+            //placeholder object for user input data, the attributes will be increased in the functions
             userInputPdfDetails: {
+                startDate: '',
+                endDate: ''
+            },
+            /* {
                 previousMonthBalance: '',
                 startDate: '',
                 endDate: '',
@@ -156,9 +162,10 @@ class BankAccountDetails extends React.Component {
                 currentMonthBalance: '',
                 creditCardSpend: '',
                 averageDailyBalance: '',
-                wealth: ''
-            },
+                wealth: 0
+            } */
 
+            //settings for chart
             chartDetails : {
                 label: [],
                 interestEarned: [],
@@ -197,7 +204,7 @@ class BankAccountDetails extends React.Component {
                         data: this.state.chartDetails.interestEarned
                       }, 
                       {
-                        label: "Interest you could have earned (S$)",
+                        label: "Additional interest you could have earned (S$)",
                         borderColor: "#00ff00",
                         pointBorderColor: "#00ff00",
                         pointBackgroundColor: "#2c2c2c",
@@ -287,19 +294,31 @@ class BankAccountDetails extends React.Component {
         }
     }
 
+    /**
+     * triggers askForFeedback() function in FeedbackPlugin.jsx
+     */
     askforFeedback = () => {
         this.refs.feedbackPlugin.askforFeedback()
     }
 
+    /**
+     * triggers closeFeedBack() function in FeedbackPlugin.jsx
+     */
     closeFeedback = () => {
         this.refs.feedbackPlugin.closeFeedback()
     }
 
+    /**
+     * when page loads, 2 scenarios happen
+     * 1. user came from Dashboard.jsx or Banks.jsx and the specific bank account is pushed from there. The bank account will be set onto the state
+     * 2. use refreshes the page, the bank specific bank account is fetched from the localStorage
+     * it will proceed to retrieve previous recommendations and chart information
+     */
     componentDidMount = () => {
-        
+       
 
         if (this.props.location.data) {
-            this.setState({ bankAccountDetails: this.props.location.data, JWT_Token: cookie.load('JWT_Token') }, () => {
+            this.setState({ bankAccountDetails: this.props.location.data}, () => {
                 /* (() => { this.retrievePreviousRecommendations() })
                 (() => { localStorage.setItem("bankAccountDetails", JSON.stringify(this.state.bankAccountDetails)) }) */
                 this.retrievePreviousRecommendations()
@@ -308,7 +327,7 @@ class BankAccountDetails extends React.Component {
             })
         } else {
             var bankAccountDetails = localStorage.getItem("bankAccountDetails")
-            this.setState({ bankAccountDetails: JSON.parse(bankAccountDetails), JWT_Token: cookie.load('JWT_Token') }, () => {
+            this.setState({ bankAccountDetails: JSON.parse(bankAccountDetails)}, () => {
                 this.retrievePreviousRecommendations()
                 this.retrieveChartDetails()
             })
@@ -319,13 +338,14 @@ class BankAccountDetails extends React.Component {
 
     }
 
+    /**
+     * retrieves the chart information of a user bank account
+     */
     retrieveChartDetails = () => {
         axios({
             method: 'post',
             url: `${api}/getParametersForGraph`,
-            headers: {
-                authorisation: `Bearer ${this.state.JWT_Token}`
-            },
+            withCredentials: true,
             data: {
                 userId: this.state.bankAccountDetails.userId,
                 accountTypeid: this.state.bankAccountDetails.accountTypeId
@@ -362,6 +382,10 @@ class BankAccountDetails extends React.Component {
         })
     }
 
+    /**
+     * retrieves latest recommendations of a user bank account
+     * the percentage for the current tier and max tier is calculated here
+     */
     retrievePreviousRecommendations = () => {
         this.setState({ currentProgress: 0 })
         this.setState({ maxProgress: 0 })
@@ -409,19 +433,41 @@ class BankAccountDetails extends React.Component {
         })
     }
 
-    singleFile = React.createRef();
-    ccStatement = React.createRef();
-    transactionHistory = React.createRef();
+    
 
+    /**
+     * 
+     * @param {*} place - place to notify
+     * @param {*} color - color of notification
+     */
     notify(place, color) {
         this.refs.notificationAlert.notificationAlert(CustomNotification.notify(place, color, this.state.message));
     }
 
+    /**
+     * creates references for the 3 input file upload
+     * these are necessary to hide the input file upload button, and to let the custom upload button reference this
+     */
+    singleFile = React.createRef();
+    ccStatement = React.createRef();
+    transactionHistory = React.createRef();
+
+    /**
+     * clicks on the element based on the type
+     * the type is either singleFile, ccStatement, or transactionHistory reference created earlier on
+     * @param {*} e - event triggering this function
+     * @param {*} type - referencing element
+     */
     handleFileInput = (e, type) => {
         this[type].current.click(e);
     };
 
-
+    /**
+     * checks if the file uploaded is a PDF and sets it onto the state
+     * @param {*} e - event triggering this function
+     * @param {*} type - the file type set by the input upload element
+     * @param {*} id - id of the element
+     */
     addFile = (e, type, id) => {
 
         let fileNames = "";
@@ -511,6 +557,9 @@ class BankAccountDetails extends React.Component {
 
     };
 
+    /**
+     * removes the bank statement from the state
+     */
     clearBankStatement = () => {
         this.setState(
             {
@@ -520,6 +569,9 @@ class BankAccountDetails extends React.Component {
         )
     }
 
+    /**
+     * removes the transaction history from the state
+     */
     cleartTransactionHistory = () => {
         this.setState(
             {
@@ -529,6 +581,9 @@ class BankAccountDetails extends React.Component {
          )
     }
 
+    /**
+     * removes the credit card statement from the state
+     */
     clearCCStatement = () => {
         this.setState(
             {
@@ -538,6 +593,10 @@ class BankAccountDetails extends React.Component {
         )
     }
 
+    /**
+     * user clicks on submit
+     * sends form data to RESTful api and transforms parsedData dynamically into fields for user to verify
+     */
     uploadBankStatement = () => {
 
        
@@ -577,6 +636,30 @@ class BankAccountDetails extends React.Component {
 
                 if (res.status === 200) {
 
+
+                    /* Retrieve all the attributes required from the parsedData object */
+                    let parsedData = res.data.parsedData
+                    let PdfDetails = this.state.PdfDetails
+                    let userInputPdfDetails = this.state.userInputPdfDetails
+
+                    Object.keys(parsedData).forEach(function (key) {
+                        
+                    if (key === 'date') {
+
+                    } else {
+
+                        PdfDetails[key] = parsedData[key]
+                        userInputPdfDetails[key] = ''  
+                       
+                    }
+
+                      
+                                
+                    })
+
+
+
+
                     var d1 = new moment()
                     var d2 = new moment()
 
@@ -596,30 +679,34 @@ class BankAccountDetails extends React.Component {
                     }
                     
 
-                    /* console.log(d1)
-                    console.log(d2) */
-
-                    let userInputPdfDetails = this.state.userInputPdfDetails
+                    
+                    PdfDetails.startDate = d1
+                    PdfDetails.endDate = d2
+                    this.setState({ PdfDetails }, () => {
+                       
+                    })
+                    
                     userInputPdfDetails.startDate = d1
                     userInputPdfDetails.endDate = d2
                     this.setState({ userInputPdfDetails })
 
+                    
 
 
-
-                    let PdfDetails = new PDFDetails(res.data.parsedData.previousMonthBalance,
+                   /*  let PdfDetails = new PDFDetails(res.data.parsedData.previousMonthBalance,
                         res.data.parsedData.currentMonthBalance,
                         res.data.parsedData.averageDailyBalance,
                         d1,
                         d2,
                         res.data.parsedData.salary,
-                        res.data.parsedData.creditCardSpend)
+                        res.data.parsedData.creditCardSpend? res.data.parsedData.creditCardSpend: 0) */
 
-                    this.setState({ PdfDetails: PdfDetails })
-                    this.setState({ message: 'Your bank statement has been uploaded successfully' }, () => {
+                    
+                    this.setState({ /* PdfDetails ,userInputPdfDetails , */message: 'Your bank statement has been uploaded successfully' }, () => {
                         setTimeout(() => {
+                            
                             this.setState({ showPdfDetails: true })
-
+                           
                             try {
                                 this.closeFeedback()
                             } catch (err) {
@@ -646,32 +733,10 @@ class BankAccountDetails extends React.Component {
             
         }
     
-
-
-    colSizeBankUpload = () => {
-        if (this.state.bankStatement) {
-            return 9
-        } else {
-            return 12
-        }
-    }
-
-    colSizeTransactionUpload = () => {
-        if (this.state.transactionHistory) {
-            return 9
-        } else {
-            return 12
-        }
-    }
-
-    colSizeCCUpload = () => {
-        if (this.state.ccStatement) {
-            return 9
-        } else {
-            return 12
-        }
-    }
-
+    /**
+     * sets the state of userInputPdfDetails whenever they type an input
+     * @param {*} event - event triggering this function
+     */
     handleUserInputOnPdfDetails = (event) => {
        
 
@@ -687,6 +752,11 @@ class BankAccountDetails extends React.Component {
         })
     }
 
+    /**
+     * special event handler to take care of user input dates
+     * @param {*} moment - date retrieved from calendar element
+     * @param {*} name - name of the element
+     */
     handleDateTime = (moment, name) => {
 
         var canUpdate = true
@@ -730,6 +800,10 @@ class BankAccountDetails extends React.Component {
 
     }
 
+    /**
+     * submits the data after user verification via RESTful api
+     * @param {*} event - event triggering this function
+     */
     checkPDFDetailsSubmit = (event) => {
         event.preventDefault();
 
@@ -739,6 +813,9 @@ class BankAccountDetails extends React.Component {
         var PdfDetails = this.state.PdfDetails
         var userInputPdfDetails = this.state.userInputPdfDetails
 
+        //temp adding creditCardSpend attribute to avoid 'undefined' error from server
+        /* PdfDetails.creditCardSpend = 0
+        userInputPdfDetails.creditCardSpend = 0 */
 
         Object.keys(userInputPdfDetails).forEach(function (key) {
            
@@ -756,7 +833,10 @@ class BankAccountDetails extends React.Component {
 
         var d1 = "";
         var d2 = "";
+        var d3 = "";
+        var d4 = "";
 
+        //Formatting moment into a string so it can be inserted into DB
         try {
             d1 = userInputPdfDetails.startDate.toString().split(" ")
             userInputPdfDetails.startDate = d1[2] + " " + d1[1] + " " + d1[3]
@@ -767,15 +847,21 @@ class BankAccountDetails extends React.Component {
            
         }
 
-        /* Processing Date */
-       
+        try {
+            PdfDetails = this.state.PdfDetails
 
+            d3 = PdfDetails.startDate.toString().split(" ")
+            PdfDetails.startDate = d3[2] + " " + d3[1] + " " + d3[3]
+    
+            d4 = PdfDetails.endDate.toString().split(" ")
+            PdfDetails.endDate = d4[2] + " " + d4[1] + " " + d4[3]
 
-       /*  var statementDate = userInputPdfDetails.startDate + " TO " + userInputPdfDetails.endDate
-        userInputPdfDetails.date = statementDate */
+            this.setState({ PdfDetails })
+        } catch (err) {
+           
+        }
 
         
-
 
 
 
@@ -786,11 +872,13 @@ class BankAccountDetails extends React.Component {
             data: {
                 userId: this.state.bankAccountDetails.userId,
                 accountTypeId: this.state.bankAccountDetails.accountTypeId,
-                parsedData: userInputPdfDetails
+                parsedData: this.state.PdfDetails,
+                userInput: userInputPdfDetails
             }
         }).then((res) => {
             this.setState({ message: "Your financial statements have been verified!" },
                 () => {
+                    
                     this.notify('br', 5)
                     setTimeout(() => {
                         this.setState({ showPdfDetails: false, bankStatementVerificationLoading: false })
@@ -807,15 +895,61 @@ class BankAccountDetails extends React.Component {
         })
     }
 
+    /**
+     * user closes the verification page
+     */
     checkPDFDetailsCancel = () => {
         this.setState({ showPdfDetails: false })
     }
 
+    /**
+     * changes state when user toggles tooltip
+     * this tooltip is at "Upload financial statements"
+     */
     toggleToolTip = () => {
         this.setState({ infoState: !this.state.infoState })
     }
 
-    //Render form to let user submit what the PDF parser parsed
+    /**
+     * changes syaye when user toggles tooltip
+     * this tooltip is at "Verification"
+     */
+    toggleVerifyInfoToolTip = () => {
+        this.setState({ verifyInfoState: !this.state.verifyInfoState})
+    }
+
+    /**
+     * I got this regex from stackoverflow to transform the variable name to cap each first letter 
+     * and a space in between each word from camelCase
+     * @param {*} string - input string
+     */
+    formatString = (string) => {
+        var result = string                         
+            .replace(/([a-z])([A-Z][a-z])/g, "$1 $2")           
+            .replace(/([A-Z][a-z])([A-Z])/g, "$1 $2")           
+            .replace(/([a-z])([A-Z]+[a-z])/g, "$1 $2")          
+            .replace(/([A-Z]+)([A-Z][a-z][a-z])/g, "$1 $2")     
+            .replace(/([a-z]+)([A-Z0-9]+)/g, "$1 $2")           
+            
+            // Note: the next regex includes a special case to exclude plurals of acronyms, e.g. "ABCs"
+            .replace(/([A-Z]+)([A-Z][a-rt-z][a-z]*)/g, "$1 $2") 
+            .replace(/([0-9])([A-Z][a-z]+)/g, "$1 $2")           
+
+            // Note: the next two regexes use {2,} instead of + to add space on phrases like Room26A and 26ABCs but not on phrases like R2D2 and C3PO"
+            .replace(/([A-Z]{2,})([0-9]{2,})/g, "$1 $2")        
+            .replace(/([0-9]{2,})([A-Z]{2,})/g, "$1 $2")        
+            .trim();
+
+
+        // capitalize the first letter
+        return result.charAt(0).toUpperCase() + result.slice(1);
+    }
+
+    
+   
+    /**
+     * Render form to let user submit what the PDF parser parsed
+     */
     renderCheckPDFDetails = () => {
         return (
             <>
@@ -841,7 +975,269 @@ class BankAccountDetails extends React.Component {
                         </CardHeader>
                         <CardBody>
                             <Form onSubmit={this.checkPDFDetailsSubmit} >
-                                <Row>
+                            <Table responsive style={{overflow: 'auto'}}>
+                                <thead className="text-primary">
+                                    
+                                    <tr>
+                                        
+                                        <th sm="3">
+                                            Variables
+                                        </th>
+
+                                        <th sm="3">
+                                            Extracted Values
+                                        </th>
+
+                                        <th sm="3">
+                                        
+                                            Verification
+
+                                            <i id="verification" className="now-ui-icons travel_info" />
+                                        </th>
+                                            <Tooltip placement="right" target="verification" isOpen={this.state.verifyInfoState} toggle={this.toggleVerifyInfoToolTip}>
+                                                You may input the correct information for each of the variables if the extracted information is inaccurate
+                                            </Tooltip>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                        <td>
+                                            Start Date
+                                        </td>
+
+                                        <td>
+                                            {moment(this.state.PdfDetails.startDate)
+                                                        .tz("Singapore")
+                                                        .format('DD/MM/YYYY')}
+                                        </td>
+
+                                        <td>
+                                            <Col sm="6">
+                                            
+                                                <Datetime
+                                                        inputProps={{
+                                                            placeholder: moment(this.state.PdfDetails.startDate)
+                                                                .tz("Singapore")
+                                                                .format('DD/MM/YYYY')
+                                                        }}
+                                                        dateFormat="DD/MM/YYYY"
+                                                        timeFormat={false}
+
+
+                                                        value={moment(this.state.userInputPdfDetails.startDate)
+                                                            .tz("Singapore")
+                                                            .format('DD/MM/YYYY')}
+                                                        onChange={moment => this.handleDateTime(moment, 'startDate')}
+                                                    />
+                                            
+                                            </Col>
+                                        </td>
+                                        
+                                        </tr>
+
+                                        <tr>
+                                        <td>
+                                            End Date
+                                        </td>
+
+                                        <td>
+                                            {moment(this.state.PdfDetails.endDate)
+                                                        .tz("Singapore")
+                                                        .format('DD/MM/YYYY')}
+                                        </td>
+
+                                        <td>
+                                            <Col sm="6">
+                                                <Datetime
+                                                        inputProps={{
+                                                            placeholder: moment(this.state.PdfDetails.endDate)
+                                                                .tz("Singapore")
+                                                                .format('DD/MM/YYYY')
+                                                        }}
+                                                        dateFormat="DD/MM/YYYY"
+                                                        timeFormat={false}
+
+
+                                                        value={moment(this.state.userInputPdfDetails.endDate)
+                                                            .tz("Singapore")
+                                                            .format('DD/MM/YYYY')}
+                                                        onChange={moment => this.handleDateTime(moment, 'endDate')}
+                                                    />
+                                            </Col>
+                                        </td>
+                                    </tr>
+
+                                        {this.state.PdfDetails && Object.keys(this.state.PdfDetails).map((key) => (
+                                            key !== 'startDate' && key !== 'endDate'? 
+                                            (
+                                                <tr key={key}>
+                                                    <td>
+                                                        {this.formatString(key)}
+                                                    </td>
+
+                                                    <td>
+                                                        {this.state.PdfDetails[key]}
+                                                    </td>
+
+                                                    <td>
+                                                        <Col sm="6">
+                                                            <Input
+                                                                    name={key}
+                                                                    type="number"
+                                                                    min="0.00"
+                                                                    max="1000000"
+                                                                    step="100"
+                                                                    placeholder={this.state.PdfDetails[key]}
+                                                                    onChange={this.handleUserInputOnPdfDetails}
+                                                                    width=""
+                                                                />
+                                                        </Col>
+                                                    </td>
+                                                </tr>
+                                            ) : (React.Fragment)
+                                            
+                                        ))}
+                                    
+                                      
+                                   
+                                   
+
+                                    
+
+                                    
+                                    
+
+                                   {/*  <tr>
+                                        <td>
+                                            This month's current balance         
+                                        </td>
+
+                                        <td>
+                                            {this.state.PdfDetails.currentMonthBalance}
+                                        </td>
+
+                                        <td>
+                                            <Col sm="6">
+                                                <Input
+                                                        name="currentMonthBalance"
+                                                        type="number"
+                                                        min="0.00"
+                                                        max="1000000"
+                                                        step="100"
+                                                        placeholder={this.state.PdfDetails.currentMonthBalance}
+                                                        onChange={this.handleUserInputOnPdfDetails}
+                                                        width=""
+                                                    />
+                                            </Col>
+                                        </td>
+
+                                    </tr>
+
+                                    <tr>
+                                        <td>
+                                            Previous month's Balance         
+                                        </td>
+
+                                        <td>
+                                            {this.state.PdfDetails.previousMonthBalance}
+                                        </td>
+
+                                        <td>
+                                            <Col sm="6">
+                                                <Input
+                                                    name="previousMonthBalance"
+                                                    type="number"
+                                                    min="0.00"
+                                                    max="1000000"
+                                                    step="100"
+                                                    placeholder={this.state.PdfDetails.previousMonthBalance}
+                                                    onChange={this.handleUserInputOnPdfDetails}
+                                                />
+                                            </Col>
+                                        </td>
+
+                                    </tr>
+
+                                    <tr>
+                                        <td>
+                                            Salary credited         
+                                        </td>
+
+                                        <td>
+                                            {this.state.PdfDetails.salary}
+                                        </td>
+
+                                        <td>
+                                            <Col sm="6">
+                                                <Input
+                                                    name="salary"
+                                                    type="number"
+                                                    min="0.00"
+                                                    max="1000000"
+                                                    step="100"
+                                                    placeholder={this.state.PdfDetails.salary}
+                                                    onChange={this.handleUserInputOnPdfDetails}
+                                                />
+                                            </Col>
+                                        </td>
+
+                                    </tr>
+
+                                    <tr>
+                                        <td>
+                                            Average daily balance         
+                                        </td>
+
+                                        <td>
+                                            {this.state.PdfDetails.averageDailyBalance}
+                                        </td>
+
+                                        <td>
+                                            <Col sm="6">
+                                                <Input
+                                                    name="averageDailyBalance"
+                                                    type="number"
+                                                    min="0.00"
+                                                    max="1000000"
+                                                    step="100"
+                                                    placeholder={this.state.PdfDetails.averageDailyBalance}
+                                                    onChange={this.handleUserInputOnPdfDetails}
+                                                />
+                                            </Col>
+                                        </td>
+
+                                    </tr>
+
+                                    <tr>
+                                        <td>
+                                            Credit card spending         
+                                        </td>
+
+                                        <td>
+                                            {this.state.PdfDetails.creditCardSpend}
+                                        </td>
+
+                                        <td>
+                                            <Col sm="6">
+                                                <Input
+                                                    name="creditCardSpend"
+                                                    type="number"
+                                                    min="0.00"
+                                                    max="1000000"
+                                                    step="100"
+                                                    placeholder={this.state.PdfDetails.creditCardSpend}
+                                                    onChange={this.handleUserInputOnPdfDetails}
+                                                />
+                                            </Col>
+                                        </td>
+
+                                    </tr> */}
+                                   
+                                </tbody>
+
+                            </Table>
+
+                               {/*  <Row>
                                     <Col sm="3">
                                     </Col>
 
@@ -981,7 +1377,7 @@ class BankAccountDetails extends React.Component {
                                     <Col sm="2">
 
                                     </Col>
-                                </Row>
+                                </Row> */}
 
                             
                                 {this.state.bankStatementVerificationLoading? 
@@ -1053,7 +1449,7 @@ class BankAccountDetails extends React.Component {
                         <CardFooter>
                             <div className="stats">
                                 <i className="now-ui-icons emoticons_satisfied" />
-                                Help us improve our recommendation engine by verifying the fields below
+                                Help us improve our recommendation engine by verifying the fields above
                             </div>
                         </CardFooter>
 
@@ -1064,7 +1460,9 @@ class BankAccountDetails extends React.Component {
         )
     }
 
-    //Render recommendations and card to upload financial statements
+    /**
+     * Render recommendations and card to upload financial statements
+     */
     renderNormal = () => {
         return (
             <>
@@ -1143,13 +1541,14 @@ class BankAccountDetails extends React.Component {
                                     this.state.recommendation ?
                                         <div>
 
-                                            {this.state.recommendation.map((recommendation) =>
-                                                <Table responsive className="table-shopping" key={recommendation.recommendationId}>
+                                            
+                                                <Table responsive className="table-shopping" /* key={recommendation.recommendationId} */>
+                                                     
                                                     <tbody>
                                                        
-
+                                                    {this.state.recommendation.map((recommendation) =>
                                                                     <tr key={recommendation.recommendationId} >
-
+                                                                        
                                                                         <td >
                                                                         <Spring
                                                             from={{ opacity: 0, marginTop: 500 }}
@@ -1182,6 +1581,7 @@ class BankAccountDetails extends React.Component {
                                                                              )}
                                                                              </Spring>
                                                                         </td>
+                                                                       
 
                                                                         <td>
 
@@ -1198,12 +1598,12 @@ class BankAccountDetails extends React.Component {
 
 
 
-                                                       
+                                                            )}
                                                     </tbody>
 
                                                 </Table>
 
-                                            )}
+                                            
                                         </div> :
 
                                         <div>
@@ -1275,23 +1675,25 @@ class BankAccountDetails extends React.Component {
                                         <h5>Bank statement</h5>
                                     </Col>
 
-                                    <Col xs={this.colSizeBankUpload()}>
-                                        <FormGroup className="form-file-upload form-file-simple">
+                                    <Col xs="10">
+                                        <FormGroup className="">
                                             <Input
                                                 type="text"
                                                 className="inputFileVisible"
                                                 placeholder="Bank statement is mandatory"
-                                                onClick={e => this.handleFileInput(e, "singleFile")}
+                                                /* onClick={e => this.handleFileInput(e, "singleFile")} */
                                                 defaultValue={this.state.singleFileName}
                                             />
+
                                             <input
                                                 type="file"
                                                 accept='.pdf'
                                                 className="inputFileHidden"
-                                                /*  style={{ zIndex: -1 }} */
+                                                style={{ zIndex: -1 }}
                                                 ref={this.singleFile}
                                                 onChange={e => this.addFile(e, "singleFile", "bankStatement")}
                                             />
+                                            
                                         </FormGroup>
 
 
@@ -1300,27 +1702,34 @@ class BankAccountDetails extends React.Component {
                                     {this.state.bankStatement ? (
                                         <div>
 
-                                            <Col xs="3">
+                                            <Col xs="2">
                                                 <Button onClick={this.clearBankStatement} color="danger" className="btn-round btn-icon" style={{ display: 'block,', margin: 'auto' }}>
                                                     <i className="fa fa-times" />
                                                 </Button>
                                             </Col>
                                         </div>
-                                    ) : (<div></div>)}
+                                    ) : (
+                                    <div>
+                                        <Col xs="2">
+                                            <Button onClick={e => this.handleFileInput(e, "singleFile")} color="info" className="btn-round btn-icon" style={{ display: 'block,', margin: 'auto' }}>
+                                            <i className="fa fa-upload" />
+                                            </Button>
+                                        </Col>
+                                    </div>)}
 
 
                                     <Col sm='12'>
                                         <h5>Transaction history</h5>
                                     </Col>
 
-                                    <Col xs={this.colSizeTransactionUpload()}>
+                                    <Col xs="10">
 
                                         <FormGroup className="form-file-upload form-file-simple">
                                             <Input
                                                 type="text"
                                                 className="inputFileVisible"
                                                 placeholder="Transaction history is mandatory"
-                                                onClick={e => this.handleFileInput(e, "transactionHistory")}
+                                                /* onClick={e => this.handleFileInput(e, "transactionHistory")} */
                                                 defaultValue={this.state.transactionHistoryFileName}
                                             />
                                             <input
@@ -1340,27 +1749,35 @@ class BankAccountDetails extends React.Component {
                                     {this.state.transactionHistory ? (
                                         <div>
 
-                                            <Col xs="3">
+                                            <Col xs="2">
                                                 <Button onClick={this.cleartTransactionHistory} color="danger" className="btn-round btn-icon" style={{ display: 'block,', margin: 'auto' }}>
                                                     <i className="fa fa-times" />
                                                 </Button>
                                             </Col>
                                         </div>
-                                    ) : (<div></div>)}
+                                    ) : (
+                                        <div>
+                                            <Col xs="2">
+                                                <Button onClick={e => this.handleFileInput(e, "transactionHistory")} color="info" className="btn-round btn-icon" style={{ display: 'block,', margin: 'auto' }}>
+                                                <i className="fa fa-upload" />
+                                                </Button>
+                                            </Col>
+                                        </div>
+                                    )}
 
 
                                     <Col sm='12'>
                                         <h5>Credit card statement</h5>
                                     </Col>
 
-                                    <Col xs={this.colSizeCCUpload()}>
+                                    <Col xs="10">
 
                                         <FormGroup className="form-file-upload form-file-simple">
                                             <Input
                                                 type="text"
                                                 className="inputFileVisible"
                                                 placeholder="Credit card statement is optional"
-                                                onClick={e => this.handleFileInput(e, "ccStatement")}
+                                                /* onClick={e => this.handleFileInput(e, "ccStatement")} */
                                                 defaultValue={this.state.ccFileName}
                                             />
                                             <input
@@ -1386,7 +1803,17 @@ class BankAccountDetails extends React.Component {
                                                 </Button>
                                             </Col>
                                         </div>
-                                    ) : (<div></div>)}
+                                    ) : (
+                                        <div>
+                                            <div>
+                                                <Col xs="2">
+                                                    <Button onClick={e => this.handleFileInput(e, "ccStatement")} color="info" className="btn-round btn-icon" style={{ display: 'block,', margin: 'auto' }}>
+                                                    <i className="fa fa-upload" />
+                                                    </Button>
+                                                </Col>
+                                            </div>
+                                        </div>
+                                        )}
 
 
                                 </Row>
@@ -1462,7 +1889,9 @@ class BankAccountDetails extends React.Component {
 
 
 
-
+    /**
+     * determines whether to renderNormal() or renderCheckPDFDetails() based on what the user clicks
+     */
     render() {
         return (
             <>

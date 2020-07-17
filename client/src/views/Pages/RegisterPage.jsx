@@ -71,6 +71,8 @@ class RegisterPage extends React.Component {
       emailState: "",
       password: '',
       passwordState: '',
+      reTypePassword: '',
+      reTypePasswordState: '',
       firstName: '',
       firstNameState: '',
       lastNameState: '',
@@ -86,13 +88,26 @@ class RegisterPage extends React.Component {
       accountToolTipState: false
     };
   }
+
+  /**
+   * default function by Creative Tim
+   */
   componentDidMount() {
     document.body.classList.add("register-page");
   }
+
+  /**
+   * default function by Creative Tim
+   */
   componentWillUnmount() {
     document.body.classList.remove("register-page");
   }
 
+  /**
+   * 
+   * @param {*} place - place of notification
+   * @param {*} color - color of notification
+   */
   notify(place, color) {
     //var color = 5;
     var type;
@@ -132,6 +147,10 @@ class RegisterPage extends React.Component {
     this.refs.notificationAlert.notificationAlert(options);
   }
 
+  /**
+   * checks for user email input and changes the state accordingly based on whether it's valid or not
+   * @param {*} e - event triggering this function
+   */
   emailChange(e) {
     this.setState({
       email: e.target.value
@@ -148,6 +167,10 @@ class RegisterPage extends React.Component {
     }
   }
 
+   /**
+   * checks for user first name input and changes the state accordingly based on whether it's valid or not
+   * @param {*} e - event triggering this function
+   */
   firstNameChange(e) {
     this.setState({
       firstName: e.target.value
@@ -163,6 +186,10 @@ class RegisterPage extends React.Component {
     }
   }
 
+   /**
+   * checks for user last name input and changes the state accordingly based on whether it's valid or not
+   * @param {*} e - event triggering this function
+   */
   lastNameChange(e) {
     this.setState({
       lastName: e.target.value
@@ -178,9 +205,27 @@ class RegisterPage extends React.Component {
     }
   }
 
+   /**
+   * checks for user password input and changes the state accordingly based on whether it's valid or not
+   * @param {*} e - event triggering this function
+   */
   passwordChange(e) {
     this.setState({
       password: e.target.value
+    }, () => {
+      if (this.state.reTypePassword === this.state.password) {
+
+
+
+        this.setState({
+          reTypePasswordState: " has-success"
+        });
+      } else {
+        this.setState({
+          reTypePasswordState: " has-danger"
+        });
+      }
+
     });
 
     //8 to 15 characters which contain at least one lowercase letter, one uppercase letter, one numeric digit, and one special character
@@ -189,19 +234,41 @@ class RegisterPage extends React.Component {
       this.setState({
         passwordState: " has-success"
       });
-      //console.log("pw regex pass");
     } else {
       this.setState({
         passwordState: " has-danger"
       });
-      //console.log("pw regex fail");
     }
   }
 
+  
+  reTypePasswordChange(e) {
+    this.setState({
+      reTypePassword: e.target.value
+    }, () => {
+      if (this.state.reTypePassword === this.state.password) {
+        this.setState({
+          reTypePasswordState: " has-success"
+        });
+      } else {
+        this.setState({
+          reTypePasswordState: " has-danger"
+        });
+      }
+    });
+  }
+
+  /**
+   * tooltip for password strength
+   */
   toggleToolTip = () => {
     this.setState({ accountToolTipState: !this.state.accountToolTipState })
   }
 
+   /**
+   * checks for user number input and changes the state accordingly based on whether it's valid or not
+   * @param {*} e - event triggering this function
+   */
   numberChange(e) {
     this.setState({
       number: e.target.value
@@ -217,6 +284,9 @@ class RegisterPage extends React.Component {
     }
   }
 
+  /**
+   * checks if all of the input are valid
+   */
   isValidated() {
     if (this.state.firstNameState !== " has-success") {
       this.setState({
@@ -267,15 +337,19 @@ class RegisterPage extends React.Component {
     return true;
   }
 
-  handleUserInput = (event) => {
+ 
+ /*  handleUserInput = (event) => {
     this.setState({
       [event.target.name]: event.target.value,
     });
-  };
+  }; */
 
 
 
-
+  /**
+   * when user clicks on "Register"
+   * @param {*} event - event triggering this function
+   */
   handleSubmit = (event) => {
 
 
@@ -315,6 +389,9 @@ class RegisterPage extends React.Component {
     event.preventDefault();
   }
 
+  /**
+   * submit details to server via RESTful api
+   */
   registerViaServer = () => {
 
 
@@ -380,15 +457,23 @@ class RegisterPage extends React.Component {
   } */
 
 
-  //Dialog
+  /**
+   * open OTP dialog
+   */
   openDialog = () => {
     this.setState({ openDialog: true })
   }
 
+  /**
+   * close OTP dialog
+   */
   closeDialog = () => {
     this.setState({ openDialog: false })
   }
 
+  /**
+   * when user completes OTP check
+   */
   completedDialog = () => {
     this.setState({
       dialogFinish: true,
@@ -397,6 +482,9 @@ class RegisterPage extends React.Component {
 
   }
 
+  /**
+   * render loading button
+   */
   renderLoading() {
     return (
 
@@ -411,7 +499,9 @@ class RegisterPage extends React.Component {
     )
   }
 
-
+  /**
+   * render register page
+   */
   render() {
     return (
       <>
@@ -580,15 +670,44 @@ class RegisterPage extends React.Component {
                             onChange={e => this.passwordChange(e)}
                           />
                           {this.state.passwordState === " has-danger" ? (
-                            
+
                             <Tooltip placement="right" target="password" isOpen={this.state.passwordState === " has-danger"} >
                               Password must contain 8 to 15 characters which contain at least one lowercase letter,
                               one uppercase letter, one numeric digit, and one special character.
-                        </Tooltip>
-                        
+                            </Tooltip>
+
                           ) : (
                               <div />
                             )}
+                        </InputGroup>
+
+                        <InputGroup
+                          className={
+                            "form-control-lg" +
+                            (this.state.reTypePasswordState ? this.state.reTypePasswordState : "") +
+                            (this.state.reTypePasswordFocus ? " input-group-focus" : "")
+                          }
+                        >
+                          <InputGroupAddon addonType="prepend">
+                            <InputGroupText>
+                              <i className="now-ui-icons objects_key-25" />
+                            </InputGroupText>
+                          </InputGroupAddon>
+                          <Input
+                            /* defaultValue={this.state.password} */
+                            id="reTypePassword"
+                            value={this.state.reTypePassword}
+                            type="password"
+                            placeholder="Retype Password (required)"
+                            name="reTypepassword"
+                            onFocus={e => this.setState({ reTypePasswordFocus: true })}
+                            onBlur={e => this.setState({ reTypePasswordFocus: false })}
+                            onChange={e => this.reTypePasswordChange(e)}
+                          />
+                          <Tooltip placement="right" target="reTypePassword" isOpen={(this.state.passwordState === " has-success") && (this.state.reTypePasswordState === " has-danger")} >
+                            Passwords do not match!
+                            </Tooltip>
+
                         </InputGroup>
 
                         <InputGroup

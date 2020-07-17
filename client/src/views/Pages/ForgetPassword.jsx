@@ -37,26 +37,44 @@ class ForgetPassword extends React.Component {
     };
   }
 
+  /**
+   * redirects user to Dashboard.jsx if user is already logged in
+   */
   componentDidMount = () => {
     if (localStorage.getItem('isLoggedIn')) {
       this.setState({ redirect: true })
     }
   }
 
+  /**
+   * default function by Creative Tim
+   */
   componentWillUnmount() {
     document.body.classList.remove("forgetPassword-page");
   }
 
+  /**
+   * 
+   * @param {*} place - place to notify
+   * @param {*} color - color of notification
+   */
   notify(place, color) {
     this.refs.notificationAlert.notificationAlert(CustomNotification.notify(place, color, this.state.message));
   }
 
+  /**
+   * handles user input and set them to the state
+   * @param {*} event - event triggering this function
+   */
   handleUserInput = (event) => {
     this.setState({
       [event.target.name]: event.target.value,
     });
   };
 
+  /**
+   * checks if user input is valid before sending it to the server
+   */
   testReset = () => {
 
     var email = this.state.email;
@@ -84,7 +102,10 @@ class ForgetPassword extends React.Component {
   }
 
   
-
+  /**
+   * when user clicks "Reset"
+   * @param {*} event - event triggering this function
+   */
   handleSubmit = (event) => {
     event.preventDefault();
     this.setState({renderLoading : true}, () => {
@@ -106,6 +127,9 @@ class ForgetPassword extends React.Component {
     }
   }
 
+  /**
+   * sends data to server to reset password via RESTful api
+   */
   resetViaServer = () => {
     axios({
       method: 'post',
@@ -127,6 +151,9 @@ class ForgetPassword extends React.Component {
     })
   }
 
+  /**
+   * render loading button
+   */
   renderLoading() {
     return (
 
@@ -141,7 +168,9 @@ class ForgetPassword extends React.Component {
   
 
      
-
+  /**
+   * render password reset page
+   */
   render() {
     return (
       <>

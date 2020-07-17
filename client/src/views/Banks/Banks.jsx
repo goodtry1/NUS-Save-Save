@@ -31,13 +31,28 @@ export class Banks extends Component {
     constructor(props) {
         super(props);
         this.retrieveUserBanks.bind(this)
+
+        /** 
+         * user will be set from the localStorage
+         *  accounts belonging to the user will be fetched via RESTful api
+         *  redirectToAddBanks is a way to check if the user has clicked on the "+" sign. deprecated as we changed it to props.history.push()
+         */
         this.state = {
             user: '',
             accounts: '',
-            redirectToAddBanks: false
+            /* redirectToAddBanks: false */
         }
     }
 
+    /** 
+     * user will be retrieve whenever the page loads
+     *  user object will be set into the state
+     *  system will wait for 2 seconds before it retrieves the accounts that the user has
+     *  to prevent using an empty user state
+     *  this is just one of the methods to ensure a smooth UX
+     *  we have implemented other ways in other components
+     * 
+    */
     componentDidMount = () => {
         var user = localStorage.getItem('user')
         this.setState({ user: JSON.parse(user) })
@@ -49,6 +64,10 @@ export class Banks extends Component {
 
     }
 
+    /**
+     * fetches all the user accounts via RESTful api
+     * sets it into the state to be displayed to the user
+     */
     retrieveUserBanks = () => {
 
 
@@ -70,6 +89,11 @@ export class Banks extends Component {
         })
     }
 
+    /**
+     * sets the account the user clicks on and redirects them to BankAccountDetails.jsx 
+     * @param {*} e - event triggering this, which is a button click
+     * @param {*} account - the account that the user clicks on
+     */
     redirectToBankAccountDetails = (e, account) => {
         this.props.history.push({
             pathname: '/admin/BankAccountDetails',
@@ -77,6 +101,9 @@ export class Banks extends Component {
         })
     }
 
+    /**
+     * sets the account the user has and redirects them to AddBanks.jsx
+     */
     redirectToAddBanks = () => {
         this.props.history.push({
             pathname: '/admin/addBanks',
@@ -86,6 +113,9 @@ export class Banks extends Component {
         //this.setState({ redirectToAddBanks: true })
     }
 
+    /**
+     * renders loading button
+     */
     renderLoading() {
         return (
             <div>
@@ -99,6 +129,9 @@ export class Banks extends Component {
         )
     }
 
+    /**
+     * renders the accounts the user has and "+" button to add bank account
+     */
     renderBanks() {
         return (
             <div>
@@ -184,6 +217,9 @@ export class Banks extends Component {
         )
     }
 
+    /**
+     * determines if renderLoading() or renderBanks() should be rendered based on the state of the accounts
+     */
     render() {
         /* if (this.state.redirectToAddBanks) {
             return <Redirect to="/admin/addBanks" />;

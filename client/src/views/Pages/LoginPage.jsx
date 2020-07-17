@@ -89,7 +89,9 @@ class LoginPage extends React.Component {
   }
 
 
-
+  /**
+   * redirects to Dashboard.jsx if user is already logged in
+   */
   componentDidMount() {
     if (localStorage.getItem('isLoggedIn')) {
       this.setState({ redirect: true })
@@ -97,16 +99,27 @@ class LoginPage extends React.Component {
 
     document.body.classList.add("login-page");
   }
+
+  /**
+   * default function by Creative Tim
+   */
   componentWillUnmount() {
     document.body.classList.remove("login-page");
   }
 
+  /**
+   * sets the input onto the state based on the name of the element calling this function
+   * @param {*} event - event triggering this function
+   */
   handleUserInput = (event) => {
     this.setState({
       [event.target.name]: event.target.value,
     });
   };
 
+  /**
+   * redirect the user to Dashboard.jsx
+   */
   redirect = () => {
     setTimeout(() => {
       this.setState({ redirect: true })
@@ -152,12 +165,19 @@ class LoginPage extends React.Component {
     this.refs.notificationAlert.notificationAlert(options);
   } */
 
+  /**
+   * 
+   * @param {*} place - place of notification 
+   * @param {*} color - color of notification
+   */
   notify(place, color) {
     this.refs.notificationAlert.notificationAlert(CustomNotification.notify(place, color, this.state.message));
   }
 
 
-
+  /**
+   * checks if the input is valid when user clicks on login before sending it to the server
+   */
   testLogin = () => {
 
     var email = this.state.email;
@@ -178,6 +198,10 @@ class LoginPage extends React.Component {
     }
   }
 
+  /**
+   * submits the data when user clicks on login
+   * @param {*} event - event triggering this function 
+   */
   handleSubmit = (event) => {
     event.preventDefault();
     this.setState({renderLoading : true},
@@ -201,6 +225,9 @@ class LoginPage extends React.Component {
 
   }
 
+  /**
+   * sends login data to server via RESTful api
+   */
   loginViaServer = () => {
     
     axios({
@@ -271,11 +298,15 @@ class LoginPage extends React.Component {
         password: ''
       })
     }).catch((err) => {
-      this.setState({message : "Unknown error has occured. Please try again later", renderLoading: false}, () => {this.notify('tc', 3)})
+      this.setState({message : "Unknown error has occured. Please try again later: " + err.message, renderLoading: false}, () => {this.notify('tc', 3)})
     })
 
   }
 
+  /**
+   * checks if the OTP user submitted is the same as the one sent to their email
+   * @param {*} event - event triggering this function
+   */
   submitOTP = (event) => {
     event.preventDefault();
 
@@ -304,7 +335,9 @@ class LoginPage extends React.Component {
     }
   }
 
-
+  /**
+   * render OTP input screen
+   */
   renderOTP() {
     return (
       <div>
@@ -365,6 +398,9 @@ class LoginPage extends React.Component {
     )
   }
 
+  /**
+   * render loading button
+   */
   renderLoading() {
     return (
 
@@ -385,6 +421,9 @@ class LoginPage extends React.Component {
     )
   }
 
+  /**
+   * render login screen
+   */
   render() {
 
     if (this.state.redirect) {
@@ -500,14 +539,18 @@ class LoginPage extends React.Component {
                             <div className="">
                               <center>
                               <h6>
-                                <a href="/auth/forgetPassword-page" className="link footer-link">
-                                  Forgot password
+                              <a href="/auth/register-page" className="link footer-link">
+                              Create Account
                                 </a>
+                                                            
+                              </h6>
+                              <h6>
+                              <a href="/auth/forgetPassword-page" className="link footer-link">
+                                  Forgot password
+                                </a>  
                               </h6>
                               </center>
                             </div>
-                         
-                            
                           </CardFooter>
                         </Form>
                       </div>

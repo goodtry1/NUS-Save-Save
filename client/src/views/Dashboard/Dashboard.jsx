@@ -14,6 +14,7 @@
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 */
+
 import React from "react";
 // react plugin used to create charts
 // import { Line } from "react-chartjs-2";
@@ -30,32 +31,12 @@ import {
   CardBody,
   CardFooter,
   CardTitle,
-  //DropdownToggle,
-  //DropdownMenu,
-  //DropdownItem,
-  //UncontrolledDropdown,
-  //Table,
-  //Progress,
   Row,
   Col
 } from "reactstrap";
 
 // core components
 import PanelHeader from "components/PanelHeader/PanelHeader.jsx";
-/*
-import {
-  dashboardPanelChart,
-  dashboardActiveUsersChart,
-  dashboardSummerChart,
-  dashboardActiveCountriesCard
-} from "variables/charts.jsx";
-
-import jacket from "assets/img/saint-laurent.jpg";
-import shirt from "assets/img/balmain.jpg";
-import swim from "assets/img/prada.jpg";
-*/
-
-import { table_data } from "variables/general.jsx";
 import moment from "moment";
 import "moment-timezone"
 //import { User } from '../../models/User';
@@ -64,8 +45,6 @@ import "moment-timezone"
 //Axios
 import axios from 'axios';
 /* import TouchRipple from "@material-ui/core/ButtonBase/TouchRipple"; */
-
-
 
 class Dashboard extends React.Component {
   constructor(props) {
@@ -82,10 +61,7 @@ class Dashboard extends React.Component {
 
   componentDidMount = () => {
     var user = localStorage.getItem('user')
-    this.setState({ user: JSON.parse(user) }, () => {
-     
-    })
-
+    this.setState({ user: JSON.parse(user) }, () => {    })
 
     setTimeout(() => {
       this.retrieveUserBanks()
@@ -93,8 +69,12 @@ class Dashboard extends React.Component {
 
   }
 
+  /**
+   *  Upon entering this page, this method will be called to make a RESTful API call 
+   *  to backend to retrieve all the bank accounts tagged to this account. 
+   *  Same API retrieved from Banks.jsx
+   */
   retrieveUserBanks = () => {
-
     axios({
       method: 'post',
       url: `${api}/userBankAccountDetails`,
@@ -106,15 +86,20 @@ class Dashboard extends React.Component {
       if (response.status === 200) {
         this.setState({ accounts: response.data.userBankAccountDetails })
         this.setState({ finishedLoading: true })
-
       } else {
-        
+
       }
     }).catch((err) => {
       console.log(err.message)
     })
   }
 
+  /**
+   * This method will redirect the user from the dashboard to the specified bank account. 
+   * 
+   * @param {*} e - Event that is triggered when user click on the 'View More' button
+   * @param {*} account - The account that is used to be pushed to the actual bank account page
+   */
   redirectToBankAccountDetails = (e, account) => {
     this.props.history.push({
       pathname: '/admin/BankAccountDetails',
@@ -175,37 +160,23 @@ class Dashboard extends React.Component {
     return 0
   } */
 
-  createTableData() {
-    var tableRows = [];
-    for (var i = 0; i < table_data.length; i++) {
-      tableRows.push(
-        <tr key={i}>
-          <td>
-            <div className="flag">
-              <img src={table_data[i].flag} alt="us_flag" />
-            </div>
-          </td>
-          <td>{table_data[i].country}</td>
-          <td className="text-right">{table_data[i].count}</td>
-          <td className="text-right">{table_data[i].percentage}</td>
-        </tr>
-      );
-    }
-    return tableRows;
-  }
-
+  /**
+   *  This method will only be used when the logged in user do not have any existing bank accounts created
+   *  This is to boost the UX to reduce number of clicks they have to perform in order to add a new bank acc
+   */
   redirectToAddBanks = () => {
     this.props.history.push({
       pathname: '/admin/addBanks',
       data: this.state.accounts // your data array of objects
     })
-
   }
 
+  /**
+   * Render the loading spinner when API call is still being made.
+   */
   renderLoading() {
     console.log("rendering loading..")
     return (
-
       <div>
         <center>
           <button className="btn btn-info btn-sm mb" type="button" disabled>
@@ -217,11 +188,9 @@ class Dashboard extends React.Component {
     )
   }
 
-
   render() {
     return (
       <>
-
         <PanelHeader
           content={
             <div className="header text-center">
@@ -233,39 +202,22 @@ class Dashboard extends React.Component {
               </p>
             </div>
           }
-
         />
-
-        {/** 
-            content={
-              <Line
-                data={dashboardPanelChart.data}
-                options={dashboardPanelChart.options}
-              }
-          */}
-
         <div className="content">
-
-
           <Row>
             <Col xs={12} md={12}>
               <Card className="card-chart">
                 <CardHeader>
-                 {/*  <h5 className="card-category"></h5> */}
+                  {/*  <h5 className="card-category"></h5> */}
                   <CardTitle tag="h2" >
                     My Bank Status
-
                   </CardTitle>
                 </CardHeader>
                 <CardBody>
                   <Row>
-
                     {this.state.finishedLoading === true ? (
-
-
                       this.state.accounts.length !== 0 ? (
                         this.state.accounts.map((account) =>
-
                           <Col key={account.userBankAccountId} xs={12} md={4}>
                             <Card className="card-chart">
                               <CardHeader>
@@ -275,82 +227,39 @@ class Dashboard extends React.Component {
                                 Date Created: {moment(account.date)
                                   .tz("Singapore")
                                   .format('DD-MMMM-YYYY')}
-
                                 <br />
                                   Progress:  <b> To be updated.. PLACEHOLDER </b>{/* this.getBankProgress(account.accountTypeId) */}
                                 <br />
                                   Interest Rates  <b> To be updated.. PLACEHOLDER </b>
                                 <br />
-
                                 <Button color="primary" className="btn-round float-right" onClick={(e) => this.redirectToBankAccountDetails(e, account)}>
                                   View more
                              </Button>
                               </CardBody>
                             </Card>
-
                           </Col>
                         )
                       ) : (
                           <Col>
-                          
                             <CardHeader>
                               <center>
                                 <b>You have no bank accounts added with us..... Lets get started now! </b>
-                                <br/>
+                                <br />
                                 <Button color="alert" onClick={this.redirectToAddBanks} className="btn-round btn-icon">
-                                        <i className="now-ui-icons ui-1_simple-add" />
-                                    </Button>
+                                  <i className="now-ui-icons ui-1_simple-add" />
+                                </Button>
                               </center>
                             </CardHeader>
                           </Col>
                         )
-
                     ) : (
                         <Col md={12}>
-
                           {this.renderLoading()}
                         </Col>
                       )
                     }
 
                   </Row>
-                  {/*
-                    <Col xs={12} md={4}>
-                      <Card className="card-chart">
-                        <CardHeader>
-                          B
-                        </CardHeader>
-                        <CardBody>
-                          1231231
-                        </CardBody>
-                      </Card>
-
-                    </Col>
-                    <Col xs={12} md={4}>
-                      <Card className="card-chart">
-                        <CardHeader>
-                          C
-                        </CardHeader>
-                        <CardBody>
-                          1231231
-                        </CardBody>
-                      </Card>
-
-                    </Col>
-
-
-                  </Row>
-                  
-                  <div className="chart-area">
-                    <Line
-                      data={dashboardActiveUsersChart.data}
-                      options={dashboardActiveUsersChart.options}
-                    />
-                  </div>
-                  <Table responsive>
-                    <tbody>{this.createTableData()}</tbody>
-                  </Table>
-                  */}
                 </CardBody>
                 <CardFooter>
                   <div className="stats">
@@ -361,227 +270,6 @@ class Dashboard extends React.Component {
               </Card>
             </Col>
           </Row>
-          {/*
-            <Col xs={12} md={4}>
-              <Card className="card-chart">
-                <CardHeader>
-                  <h5 className="card-category">Summer Email Campaign</h5>
-                  <CardTitle tag="h2">55,300</CardTitle>
-                  <UncontrolledDropdown>
-                    <DropdownToggle
-                      className="btn-round btn-icon"
-                      color="default"
-                      outline
-                    >
-                      <i className="now-ui-icons loader_gear" />
-                    </DropdownToggle>
-                    <DropdownMenu right>
-                      <DropdownItem>Action</DropdownItem>
-                      <DropdownItem>Another Action</DropdownItem>
-                      <DropdownItem>Something else here</DropdownItem>
-                      <DropdownItem className="text-danger">
-                        Remove data
-                      </DropdownItem>
-                    </DropdownMenu>
-                  </UncontrolledDropdown>
-                </CardHeader>
-                <CardBody>
-                  <div className="chart-area">
-                    <Line
-                      data={dashboardSummerChart.data}
-                      options={dashboardSummerChart.options}
-                    />
-                  </div>
-                  <div className="card-progress">
-                    <div className="progress-container">
-                      <span className="progress-badge">Delivery Rate</span>
-                      <Progress max="100" value="90">
-                        <span className="progress-value">90%</span>
-                      </Progress>
-                    </div>
-                    <div className="progress-container progress-success">
-                      <span className="progress-badge">Open Rate</span>
-                      <Progress max="100" value="60">
-                        <span className="progress-value">60%</span>
-                      </Progress>
-                    </div>
-                    <div className="progress-container progress-info">
-                      <span className="progress-badge">Click Rate</span>
-                      <Progress max="100" value="12">
-                        <span className="progress-value">12%</span>
-                      </Progress>
-                    </div>
-                    <div className="progress-container progress-warning">
-                      <span className="progress-badge">Hard Bounce</span>
-                      <Progress max="100" value="5">
-                        <span className="progress-value">5%</span>
-                      </Progress>
-                    </div>
-                    <div className="progress-container progress-danger">
-                      <span className="progress-badge">Spam Report</span>
-                      <Progress max="100" value="0.11">
-                        <span className="progress-value">0.11%</span>
-                      </Progress>
-                    </div>
-                  </div>
-                </CardBody>
-                <CardFooter>
-                  <div className="stats">
-                    <i className="now-ui-icons arrows-1_refresh-69" />
-                    Just Updated
-                  </div>
-                </CardFooter>
-              </Card>
-            </Col>
-            <Col xs={12} md={4}>
-              <Card className="card-chart">
-                <CardHeader>
-                  <h5 className="card-category">Active Countries</h5>
-                  <CardTitle tag="h2">105</CardTitle>
-                </CardHeader>
-                <CardBody>
-                  <div className="chart-area">
-                    <Line
-                      data={dashboardActiveCountriesCard.data}
-                      options={dashboardActiveCountriesCard.options}
-                    />
-                  </div>
-                  <VectorMap
-                    map={"world_mill"}
-                    backgroundColor="transparent"
-                    zoomOnScroll={false}
-                    containerStyle={{
-                      width: "100%",
-                      height: "280px"
-                    }}
-                    containerClassName="map"
-                    regionStyle={{
-                      initial: {
-                        fill: "#e4e4e4",
-                        "fill-opacity": 0.9,
-                        stroke: "none",
-                        "stroke-width": 0,
-                        "stroke-opacity": 0
-                      }
-                    }}
-                    series={{
-                      regions: [
-                        {
-                          values: mapData,
-                          scale: ["#AAAAAA", "#444444"],
-                          normalizeFunction: "polynomial"
-                        }
-                      ]
-                    }}
-                  />
-                </CardBody>
-                <CardFooter>
-                  <div className="stats">
-                    <i className="now-ui-icons ui-2_time-alarm" />
-                    Last 7 days
-                  </div>
-                </CardFooter>
-              </Card>
-            </Col>
-          </Row>
-          <Row>
-            <Col xs={12} md={12}>
-              <Card>
-                <CardHeader>
-                  <CardTitle tag="h4">Best Selling Products</CardTitle>
-                </CardHeader>
-                <CardBody>
-                  <Table responsive className="table-shopping">
-                    <thead>
-                      <tr>
-                        <th className="text-center" />
-                        <th>PRODUCT</th>
-                        <th>COLOR</th>
-                        <th>Size</th>
-                        <th className="text-right">PRICE</th>
-                        <th className="text-right">QTY</th>
-                        <th className="text-right">AMOUNT</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>
-                          <div className="img-container">
-                            <img src={jacket} alt="..." />
-                          </div>
-                        </td>
-                        <td className="td-name">
-                          <a href="#jacket">Suede Biker Jacket</a>
-                          <br />
-                          <small>by Saint Laurent</small>
-                        </td>
-                        <td>Black</td>
-                        <td>M</td>
-                        <td className="td-number">
-                          <small>€</small>3,390
-                        </td>
-                        <td className="td-number">1</td>
-                        <td className="td-number">
-                          <small>€</small>549
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>
-                          <div className="img-container">
-                            <img src={shirt} alt="..." />
-                          </div>
-                        </td>
-                        <td className="td-name">
-                          <a href="#shirt">Jersey T-Shirt</a>
-                          <br />
-                          <small>by Balmain</small>
-                        </td>
-                        <td>Black</td>
-                        <td>M</td>
-                        <td className="td-number">
-                          <small>€</small>499
-                        </td>
-                        <td className="td-number">2</td>
-                        <td className="td-number">
-                          <small>€</small>998
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>
-                          <div className="img-container">
-                            <img src={swim} alt="..." />
-                          </div>
-                        </td>
-                        <td className="td-name">
-                          <a href="#pants">Slim-Fit Swim Short </a>
-                          <br />
-                          <small>by Prada</small>
-                        </td>
-                        <td>Red</td>
-                        <td>M</td>
-                        <td className="td-number">
-                          <small>€</small>200
-                        </td>
-                        <td className="td-number">3</td>
-                        <td className="td-number">
-                          <small>€</small>799
-                        </td>
-                      </tr>
-                      <tr>
-                        <td colSpan="5" />
-                        <td className="td-total">Total</td>
-                        <td className="td-price">
-                          <small>€</small>2,346
-                        </td>
-                      </tr>
-                    </tbody>
-                  </Table>
-                </CardBody>
-              </Card>
-            </Col>
-          </Row>
-
-          */}
         </div>
       </>
     );

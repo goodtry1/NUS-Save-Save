@@ -18,25 +18,27 @@ import {
 // core components
 import PanelHeader from "components/PanelHeader/PanelHeader.jsx";
 
+// Custom Notification that GS created
 import CustomNotification from '../../Notifications/CustomNotification'
 import NotificationAlert from "react-notification-alert";
 
 import Switch from "react-bootstrap-switch";
 
-//Axios
+// Axios
 import axios from 'axios';
 
-//Animation
+// Spring Animation
 import { Spring } from 'react-spring/renderprops'
 
-
-
 import { User } from '../../models/User'
+
+import moment from "moment";
+
+import "moment-timezone"
 
 export class MyProfile extends Component {
     constructor(props) {
         super(props);
-        //this.retrieveUserBanks.bind(this)
         this.state = {
             user: '',
             updatedUser: '',
@@ -62,94 +64,108 @@ export class MyProfile extends Component {
             updateLoading: false,
             changePwLoading: false
         })
-       
-
     }
 
+    /**
+     * Custom method that will create and render a notification  based on the given input
+     * @param {*} place - Position of the notification 
+     * @param {*} color - Color of notification. Success/Danger/Warning etc
+     */
     notify(place, color) {
         this.refs.notificationAlert.notificationAlert(CustomNotification.notify(place, color, this.state.notifyMsg));
     }
 
+    /** 
+     * Toggle out the EditProfile card.
+     * If `hideChangePw` is set to false, it means that the ChangePw card is opened, hence it will close before opening the EditProfile card.
+     * Set `hideEdit` from true to false (If you are opening it) OR false to true (If you are closing it)
+     * @param {*} e - Event that trigger when user click the 'Edit' button'
+     */
     toggleEdit = (e) => {
         var toggleEdit = this.state.hideEdit
-        this.setState({ hideEdit: !toggleEdit })
+        this.setState({ hideEdit: !toggleEdit });
 
         var toggleChangePw = this.state.hideChangePw
         if (toggleChangePw === false) { //means changePw window is opened
             this.setState({
                 hideChangePw: !toggleChangePw,
                 newPasswordState: ''
-            })
+            });
         }
-
     }
 
+    /** 
+     * Toggle out the Change password card
+     * If `hideEdit` is set to false, it means that the EditProfile card is opened, hence it will close it before opening the ChangePw card.
+     * Set `hideChangePw` from true to false (If you are opening it) OR false to true (If you are closing it)
+     * @param {*} e - Event that trigger when user click the 'Change password' button'
+    */
     toggleChangePw = (e) => {
         var toggleChangePw = this.state.hideChangePw
         this.setState({
             hideChangePw: !toggleChangePw,
             newPasswordState: ''
-        })
+        });
 
         var toggleEdit = this.state.hideEdit
         if (toggleEdit === false) { //means editProfile window is opened
             this.setState({ hideEdit: !toggleEdit })
         }
-
-
     }
 
+    /**  
+     * Toggle 2FA for edit profile as needed.
+     * @param {*} e - Event that trigger when user click the 2FA option 
+     */
     toggleTwoFa = (e) => {
         var tempUpdatedUser = this.state.updatedUser
-        //console.log("updating 2fa, current is -> " + tempUpdatedUser.twoFAAuth)
         tempUpdatedUser.twoFAAuth = !(tempUpdatedUser.twoFAAuth)
-        //console.log("now !  " + tempUpdatedUser["twoFAAuth"])
-
         this.setState({ updatedUser: tempUpdatedUser })
     }
 
+    /**
+     * Bind all user’s input to the relevant states
+     * @param {*} e - Event that trigger on every changes in the 'Edit Profile' input form 
+     */ 
     handleUpdate = (e) => {
-        //console.log("key =>" + e.target.name + " value =>" + e.target.value);
-
         var tempUpdatedUser = this.state.updatedUser
         var field = e.target.name
         var fieldValue = e.target.value
-
         tempUpdatedUser[field] = fieldValue
-
         this.setState({ updatedUser: tempUpdatedUser })
     }
 
+    /**
+     * Bind all user’s input to the relevant password states
+     * @param {*} e - Event that trigger on every changes in the 'Change Password' input form 
+     */ 
     handlePwUpdate = (e) => {
-
-        //console.log(key + "__" + value)
-
         if (e.target.name === "newPw") {
             var passRex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{8,15}$/;
             if (passRex.test(e.target.value)) {
                 this.setState({
                     newPasswordState: " has-success",
                     newPw: e.target.value
-                }, () => { /*console.log("pw regex passn newPw state is " + this.state.newPw); */});
+                }, () => { /*console.log("pw regex passn newPw state is " + this.state.newPw); */ });
 
             } else {
                 this.setState({
                     newPasswordState: " has-danger",
                     newPw: ""
-                }, () => { /*console.log("pw regex fail, newPw state is " + this.state.newPw); */});
+                }, () => { /*console.log("pw regex fail, newPw state is " + this.state.newPw); */ });
             }
         } else {
             this.setState({ [e.target.name]: e.target.value })
         }
     }
 
+    /**
+     * Perform RESTful API call to the backend when the user clicks the update button when editing Profile.
+     * @param {*} e - event action that triggers RESTful API call to backend when User click (onClick) the Edit Profile button.
+     */
     handleUpdateButton = (e) => {
-
-        //console.log("update button called")
         var updatedUser = this.state.updatedUser;
-        //console.log(JSON.stringify(updatedUser));
         this.setState({ updateLoading: true })
-
         axios({
             method: 'post',
             url: `${api}/editProfile`,
@@ -164,11 +180,7 @@ export class MyProfile extends Component {
             }
         }).then((response) => {
             if (response.status === 200) {
-                //this.setState({ accounts: response.data.userBankAccountDetails })
-                //console.log(" Update Success!")
-                //var tempUser = updatedUser;
                 var tempUser = new User(updatedUser.userId, updatedUser.email, updatedUser.firstName, updatedUser.lastName, updatedUser.joinDate, updatedUser.contactNo, updatedUser.twoFAAuth);
-
                 this.setState({
                     user: tempUser,
                     notifyMsg: "Edit Successful!",
@@ -178,36 +190,31 @@ export class MyProfile extends Component {
                     this.toggleEdit()
                 })
                 localStorage.setItem('user', JSON.stringify(tempUser))
-
-
-
             } else {
-                //console.log("Failed to Update proper")
                 this.setState({
                     notifyMsg: "Failed to update properly, please check your fields",
                     updateLoading: false
                 }, () => {
                     this.notify('br', 3)
                 })
-
             }
         }).catch((err) => {
-            //console.log(err.message)
             this.setState({
                 notifyMsg: "Unknown Error. Please contact admin!",
                 updateLoading: false
             }, () => {
                 this.notify('br', 3)
             })
-
         })
-
     }
-
+ 
+   /**
+    * Perform RESTful API call to the backend when the user clicks the change password button.
+    * In the backend, if the old password matches, then send success message, else error message
+    * @param {*} e - event action that triggers RESTful API call to backend when User click (onClick) the change password button.
+    */
     handlePwUpdateButton = (e) => {
-        //console.log("ChangePw button called")
         this.setState({ changePwLoading: true })
-
         if (this.state.newPasswordState === " has-danger") {
             this.setState({
                 notifyMsg: "Error! New Password do not fulfil requirement. ",
@@ -216,26 +223,21 @@ export class MyProfile extends Component {
                 this.notify('br', 3)
             })
         } else if ((this.state.oldPw === '') || (this.state.newPw === '') || (this.state.retypeNewPw === '')) {
-            //console.log("Error! One of the fields is empty.");
             this.setState({
                 notifyMsg: "Error! One of the fields is empty. ",
                 changePwLoading: false
             }, () => {
                 this.notify('br', 3)
             })
-        }
-        else {
+        } else {
             if (this.state.newPw !== this.state.retypeNewPw) {
-                //console.log("Error! New passwords do not match.")
                 this.setState({
                     notifyMsg: "Error! New passwords do not match. ",
                     changePwLoading: false
                 }, () => {
                     this.notify('br', 3)
                 })
-
             } else {
-                //console.log("Check correct.")
                 axios({
                     method: 'post',
                     url: `${api}/changePassword`,
@@ -247,55 +249,39 @@ export class MyProfile extends Component {
                     }
                 }).then((response) => {
                     if (response.status === 200) {
-                        //console.log(" Password changed Success!")
-
                         this.setState({ oldPw: '' })
                         this.setState({ newPw: '' })
                         this.setState({ retypeNewPw: '' })
-
                         this.setState({
                             notifyMsg: "Success! Password changed successfully.",
                             changePwLoading: false
                         }, () => {
                             this.notify('br', 2)
-
                             this.toggleChangePw();
                         })
-
-
-
-
                     } else {
-                        //console.log(response.status)
                         this.setState({
                             notifyMsg: "Error! Your old password do not match. Please try again!",
                             changePwLoading: false
                         }, () => {
                             this.notify('br', 3)
+                            console.log("dafug?")
                         })
-
                     }
                 }).catch((err) => {
-                    //console.log(err.message)
                     this.setState({
                         notifyMsg: "Unknown Error. Please contact admin!",
                         changePwLoading: false
                     }, () => {
                         this.notify('br', 3)
                     })
-
                 })
             }
         }
-
     }
-
-
-
 
     render() {
         return (
-
             <>
                 <NotificationAlert ref="notificationAlert" />
                 <PanelHeader size="sm" />
@@ -323,7 +309,9 @@ export class MyProfile extends Component {
                                     </div>
                                     <p className="description text-center">
                                         {this.state.user.contactNo} <br />
-                                        {this.state.user.joinDate}
+                                        {moment(this.state.user.joinDate)
+                  .tz("Singapore")
+                  .format('DD-MMMM-YYYY')}
 
                                     </p>
                                 </CardBody>
@@ -391,7 +379,9 @@ export class MyProfile extends Component {
                                                             <FormGroup>
                                                                 <label>Joined Date (disabled)</label>
                                                                 <Input
-                                                                    defaultValue={this.state.updatedUser.joinDate}
+                                                                    defaultValue={moment(this.state.user.joinDate)
+                                                                        .tz("Singapore")
+                                                                        .format('DD-MMMM-YYYY')}
                                                                     disabled
                                                                     placeholder="Company"
                                                                     type="text"
@@ -489,7 +479,6 @@ export class MyProfile extends Component {
                                                                     <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
                                             Loading...
                                             </Button>
-
                                                             </div>
                                                         )}
                                                 </Form>
@@ -584,11 +573,6 @@ Loading...
 </Button>
                                                             </div>
                                                         )}
-
-
-
-
-
                                                 </Form>
                                             </CardBody>
                                         </Card>
@@ -601,7 +585,6 @@ Loading...
                         )}
                 </div>
             </>
-
         );
     }
 }

@@ -64,7 +64,7 @@ var server = app.listen(5001, function () {
 function authenticateToken(req, res, next) {
 
 	const accessToken = req.cookies.access_token
-	if (accessToken === null) 
+	if (accessToken === null)
 		return res.sendStatus(401)
 
 	jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
@@ -208,9 +208,6 @@ app.post('/api/signin', (req, res) => {
 							res.status(204).send()
 						}
 						else {
-
-							
-
 							var user = results.recordset[0]
 
 							var accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET)
@@ -236,9 +233,9 @@ app.post('/api/signin', (req, res) => {
 });
 
 app.post("/api/logOut", (req, res) => {
-	res.cookie('access_token', '', {maxAge: 0, httpOnly: true} )
+	res.cookie('access_token', '', { maxAge: 0, httpOnly: true })
 
-	
+
 	res.status(200).send()
 })
 
@@ -395,7 +392,7 @@ app.post('/api/resetPassword', (req, res) => {
 						var newPw = secureRandomPw.randomPassword({ length: 13 })
 
 						//update pw
-						bcrypt.hash(newPw, 10).then(function(hash) {
+						bcrypt.hash(newPw, 10).then(function (hash) {
 							if (error) {
 								console.log(error);
 								res.status(400).send()
@@ -435,7 +432,7 @@ app.post('/api/resetPassword', (req, res) => {
 											console.log("email sent.")
 											res.status(200).send("Email has been sent.")
 										}
-									});							
+									});
 								}
 							});
 						})
@@ -450,7 +447,7 @@ app.post('/api/resetPassword', (req, res) => {
 })
 
 //get account type based on bank id
-app.post('/api/fetchAccountType', authenticateToken, (req, res) => {
+app.post('/api/fetchAccountType', /* authenticateToken, */ (req, res) => {
 	bank_id = req.body.bankid;
 	console.log('bankid' + bank_id)
 	sql.connect(sqlConfig, function () {
@@ -471,27 +468,28 @@ app.post('/api/fetchAccountType', authenticateToken, (req, res) => {
 })
 
 //get the paramters for the graph
-app.post('/api/getParametersForGraph', (req, res) =>  {
+app.post('/api/getParametersForGraph', authenticateToken, (req, res) => {
 	userId = req.body.userId;
-    //console.log('userId' + userId)
-    accountTypeid = req.body.accountTypeid;
-    sql.connect(sqlConfig, function() {
-        var request = new sql.Request();
-		let qu = "exec [dbo].[usp_getParametersForGraph] " + userId + ", " +accountTypeid;
+	//console.log('userId' + userId)
+	accountTypeid = req.body.accountTypeid;
+	sql.connect(sqlConfig, function () {
+		var request = new sql.Request();
+
+
+		let qu = "exec [dbo].[usp_getParametersForGraph] " + userId + ", " + accountTypeid;
 		console.log(qu)
-				 
-		request.query(qu, function(err, recordset) {
-		if(err){
-			console.log("error occured");
-			res.status(400).send()
-		}
-		else 
-		{	
-			console.log(recordset)
-			res.status(200).send(recordset)
-		}
+
+		request.query(qu, function (err, recordset) {
+			if (err) {
+				console.log("error occured");
+				res.status(400).send()
+			}
+			else {
+				console.log(recordset)
+				res.status(200).send(recordset)
+			}
 		});
-    });
+	});
 })
 
 //Deletes files in the folder.
@@ -563,12 +561,11 @@ function retrievePassword(userId) {
 
 
 //config for upload multiple files
-let uploadConfig = upload.fields([{name: 'bankStatement', maxCount: 1}, {name: 'creditCard', maxCount: 1}, {name: 'transactionHistory', maxCount: 1}]);
+let uploadConfig = upload.fields([{ name: 'bankStatement', maxCount: 1 }, { name: 'creditCard', maxCount: 1 }, { name: 'transactionHistory', maxCount: 1 }]);
 
 //upload bank account statement client passes userId and accountTypeId
 app.post('/api/uploadBankStatement', authenticateToken , uploadConfig, async (req, res) => {
 
-	
 	const options = {
 		pagerender: render_page,
 		version: 'v1.10.100'
@@ -577,14 +574,11 @@ app.post('/api/uploadBankStatement', authenticateToken , uploadConfig, async (re
 	let result = {}
 
 	let creditCardParseData = {}
-	if(req.files['transactionHistory'] && req.files['transactionHistory'][0])
-	{
-		console.log("inside transaction History")
-		let dataBuffertransaction = fs.readFileSync('./uploads/' + req.files['transactionHistory'][0].originalname); 
+	if (req.files['transactionHistory'] && req.files['transactionHistory'][0]) {
+		let dataBuffertransaction = fs.readFileSync('./uploads/' + req.files['transactionHistory'][0].originalname);
 		let filename = './uploads/' + req.files['transactionHistory'][0].originalname
-		result = await launchParseTransactionHistory(options, filename );
-		if(req.files['creditCard'] && req.files['creditCard'][0])
-		{
+		result = await launchParseTransactionHistory(options, filename, req.body.accountTypeId);
+		if (req.files['creditCard'] && req.files['creditCard'][0]) {
 			console.log("inside credit card")
 			let dataBufferCard = fs.readFileSync('./uploads/' + req.files['creditCard'][0].originalname);
 			creditCardParseData = await launchParseCard(options, dataBufferCard);
@@ -592,45 +586,61 @@ app.post('/api/uploadBankStatement', authenticateToken , uploadConfig, async (re
 		}
 		console.log('transaction History parse data')
 		console.log(result)
-		res.status(200).send({"parsedData":result})
+		res.status(200).send({ "parsedData": result })
 	}
-	else
-	{
-		let dataBufferStatement = fs.readFileSync('./uploads/' + req.files['bankStatement'][0].originalname);
-
-		PDFParser(dataBufferStatement, options).then(async function (data) {
-			fs.writeFileSync('./uploads/result.txt', data.text);
-			result  = await parser.parseStatement(req.body.accountTypeId);
-			if(req.files['creditCard'] && req.files['creditCard'][0])
-			{
-				console.log("inside credit card")
-				let dataBufferCard = fs.readFileSync('./uploads/' + req.files['creditCard'][0].originalname); 
-				creditCardParseData = await launchParseCard(options, dataBufferCard );
-				result['creditCardSpend'] = creditCardParseData['creditCardSpend']
-			}
-			res.status(200).send({"parsedData":result})
-		});
+	else {
+		let dataBuffertransaction = fs.readFileSync('./uploads/' + req.files['bankStatement'][0].originalname);
+		let filename = './uploads/' + req.files['bankStatement'][0].originalname
+		result = await launchParseBankStatement(options, filename, req.body.accountTypeId);
+		if (req.files['creditCard'] && req.files['creditCard'][0]) {
+			console.log("inside credit card")
+			let dataBufferCard = fs.readFileSync('./uploads/' + req.files['creditCard'][0].originalname);
+			creditCardParseData = await launchParseCard(options, dataBufferCard);
+			result['creditCardSpend'] = creditCardParseData['creditCardSpend']
+		}
+		console.log('Bank statement parse data')
+		console.log(result)
+		res.status(200).send({ "parsedData": result })
 	}
 	//deleteFile("./uploads/")
 })
 
 
 //upload bank account statement client passes userId and accountTypeId
-app.post('/api/updateParsedData', authenticateToken, (req, res) => {
+app.post('/api/updateParsedData', (req, res) => {
 
 	result = req.body.parsedData
+	userInput = req.body.userInput
+	console.log(userInput.startDate)
 	var dateAnalysed = DATE_FORMATER(new Date(), "yyyy-mm-dd HH:MM:ss");
 
 	//Update the Bank account details table
 	sql.connect(sqlConfig, function () {
 		var request = new sql.Request();
-
-		let qu = `INSERT INTO dbo.[parsedBankStatementData](dateAnalysed, userId, accountTypeId, previousMonthBalance, salary, currentMonthBalance, averageDailyBalance, creditCardSpend, startDate, endDate) 
-		   VALUES ( '`+ dateAnalysed + `', '` + req.body.userId + `', '` + req.body.accountTypeId + `', '` + result['previousMonthBalance'] + `' , '` + result['salary'] + `' , '` + result['currentMonthBalance'] + `' , '` + result['averageDailyBalance'] + `', '` + result['creditCardSpend'] + `', '` + result['startDate'] + `', '` + result['endDate'] + `')`;
+		var qu;
+		
+		if(req.body.accountTypeId == 2)
+		{
+			qu = `INSERT INTO dbo.[parsedBankStatementData](dateAnalysed, userId, accountTypeId, previousMonthBalance, salary, currentMonthBalance, averageDailyBalance, creditCardSpend, startDate, endDate, 
+			userInputPreviousMonthBalance, userInputSalary, userInputCurrentMonthBalance, userInputAverageDailyBalance, userInputCreditCardSpend, userInputStartDate, userInputEndDate) 
+		   VALUES ( '`+ dateAnalysed + `', '` + req.body.userId + `', '` + req.body.accountTypeId + `', '` + result['previousMonthBalance'] + `' , '` + result['salary'] + `' , '` + result['currentMonthBalance'] + `' , '` + result['averageDailyBalance'] + `', '` + result['creditCardSpend'] + `', '` + result['startDate'] + `', '` + result['endDate'] + `', 
+		   '` + userInput['previousMonthBalance'] + `', '` + userInput['salary'] + `', '` + userInput['currentMonthBalance'] + `', '` + userInput['averageDailyBalance'] + `', '` + userInput['creditCardSpend'] + `', '` + userInput['startDate'] + `', '` + userInput['endDate'] + `')`;
+			
+			
+		}
+		else if(req.body.accountTypeId == 1)
+		{
+			qu = `INSERT INTO dbo.[parsedBankStatementData](dateAnalysed, userId, accountTypeId, previousMonthBalance, salary, currentMonthBalance, creditCardSpend, startDate, endDate, insurance, investments, homeLoan, 
+			userInputPreviousMonthBalance, userInputSalary, userInputCurrentMonthBalance, userInputCreditCardSpend, userInputStartDate, userInputEndDate, userInputInsurance, userInputInvestments, userInputHomeLoan) 
+		   VALUES ( '`+ dateAnalysed + `', '` + req.body.userId + `', '` + req.body.accountTypeId + `', '` + result['previousMonthBalance'] + `' , '` + result['salary'] + `' , '` + result['currentMonthBalance'] + `' , '` + result['creditCardSpend'] + `', '` + result['startDate'] + `', '` + result['endDate'] + `', '` + result['insurance'] + `', '` + result['investments'] + `','` + result['homeLoan'] + `',
+		   '` + userInput['previousMonthBalance'] + `', '` + userInput['salary'] + `', '` + userInput['currentMonthBalance'] + `', '` + userInput['creditCardSpend'] + `', '` + userInput['startDate'] + `', '` + userInput['endDate'] + `','` + userInput['insurance'] + `', '` + userInput['investments'] + `','` + userInput['homeLoan'] + `')`;
+		
+		}
 
 		console.log(qu)
 		request.query(qu, function (error, recordset) {
 			if (error) {
+				console.log(error.message)
 				res.status(400).send()
 			}
 			else {
@@ -645,23 +655,55 @@ app.post('/api/updateParsedData', authenticateToken, (req, res) => {
 function launchParseCard(options, dataBufferCard) {
 	return new promise(function (resolve, reject) {
 		PDFParser(dataBufferCard, options).then(async function (data) {
-			fs.writeFileSync('./uploads/resultCard.txt', data.text);
-			creditCardParseData = await parser.parseCard();
+			var random = randomize('0', 6);
+			var filename = './uploads/resultCard' + String(random) + '.txt'
+			fs.writeFileSync(filename, data.text);
+			creditCardParseData = await parser.parseCard(filename);
 			resolve(creditCardParseData);
 		});
 	});
 }
 
-function launchParseTransactionHistory(options, filename)
-{
-	return new promise(function(resolve, reject) {
-		pdfUtil.pdfToText(filename, async function(err, data) {
-			fs.writeFileSync('./uploads/resultTransactions.txt', data);
-			parseData  = await parser.parseTransactionHistory();
-			resolve (parseData);
+function launchParseBankStatement(options, filename, accountTypeId) {
+	return new promise(function (resolve, reject) {
+		let dataBufferStatement = fs.readFileSync(filename);
+		if (accountTypeId == 2) {
+			PDFParser(dataBufferStatement, options).then(async function (data) {
+				var random = randomize('0', 6);
+				var filename = './uploads/result' + String(random) + '.txt'
+				fs.writeFileSync(filename, data.text);
+				result = await parser.parseBankStatementOCBC360(filename);
+				resolve(result);
+			});
+		}
+		else if (accountTypeId == 1) {
+			pdfUtil.pdfToText(filename, async function (err, data) {
+				var random = randomize('0', 6);
+				var filename = './uploads/result' + String(random) + '.txt'
+				fs.writeFileSync(filename, data);
+				result = await parser.parseBankStatementDBSMultiplier(filename);
+				resolve(result);
+			});
+		}
+	});
+}
+
+
+function launchParseTransactionHistory(options, filename, accountTypeId) {
+	return new promise(function (resolve, reject) {
+		pdfUtil.pdfToText(filename, async function (err, data) {
+			var random = randomize('0', 6);
+			var filename = './uploads/resultTransactions' + String(random) + '.txt'
+			fs.writeFileSync(filename, data);
+			if (accountTypeId == 2)
+				parseData = await parser.parseTransactionHistoryOCBC360(filename);
+			else if (accountTypeId == 1)
+				parseData = await parser.parseTransactionHistoryDBSMultiplier(filename);
+			resolve(parseData);
 		});
 	});
 }
+
 
 //get recommendations for the userid and accounttypeid
 app.post('/api/fetchrecommendations', authenticateToken, (req, res) => {
@@ -689,7 +731,6 @@ app.post('/api/fetchrecommendations', authenticateToken, (req, res) => {
 
 //add feedback for a particular session Id.
 app.post('/api/addFeedback', authenticateToken, (req, res) => {
-
 	sql.connect(sqlConfig, function () {
 		var request = new sql.Request();
 
@@ -713,24 +754,24 @@ app.post('/api/addFeedback', authenticateToken, (req, res) => {
 
 // default render callback
 function render_page(pageData) {
-  let render_options = {
-    normalizeWhitespace: false,
-    disableCombineTextItems: false
-  }
+	let render_options = {
+		normalizeWhitespace: false,
+		disableCombineTextItems: false
+	}
 
-  return pageData.getTextContent(render_options)
-    .then(function (textContent) {
-      let lastY, text = '';
-      for (let item of textContent.items) {
-        if (lastY == item.transform[5] || !lastY) {
-          text += item.str;
-        } else {
-          text += '\n' + item.str;
-        }
-        lastY = item.transform[5];
-      }
-      return text;
-    });
+	return pageData.getTextContent(render_options)
+		.then(function (textContent) {
+			let lastY, text = '';
+			for (let item of textContent.items) {
+				if (lastY == item.transform[5] || !lastY) {
+					text += item.str;
+				} else {
+					text += '\n' + item.str;
+				}
+				lastY = item.transform[5];
+			}
+			return text;
+		});
 }
 
 function recommendationEngine(userid, accountTypeid) {

@@ -2,6 +2,12 @@ import React from 'react'
 
 const CustomNotification = {
    
+    /**
+     * 
+     * @param {*} place - place of the notification, it can be 'tl', 'tc', 'tr' for top left, centre and right, 'bl', 'bc', 'br' for bottom left centre and right
+     * @param {*} color - color of the notification
+     * @param {*} message - message that you want to be displayed
+     */
     notify(place, color, message) {
         var type;
         switch (color) {
