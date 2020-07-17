@@ -618,7 +618,7 @@ app.post('/api/uploadBankStatement', uploadConfig, async (req, res) => {
 
 
 //upload bank account statement client passes userId and accountTypeId
-app.post('/api/updateParsedData', authenticateToken, (req, res) => {
+app.post('/api/updateParsedData', (req, res) => {
 
 	result = req.body.parsedData
 	userInput = req.body.userInput
@@ -628,20 +628,21 @@ app.post('/api/updateParsedData', authenticateToken, (req, res) => {
 	//Update the Bank account details table
 	sql.connect(sqlConfig, function () {
 		var request = new sql.Request();
-
+		var qu;
+		
 		if(req.body.accountTypeId == 2)
 		{
-			let qu = `INSERT INTO dbo.[parsedBankStatementData](dateAnalysed, userId, accountTypeId, previousMonthBalance, salary, currentMonthBalance, averageDailyBalance, creditCardSpend, startDate, endDate, 
+			qu = `INSERT INTO dbo.[parsedBankStatementData](dateAnalysed, userId, accountTypeId, previousMonthBalance, salary, currentMonthBalance, averageDailyBalance, creditCardSpend, startDate, endDate, 
 			userInputPreviousMonthBalance, userInputSalary, userInputCurrentMonthBalance, userInputAverageDailyBalance, userInputCreditCardSpend, userInputStartDate, userInputEndDate) 
 		   VALUES ( '`+ dateAnalysed + `', '` + req.body.userId + `', '` + req.body.accountTypeId + `', '` + result['previousMonthBalance'] + `' , '` + result['salary'] + `' , '` + result['currentMonthBalance'] + `' , '` + result['averageDailyBalance'] + `', '` + result['creditCardSpend'] + `', '` + result['startDate'] + `', '` + result['endDate'] + `', 
 		   '` + userInput['previousMonthBalance'] + `', '` + userInput['salary'] + `', '` + userInput['currentMonthBalance'] + `', '` + userInput['averageDailyBalance'] + `', '` + userInput['creditCardSpend'] + `', '` + userInput['startDate'] + `', '` + userInput['endDate'] + `')`;
 		}
 		else if(req.body.accountTypeId == 1)
 		{
-			let qu = `INSERT INTO dbo.[parsedBankStatementData](dateAnalysed, userId, accountTypeId, previousMonthBalance, salary, currentMonthBalance, creditCardSpend, startDate, endDate, insurance, investments, homeLoan, 
+			qu = `INSERT INTO dbo.[parsedBankStatementData](dateAnalysed, userId, accountTypeId, previousMonthBalance, salary, currentMonthBalance, creditCardSpend, startDate, endDate, insurance, investments, homeLoan, 
 			userInputPreviousMonthBalance, userInputSalary, userInputCurrentMonthBalance, userInputCreditCardSpend, userInputStartDate, userInputEndDate, userInputInsurance, userInputInvestments, userInputHomeLoan) 
 		   VALUES ( '`+ dateAnalysed + `', '` + req.body.userId + `', '` + req.body.accountTypeId + `', '` + result['previousMonthBalance'] + `' , '` + result['salary'] + `' , '` + result['currentMonthBalance'] + `' , '` + result['creditCardSpend'] + `', '` + result['startDate'] + `', '` + result['endDate'] + `', '` + result['insurance'] + `', '` + result['investments'] + `','` + result['homeLoan'] + `',
-		   '` + userInput['previousMonthBalance'] + `', '` + userInput['salary'] + `', '` + userInput['currentMonthBalance'] + `', '` + `', '` + userInput['creditCardSpend'] + `', '` + userInput['startDate'] + `', '` + userInput['endDate'] + `','` + userInput['insurance'] + `', '` + userInput['investments'] + `','` + userInput['homeLoan'] + `')`;
+		   '` + userInput['previousMonthBalance'] + `', '` + userInput['salary'] + `', '` + userInput['currentMonthBalance'] + `', '` + userInput['creditCardSpend'] + `', '` + userInput['startDate'] + `', '` + userInput['endDate'] + `','` + userInput['insurance'] + `', '` + userInput['investments'] + `','` + userInput['homeLoan'] + `')`;
 		
 		}
 		console.log(qu)
