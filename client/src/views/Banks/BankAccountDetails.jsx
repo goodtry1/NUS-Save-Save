@@ -874,6 +874,10 @@ class BankAccountDetails extends React.Component {
            
         }
 
+        console.log(this.state.PdfDetails)
+        console.log(this.state.userInputPdfDetails)
+
+
 
         axios({
             method: 'post',
