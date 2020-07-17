@@ -696,7 +696,7 @@ class BankAccountDetails extends React.Component {
                     PdfDetails.startDate = d1
                     PdfDetails.endDate = d2
                     this.setState({ PdfDetails }, () => {
-                        console.log(this.state.PdfDetails)
+                       
                     })
                     
                     userInputPdfDetails.startDate = d1
@@ -874,8 +874,7 @@ class BankAccountDetails extends React.Component {
            
         }
 
-        console.log(this.state.PdfDetails)
-        console.log(this.state.userInputPdfDetails)
+        
 
 
 
