@@ -204,7 +204,7 @@ class BankAccountDetails extends React.Component {
                         data: this.state.chartDetails.interestEarned
                       }, 
                       {
-                        label: "Interest you could have earned (S$)",
+                        label: "Additional interest you could have earned (S$)",
                         borderColor: "#00ff00",
                         pointBorderColor: "#00ff00",
                         pointBackgroundColor: "#2c2c2c",
