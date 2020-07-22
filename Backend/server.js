@@ -28,6 +28,9 @@ app.use(cookieParser())
 var pdfUtil = require('pdf-to-text');
 //var pdf2table = require('pdf2table');
 
+//csv
+const csv = require('csv-parser')
+
 
 var parser = require("./parser")
 
@@ -50,7 +53,13 @@ var sqlConfig = {
 	user: 'fintechlab',
 	password: 'InformationSystems88DISA!',
 	server: 'fintechlab.database.windows.net',
-	database: 'SaveSave'
+	database: 'SaveSave',
+	connectionTimeout: 300000,
+    requestTimeout: 300000,
+	pool: {
+		idleTimeoutMillis: 10000000000000,
+		max: 100
+	}
 }
 
 // Start server and listen on http://localhost:5001/
@@ -59,6 +68,7 @@ var server = app.listen(5001, function () {
 	var port = server.address().port
 	console.log("app listening at %s", port)
 });
+
 
 function authenticateToken(req, res, next) {
 
@@ -93,6 +103,66 @@ app.get('/', (req, res) => {
 // upon enter.. just to test app is working. (for /api/ path)
 app.get('/api/', (req, res) => {
 	res.send("App is working fine (for <b> /API/ </b>) but you are not supposed to enter here.... :D.")
+})
+
+app.post('/api/searchCompanyByName', (req,res) => {
+	console.log(req.body)
+
+	if (req.body.name) {
+		let qu = "Select * from [dbo].[entity] where [dbo].[entity].entityName LIKE '%" + req.body.name + "%'";
+
+
+		sql.connect(sqlConfig).then(pool => {
+			return pool.request()
+			.input('name', sql.NVarChar, req.body.name)
+			.query(qu)
+		}).then(result => {
+			res.status(200).send(result.recordset)
+		}).catch(err => {
+			console.log(error)
+		}) 
+	} else {
+		res.status(400).send("name is empty")
+	}
+
+
+})
+
+let excelConfig = upload.fields([{ name: 'csvFile', maxCount: 1 }]);
+app.post('/api/insertCsvFile', excelConfig, async (req, res) => {
+	console.log("Something came in here")
+
+	console.log(req.files['csvFile'][0].originalname)
+
+	let arr = []
+	let qu = '';
+	fs.createReadStream('./uploads/' + req.files['csvFile'][0].originalname)
+		.pipe(csv())
+		.on('data', (row) => {
+
+			
+
+			if (!row.primary_ssic_description || row.primary_ssic_description === 'na') {
+
+			} else {
+				if (row.entity_status_description === "Live" || row.entity_status_description === "Live Company") {
+					let name = row.entity_name.replace(/'/g, '"')
+					let desc = row.primary_ssic_description.replace(/'/g, '"')
+					qu += "INSERT INTO dbo.[entity](entityName, entityDescription) VALUES ('" + name + "','" + desc + "');";
+				}
+			}
+		})
+		.on('end', () => {
+			res.status(200).send("Uploading now, check the database later")
+
+			sql.connect(sqlConfig).then(pool => {
+				return pool.request().query(qu)
+			}).then(result => {
+				console.log(result)
+			}).catch(err => {
+				console.log(error)
+			}) 
+		})
 })
 
 // two factor authentication for signup
@@ -387,6 +457,7 @@ app.post('/api/resetPassword', (req, res) => {
 				console.log("error occured");
 				res.status(400).send()
 			} else {
+				console.log(results.recordset)
 				if (results.recordset && results.recordset.length > 0) {
 					if (results.recordset[0].contactNumber != contactNumber) {
 						console.log("email found, but phone number do not match.");
@@ -451,7 +522,7 @@ app.post('/api/resetPassword', (req, res) => {
 })
 
 //get account type based on bank id
-app.post('/api/fetchAccountType', /* authenticateToken, */ (req, res) => {
+app.post('/api/fetchAccountType', /* authenticateToken, */(req, res) => {
 	bank_id = req.body.bankid;
 	console.log('bankid' + bank_id)
 	sql.connect(sqlConfig, function () {
@@ -625,23 +696,21 @@ app.post('/api/updateParsedData', (req, res) => {
 	sql.connect(sqlConfig, function () {
 		var request = new sql.Request();
 		var qu;
-		
-		if(req.body.accountTypeId == 2)
-		{
+
+		if (req.body.accountTypeId == 2) {
 			qu = `INSERT INTO dbo.[parsedBankStatementData](dateAnalysed, userId, accountTypeId, previousMonthBalance, salary, currentMonthBalance, averageDailyBalance, creditCardSpend, startDate, endDate, 
 			userInputPreviousMonthBalance, userInputSalary, userInputCurrentMonthBalance, userInputAverageDailyBalance, userInputCreditCardSpend, userInputStartDate, userInputEndDate) 
 		   VALUES ( '`+ dateAnalysed + `', '` + req.body.userId + `', '` + req.body.accountTypeId + `', '` + result['previousMonthBalance'] + `' , '` + result['salary'] + `' , '` + result['currentMonthBalance'] + `' , '` + result['averageDailyBalance'] + `', '` + result['creditCardSpend'] + `', '` + result['startDate'] + `', '` + result['endDate'] + `', 
 		   '` + userInput['previousMonthBalance'] + `', '` + userInput['salary'] + `', '` + userInput['currentMonthBalance'] + `', '` + userInput['averageDailyBalance'] + `', '` + userInput['creditCardSpend'] + `', '` + userInput['startDate'] + `', '` + userInput['endDate'] + `')`;
-			
-			
+
+
 		}
-		else if(req.body.accountTypeId == 1)
-		{
+		else if (req.body.accountTypeId == 1) {
 			qu = `INSERT INTO dbo.[parsedBankStatementData](dateAnalysed, userId, accountTypeId, previousMonthBalance, salary, currentMonthBalance, creditCardSpend, startDate, endDate, insurance, investments, homeLoan, 
 			userInputPreviousMonthBalance, userInputSalary, userInputCurrentMonthBalance, userInputCreditCardSpend, userInputStartDate, userInputEndDate, userInputInsurance, userInputInvestments, userInputHomeLoan) 
 		   VALUES ( '`+ dateAnalysed + `', '` + req.body.userId + `', '` + req.body.accountTypeId + `', '` + result['previousMonthBalance'] + `' , '` + result['salary'] + `' , '` + result['currentMonthBalance'] + `' , '` + result['creditCardSpend'] + `', '` + result['startDate'] + `', '` + result['endDate'] + `', '` + result['insurance'] + `', '` + result['investments'] + `','` + result['homeLoan'] + `',
 		   '` + userInput['previousMonthBalance'] + `', '` + userInput['salary'] + `', '` + userInput['currentMonthBalance'] + `', '` + userInput['creditCardSpend'] + `', '` + userInput['startDate'] + `', '` + userInput['endDate'] + `','` + userInput['insurance'] + `', '` + userInput['investments'] + `','` + userInput['homeLoan'] + `')`;
-		
+
 		}
 
 		console.log(qu)
