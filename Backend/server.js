@@ -785,18 +785,32 @@ function render_page(pageData) {
     });
 }
 
-function recommendationEngine(userid, accountTypeid) {
+function recommendationEngine(userid, accountTypeId) {
 	sql.connect(sqlConfig, function (i) {
 		console.log("into db: " + i);
-		for (i = 19; i < 24; i++) {
+		var request = new sql.Request();
+		if (accountTypeId == 2)
+		{
+			for (i = 19; i < 24; i++) {
 
-			var request = new sql.Request();
-			query_str = "exec [dbo].[usp_OCBCRecommendation] " + userid + ", " + accountTypeid + ", " + i;
+			query_str = "exec [dbo].[usp_OCBCRecommendation] " + userid + ", " + accountTypeId + ", " + i;
 			console.log(query_str);
-			request.query(query_str, function (err, rows) {
+			request.query(query_str, function (err, recordset) {
 				if (err) throw err;
-				//console.log(rows);
+				console.log(recordset);
+			});
+			}
+		}
+		else
+		{
+			//var request = new sql.Request();
+			query_str = "exec [dbo].[usp_DBSRecommendation] " + userid + ", " + accountTypeId;
+			console.log(query_str);
+			request.query(query_str, function (err, recordset) {
+				if (err) throw err;
+				console.log(recordset);
 			});
 		}
+
 	});
 }
