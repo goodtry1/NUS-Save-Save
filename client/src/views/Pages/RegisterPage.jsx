@@ -394,15 +394,13 @@ class RegisterPage extends React.Component {
    */
   registerViaServer = () => {
 
-
-
     let values = {
       email: this.state.email,
       password: this.state.password,
       firstName: this.state.firstName,
       lastName: this.state.lastName,
       contactNumber: this.state.number,
-      twoFactorAuth: 'false'
+      twoFactorAuth: false
 
     };
 
