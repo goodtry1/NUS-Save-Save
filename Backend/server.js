@@ -203,7 +203,6 @@ app.post('/api/signUp', async (req, res) => {
 					})
 				})
 			});
-
 		})
 	}
 })
@@ -285,7 +284,6 @@ app.get('/api/bankdetails', function (req, res) {
 					}
 				})
 			})
-
 		})
 	});
 })
@@ -308,7 +306,6 @@ app.post('/api/userBankAccountDetails', authenticateToken, function (req, res) {
 					console.log("Error Occured");
 					console.log(error);
 					res.status(400).send();
-
 				} else {
 					res.status(200).send({ "userBankAccountDetails": results.recordset });
 				}
@@ -413,8 +410,7 @@ app.post('/api/editProfile', authenticateToken, (req, res) => {
 					console.log("Error Occur");
 					console.log(error)
 					res.status(400).send()
-				}
-				else {
+				} else {
 					res.status(200).send()
 				}
 				ps.unprepare(err => {
@@ -492,7 +488,6 @@ app.post('/api/resetPassword', (req, res) => {
 
 	sql.connect(sqlConfig, function () {
 
-		
 		let ps = new sql.PreparedStatement();
 		ps.input('email', sql.NVarChar(50));
 		ps.prepare(`SELECT * FROM dbo.[User] WHERE email=@email`, error => {
@@ -568,7 +563,6 @@ app.post('/api/resetPassword', (req, res) => {
 				})
 			})
 		}); 
-		
 
 		// start comment here for unsecure example! 
 		/*
@@ -907,6 +901,7 @@ app.post('/api/updateParsedData', (req, res) => {
 			   @userInputPreviousMonthBalance, @userInputSalary, @userInputCurrentMonthBalance, @userInputAverageDailyBalance, @userInputCreditCardSpend, @userInputStartDate, @userInputEndDate)`;
 
 		} else if (req.body.accountTypeId == 1) {
+
 			ps.input('dateAnalysed', sql.SmallDateTime);
 			ps.input('userId' , sql.Int);
 			ps.input('accountTypeId', sql.Int)
@@ -959,7 +954,7 @@ app.post('/api/updateParsedData', (req, res) => {
 
 			qu = `INSERT INTO dbo.[parsedBankStatementData](dateAnalysed, userId, accountTypeId, previousMonthBalance, salary, currentMonthBalance, creditCardSpend, startDate, endDate, insurance, investments, homeLoan, 
 				userInputPreviousMonthBalance, userInputSalary, userInputCurrentMonthBalance, userInputCreditCardSpend, userInputStartDate, userInputEndDate, userInputInsurance, userInputInvestments, userInputHomeLoan) 
-			   VALUES (@dateAnalysed, @userId, @accountTypeId, @result_previousMonthBalance , @result_salary , @result_currentMonthBalance , @result_creditCardSpend, @result_startDate, '@result_endDate, @result_insurance, @result_investments, @result_homeLoan,
+			      VALUES (@dateAnalysed, @userId, @accountTypeId, @result_previousMonthBalance , @result_salary , @result_currentMonthBalance , @result_creditCardSpend, @result_startDate, '@result_endDate, @result_insurance, @result_investments, @result_homeLoan,
 				@userInputPreviousMonthBalance, @userInputSalary, @userInputCurrentMonthBalance, @userInputCreditCardSpend, @userInputStartDate, @userInputEndDate, @userInputInsurance, @userInputInvestments, @userInputHomeLoan)`;
 		
 		}
@@ -1135,23 +1130,60 @@ function render_page(pageData) {
 		});
 }
 
-function recommendationEngine(userid, accountTypeid) {
+function recommendationEngine(userid, accountTypeId) {
 	sql.connect(sqlConfig, function (i) {
 		console.log("into db: " + i);
-		for (i = 19; i < 24; i++) {
+		//var request = new sql.Request();
+		if (accountTypeId == 2)
+		{	
+			for (i = 19; i < 24; i++) {
+				let ps = new sql.PreparedStatement();
+				ps.input('userid', sql.Int);
+				ps.input('accountTypeId', sql.Int);
+				ps.input('i', sql.Int);
 
+				let params = {
+					userid: userid,
+					accountTypeId: accountTypeId,
+					i: i
+				}
+
+				ps.prepare(`exec [dbo].[usp_OCBCRecommendation] @userid, @accountTypeId, @i`, error => {
+					ps.execute(params, (error, result) => {
+						if (error) {
+							throw error;
+						}
+						ps.unprepare(err => {
+							if (err) {
+								console.log(err);
+							}
+						})
+					})
+				})
+
+			/*
+			var request = new sql.Request();
+			query_str = "exec [dbo].[usp_OCBCRecommendation] " + userid + ", " + accountTypeid + ", " + i;
+			console.log(query_str);
+			request.query(query_str, function (err, rows) {
+				if (err) throw err;
+				//console.log(rows);
+			});*/
+			}
+		}
+		else
+		{
 			let ps = new sql.PreparedStatement();
 			ps.input('userid', sql.Int);
-			ps.input('accountTypeid', sql.Int);
-			ps.input('i', sql.Int);
+			ps.input('accountTypeId', sql.Int);
 
 			let params = {
 				userid: userid,
-				accountTypeid: accountTypeid,
-				i: i
+				accountTypeId: accountTypeId,
+				
 			}
 
-			ps.prepare(`exec [dbo].[usp_OCBCRecommendation] @userid, @accountTypeid, @i`, error => {
+			ps.prepare(`exec [dbo].[usp_DBSRecommendation] @userid, @accountTypeid`, error => {
 				ps.execute(params, (error, result) => {
 					if (error) {
 						throw error;
@@ -1163,6 +1195,16 @@ function recommendationEngine(userid, accountTypeid) {
 					})
 				})
 			})
+
+
+			//var request = new sql.Request();
+			// query_str = "exec [dbo].[usp_DBSRecommendation] " + userid + ", " + accountTypeId;
+			// console.log(query_str);
+			// request.query(query_str, function (err, recordset) {
+			// 	if (err) throw err;
+			// 	console.log(recordset);
+			// });
 		}
+
 	});
 }
