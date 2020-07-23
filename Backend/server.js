@@ -492,6 +492,7 @@ app.post('/api/resetPassword', (req, res) => {
 
 	sql.connect(sqlConfig, function () {
 
+		
 		let ps = new sql.PreparedStatement();
 		ps.input('email', sql.NVarChar(50));
 		ps.prepare(`SELECT * FROM dbo.[User] WHERE email=@email`, error => {
@@ -566,10 +567,11 @@ app.post('/api/resetPassword', (req, res) => {
 					}
 				})
 			})
-		});
+		}); 
+		
 
 		// start comment here for unsecure example! 
-		/* 
+		/*
 		var request = new sql.Request();
 		let qu = `SELECT * FROM dbo.[User]
          	 		  WHERE email= '` + email + `'`;
@@ -641,9 +643,9 @@ app.post('/api/resetPassword', (req, res) => {
 					res.status(400).send("Error! No user found with the given email.")
 				}
 			}
-		}); 
+		}); */
 		// end of comment for unsafe impl!
-		*/
+		
 	})
 })
 
