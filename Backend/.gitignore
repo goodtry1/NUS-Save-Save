@@ -1,5 +1,7 @@
 # Dependency directories
 node_modules/
 
-# Upload folders
-uploads/
+
+# ignoring uploads
+uploads/*
+

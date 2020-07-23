@@ -529,28 +529,25 @@ class LoginPage extends React.Component {
                             </Button> 
                             </div>)}
 
-                            {/* <div className="pull-left">
+                             <div className="pull-left">
                               <h6>
                                   <a href="/auth/register-page" className="link footer-link">
                               Create Account
                                 </a>
                               </h6>
-                            </div> */}
-                            <div className="">
-                              <center>
-                              <h6>
-                              <a href="/auth/register-page" className="link footer-link">
-                              Create Account
-                                </a>
-                                                            
-                              </h6>
+                            </div> 
+                            
+                              
+
+                              <div className="pull-right"> 
                               <h6>
                               <a href="/auth/forgetPassword-page" className="link footer-link">
                                   Forgot password
                                 </a>  
                               </h6>
-                              </center>
-                            </div>
+                              </div>
+                              
+                            
                           </CardFooter>
                         </Form>
                       </div>

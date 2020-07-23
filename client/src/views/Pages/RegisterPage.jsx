@@ -241,7 +241,10 @@ class RegisterPage extends React.Component {
     }
   }
 
-  
+  /**
+   * Handle the event change for retypepassword field.
+   * @param {*} e 
+   */
   reTypePasswordChange(e) {
     this.setState({
       reTypePassword: e.target.value
@@ -394,15 +397,13 @@ class RegisterPage extends React.Component {
    */
   registerViaServer = () => {
 
-
-
     let values = {
       email: this.state.email,
       password: this.state.password,
       firstName: this.state.firstName,
       lastName: this.state.lastName,
       contactNumber: this.state.number,
-      twoFactorAuth: 'false'
+      twoFactorAuth: false
 
     };
 
