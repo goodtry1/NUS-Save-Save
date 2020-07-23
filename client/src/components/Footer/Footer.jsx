@@ -30,7 +30,7 @@ class Footer extends React.Component {
           <nav>
             <ul>
               <li>
-                Beta Release Version 1.0
+                Beta Release Version 1.1
                {/*  <a
                   href="https://www.creative-tim.com?ref=nudr-footer"
                   className="mr-4-px"

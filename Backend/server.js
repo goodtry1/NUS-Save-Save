@@ -268,9 +268,9 @@ app.get('/api/bankdetails', function (req, res) {
 	sql.connect(sqlConfig, function () {
 
 		let ps = new sql.PreparedStatement();
-		ps.input('bankId', sql.Int);
-		ps.prepare('select * from dbo.bank where bankId =@bankId', error => {
-			ps.execute({ bankId: 2 }, (error, results) => {
+		//ps.input('bankId', sql.Int);
+		ps.prepare('select * from dbo.bank', error => {
+			ps.execute({ }, (error, results) => {
 				if (error) {
 					console.log("Error occured");
 					console.log(error);

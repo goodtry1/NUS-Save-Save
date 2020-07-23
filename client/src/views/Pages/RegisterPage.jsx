@@ -241,7 +241,10 @@ class RegisterPage extends React.Component {
     }
   }
 
-  
+  /**
+   * Handle the event change for retypepassword field.
+   * @param {*} e 
+   */
   reTypePasswordChange(e) {
     this.setState({
       reTypePassword: e.target.value

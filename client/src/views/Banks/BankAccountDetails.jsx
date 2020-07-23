@@ -1098,8 +1098,8 @@ class BankAccountDetails extends React.Component {
                                                                     name={key}
                                                                     type="number"
                                                                     min="0.00"
-                                                                    max="1000000"
-                                                                    step="100"
+                                                                    max="5000000"
+                                                                    step="0.01"
                                                                     placeholder={this.state.PdfDetails[key]}
                                                                     onChange={this.handleUserInputOnPdfDetails}
                                                                     width=""
