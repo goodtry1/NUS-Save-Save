@@ -294,7 +294,7 @@ app.post('/api/userBankAccountDetails', authenticateToken, function (req, res) {
 	userId = req.body.userId;
 
 	sql.connect(sqlConfig, function () {
-
+		
 		let ps = new sql.PreparedStatement();
 		ps.input('userId', sql.Int);
 		ps.prepare(`SELECT userAccount.userBankAccountId, userAccount.userId, userAccount.accountTypeId, account.accountTypeName, account.bankId, account.baseInterestRate, userAccount.date, userAccount.status
@@ -318,7 +318,7 @@ app.post('/api/userBankAccountDetails', authenticateToken, function (req, res) {
 
 		})
 
-		// Comment starts below here for unsafe impl! Why is this unsafe? No type checking. a simple query of: "userId": "53' OR 1=1 --" and
+		// Comment starts below here for unsafe impl! Why is this unsafe? No type checking. a simple query of: "userId": "null' OR 1=1 --" and
 		// Everything will be leaked.
 		/*
 		var request = new sql.Request();
@@ -487,7 +487,7 @@ app.post('/api/resetPassword', (req, res) => {
 	contactNumber = req.body.contactNumber;
 
 	sql.connect(sqlConfig, function () {
-
+	
 		let ps = new sql.PreparedStatement();
 		ps.input('email', sql.NVarChar(50));
 		ps.prepare(`SELECT * FROM dbo.[User] WHERE email=@email`, error => {
