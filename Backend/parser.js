@@ -171,7 +171,7 @@ function parseBankStatementDBSMultiplier(filename)
     });
 }
 
-function parseCard(filename)
+function parseCardOCBC(filename)
 {
 	
 	return new promise(function(resolve, reject) {
@@ -194,6 +194,54 @@ function parseCard(filename)
 		textMap.set(lineIndex, line);
 
 		if (line === 'TOTAL AMOUNT DUE') {
+		  indexMap.set('creditCardSpend', lineIndex + 1);
+		}
+
+		lineIndex++;
+    });
+
+
+	readInterface.on('close', function () {
+
+		if(indexMap.get('creditCardSpend'))
+		{
+			let array = textMap.get(indexMap.get('creditCardSpend')).trim().split(/\s+/);
+			if(array.length == 1)
+			{
+				result['creditCardSpend'] = parseFloat(array[0].replace(/\s|,|/g, ''));
+			}	
+		}
+		resolve (result)
+		console.log(result)
+	});
+  
+  });
+
+}
+
+function parseCardDBS(filename)
+{
+	
+	return new promise(function(resolve, reject) {
+	// record the index of each line in raw text data
+	let lineIndex = 1;
+
+	// map and index map
+	let textMap = new Map();
+	let indexMap = new Map();
+
+	// extracted information
+	let result = {}
+	result['creditCardSpend']= 0;
+
+	let readInterface = readline.createInterface({
+		input: fs.createReadStream(filename)
+	});
+
+	readInterface.on('line', function (line) {
+		textMap.set(lineIndex, line);
+
+		if (line === 'TOTAL:') {
 		  indexMap.set('creditCardSpend', lineIndex + 1);
 		}
 
@@ -434,7 +482,8 @@ module.exports = {
     initializeParseDataOCBS: initializeParseDataOCBC,
     parseBankStatementOCBC360: parseBankStatementOCBC360,
     parseBankStatementDBSMultiplier: parseBankStatementDBSMultiplier,
-	parseCard:parseCard,
+	parseCardDBS:parseCardDBS,
+	parseCardOCBC:parseCardOCBC,
 	parseTransactionHistoryOCBC360:parseTransactionHistoryOCBC360,
 	parseTransactionHistoryDBSMultiplier:parseTransactionHistoryDBSMultiplier
 }
