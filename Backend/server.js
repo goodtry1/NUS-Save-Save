@@ -55,7 +55,7 @@ var sqlConfig = {
 	server: 'fintechlab.database.windows.net',
 	database: 'SaveSave',
 	connectionTimeout: 300000,
-    requestTimeout: 300000,
+	requestTimeout: 300000,
 	pool: {
 		idleTimeoutMillis: 10000000000000,
 		max: 100
@@ -105,22 +105,22 @@ app.get('/api/', (req, res) => {
 	res.send("App is working fine (for <b> /API/ </b>) but you are not supposed to enter here.... :D.")
 })
 
-app.post('/api/searchCompanyByName', (req,res) => {
+app.post('/api/searchCompanyByName', (req, res) => {
 	console.log(req.body)
 
 	if (req.body.name) {
-		let qu = "Select * from [dbo].[entity] where [dbo].[entity].entityName LIKE '%" + req.body.name + "%'";
+		let qu = "Select * from [dbo].[entity] e INNER JOIN [dbo].[category_keyword_mapping] c ON e.categoryId = c.categoryId AND e.entityName LIKE '%" + req.body.name + "%'";
 
 
 		sql.connect(sqlConfig).then(pool => {
 			return pool.request()
-			.input('name', sql.NVarChar, req.body.name)
-			.query(qu)
+				.input('name', sql.NVarChar, req.body.name)
+				.query(qu)
 		}).then(result => {
 			res.status(200).send(result.recordset)
 		}).catch(err => {
-			console.log(error)
-		}) 
+			console.log(err)
+		})
 	} else {
 		res.status(400).send("name is empty")
 	}
@@ -129,41 +129,101 @@ app.post('/api/searchCompanyByName', (req,res) => {
 })
 
 let excelConfig = upload.fields([{ name: 'csvFile', maxCount: 1 }]);
+categories = []
 app.post('/api/insertCsvFile', excelConfig, async (req, res) => {
-	console.log("Something came in here")
 
-	console.log(req.files['csvFile'][0].originalname)
+	console.log("Received CSV file: " + req.files['csvFile'][0].originalname)
 
-	let arr = []
+
+	await fetchCategories() //force async processing to ensure categories are fetched before processing
+	res.status(200).send("Uploading now, check the database later")
+
+
+
 	let qu = '';
+
+
+
 	fs.createReadStream('./uploads/' + req.files['csvFile'][0].originalname)
 		.pipe(csv())
 		.on('data', (row) => {
 
-			
+
+
 
 			if (!row.primary_ssic_description || row.primary_ssic_description === 'na') {
 
 			} else {
 				if (row.entity_status_description === "Live" || row.entity_status_description === "Live Company") {
+
+
+
 					let name = row.entity_name.replace(/'/g, '"')
 					let desc = row.primary_ssic_description.replace(/'/g, '"')
-					qu += "INSERT INTO dbo.[entity](entityName, entityDescription) VALUES ('" + name + "','" + desc + "');";
+					let index = row.entity_name.charAt(0) //index partitioning
+					let categoryId = matchCompanyDescToCategory(row)
+
+					outerloop: //using a loop to check instead of await keyword
+					for (let i = 0; i >= 0; i++) {
+						if (categoryId) {
+							qu += "INSERT INTO dbo.[entity] VALUES ('" + name + "','" + desc + "', '" + categoryId + "', '" + index + "');";
+							i = -1
+							break outerloop;
+						}
+					}
+
 				}
 			}
 		})
 		.on('end', () => {
-			res.status(200).send("Uploading now, check the database later")
+
+			
 
 			sql.connect(sqlConfig).then(pool => {
+				console.log("Reached the end of the file, inserting into DB now")
 				return pool.request().query(qu)
 			}).then(result => {
 				console.log(result)
 			}).catch(err => {
-				console.log(error)
-			}) 
+				console.log(err)
+			})
 		})
 })
+
+
+function matchCompanyDescToCategory(row) {
+
+	for (let i = 0; i < categories.length; i++) {
+		if (row.primary_ssic_description.includes(categories[i].keyword)) {
+			return categories[i].categoryId
+		}
+
+		if (i === categories.length - 1) {
+			return 101
+		}
+	}
+
+
+}
+
+function fetchCategories() {
+	return new promise(function (resolve, reject) {
+		sql.connect(sqlConfig).then(pool => {
+
+			console.log("Fetching categories");
+			return pool.request().query("SELECT [categoryId], UPPER([keyword]) as keyword,[category] FROM [dbo].[category_keyword_mapping]");
+		}).then(result => {
+			console.log("Setting categories");
+			
+			categories = result.recordset; //array of objects
+			resolve("Success")
+		}).catch(err => {
+			console.log(error);
+			resolve("Error")
+		});
+	})
+
+}
 
 // two factor authentication for signup
 app.post('/api/twoFactorAuthenticate', async (req, res) => {
