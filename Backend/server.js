@@ -149,8 +149,6 @@ app.post('/api/insertCsvFile', excelConfig, async (req, res) => {
 		.on('data', (row) => {
 
 
-
-
 			if (!row.primary_ssic_description || row.primary_ssic_description === 'na') {
 
 			} else {
@@ -178,31 +176,44 @@ app.post('/api/insertCsvFile', excelConfig, async (req, res) => {
 		.on('end', () => {
 
 			
-
-			sql.connect(sqlConfig).then(pool => {
+			//uncomment this to run
+			/* sql.connect(sqlConfig).then(pool => {
 				console.log("Reached the end of the file, inserting into DB now")
 				return pool.request().query(qu)
 			}).then(result => {
 				console.log(result)
 			}).catch(err => {
 				console.log(err)
-			})
+			}) */
 		})
 })
 
-
+/**
+ * returns the categoryId based on the keyword found
+ * needs to be refined
+ * @param {*} row - each row from CSV 
+ */
 function matchCompanyDescToCategory(row) {
+	let description = row.primary_ssic_description
+	let descArr = description.trim().split(/[\s,\-()\/]+/)
+	
+	
+		for (let i = 0; i < categories.length; i++) {
+			for (let j = 0; j < descArr.length; j++) {
+				//console.log(descArr[j].toUpperCase() + " vs " + categories[i].keyword)
 
-	for (let i = 0; i < categories.length; i++) {
-		if (row.primary_ssic_description.includes(categories[i].keyword)) {
-			return categories[i].categoryId
+
+				if (descArr[j].length !== categories[i].keyword.length) {
+
+				} else if (descArr[j].toUpperCase().includes(categories[i].keyword)) {
+					return categories[i].categoryId
+				} 
+				
+				if (i === categories.length - 1 && j === descArr.length - 1) {
+					return 101;
+				}
+			}
 		}
-
-		if (i === categories.length - 1) {
-			return 101
-		}
-	}
-
 
 }
 
@@ -214,11 +225,11 @@ function fetchCategories() {
 			return pool.request().query("SELECT [categoryId], UPPER([keyword]) as keyword,[category] FROM [dbo].[category_keyword_mapping]");
 		}).then(result => {
 			console.log("Setting categories");
-			
+
 			categories = result.recordset; //array of objects
 			resolve("Success")
 		}).catch(err => {
-			console.log(error);
+			console.log(err);
 			resolve("Error")
 		});
 	})
