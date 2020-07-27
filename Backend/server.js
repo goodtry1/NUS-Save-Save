@@ -62,6 +62,7 @@ var sqlConfig = {
 	}
 }
 
+
 // Start server and listen on http://localhost:5001/
 var server = app.listen(5001, function () {
 	var host = server.address().address
@@ -108,8 +109,9 @@ app.get('/api/', (req, res) => {
 app.post('/api/searchCompanyByName', (req, res) => {
 	console.log(req.body)
 
+	let index = req.body.name.charAt(0).toUpperCase()
 	if (req.body.name) {
-		let qu = "Select * from [dbo].[entity] e INNER JOIN [dbo].[category_keyword_mapping] c ON e.categoryId = c.categoryId AND e.entityName LIKE '%" + req.body.name + "%'";
+		let qu = "Select * from [dbo].[entity] e INNER JOIN [dbo].[category_keyword_mapping] c ON e.categoryId = c.categoryId AND e.entityName LIKE '%" + req.body.name + "%' AND [index_alphabet] = '" + index  + "'";
 
 
 		sql.connect(sqlConfig).then(pool => {
@@ -128,65 +130,116 @@ app.post('/api/searchCompanyByName', (req, res) => {
 
 })
 
-let excelConfig = upload.fields([{ name: 'csvFile', maxCount: 1 }]);
+//let excelConfig = upload.fields([{ name: 'csvFile', maxCount: 1 }]);
 categories = []
-app.post('/api/insertCsvFile', excelConfig, async (req, res) => {
+app.post('/api/updateListings', async (req, res) => {
 
-	console.log("Received CSV file: " + req.files['csvFile'][0].originalname)
+	/* console.log("Received CSV file: " + req.files['csvFile'][0].originalname) */
+
+	/* sql.connect(sqlConfig).then(pool => {
+		console.log("Dropping current values in the table")
+		return pool.request().query("Delete from [dbo].[entity_test]")
+	}).then(result => {
+		console.log(result)
+	}).catch(err => {
+		console.log(err)
+	}) */
+
+
+	let start = new Date()
+	res.status(200).send("Uploading now, check the database later")
+	console.log("Dropping current values in the table")
+	let pool = await sql.connect(sqlConfig)
+	let result = await pool.request().query("Delete from [dbo].[entity]")
+	console.log("Values dropped:")
+	console.log(result)
+
+
 
 
 	await fetchCategories() //force async processing to ensure categories are fetched before processing
-	res.status(200).send("Uploading now, check the database later")
 
 
 
-	let qu = '';
+	let alphabets = "abcdefghijklmnopqrstuwxyz" //
 
 
 
-	fs.createReadStream('./uploads/' + req.files['csvFile'][0].originalname)
-		.pipe(csv())
-		.on('data', (row) => {
+	for (let z = 0; z < alphabets.length; z++) {
+		result = await insertIntoDB(z, alphabets)
+		console.log(result)
+		if (z === alphabets.length-1) {
+			console.log("Update completed")
+			var end = new Date() - start
+			console.info('Execution time: %dms', end)
+		}
+
+	}
 
 
-			if (!row.primary_ssic_description || row.primary_ssic_description === 'na') {
-
-			} else {
-				if (row.entity_status_description === "Live" || row.entity_status_description === "Live Company") {
 
 
-
-					let name = row.entity_name.replace(/'/g, '"')
-					let desc = row.primary_ssic_description.replace(/'/g, '"')
-					let index = row.entity_name.charAt(0) //index partitioning
-					let categoryId = matchCompanyDescToCategory(row)
-
-					outerloop: //using a loop to check instead of await keyword
-					for (let i = 0; i >= 0; i++) {
-						if (categoryId) {
-							qu += "INSERT INTO dbo.[entity] VALUES ('" + name + "','" + desc + "', '" + categoryId + "', '" + index + "');";
-							i = -1
-							break outerloop;
-						}
-					}
-
-				}
-			}
-		})
-		.on('end', () => {
-
-			
-			//uncomment this to run
-			/* sql.connect(sqlConfig).then(pool => {
-				console.log("Reached the end of the file, inserting into DB now")
-				return pool.request().query(qu)
-			}).then(result => {
-				console.log(result)
-			}).catch(err => {
-				console.log(err)
-			}) */
-		})
 })
+
+
+function insertIntoDB(z, alphabets) {
+	let qu = '';
+	return new Promise(function (resolve, reject) {
+		fs.createReadStream('./uploads/acra_listings/acra-information-on-corporate-entities-' + alphabets[z] + '.csv')/* req.files['csvFile'][0].originalname) */
+			.pipe(csv())
+			.on('data', (row) => {
+
+
+				if (!row.primary_ssic_description || row.primary_ssic_description === 'na') {
+
+				} else {
+					if (row.entity_status_description === "Live" || row.entity_status_description === "Live Company") {
+
+
+
+						let name = row.entity_name.replace(/'/g, '"')
+						let desc = row.primary_ssic_description.replace(/'/g, '"')
+						let index = row.entity_name.charAt(0) //index partitioning
+						let categoryId = matchCompanyDescToCategory(row)
+
+						outerloop: //using a loop to check instead of await keyword
+						for (let i = 0; i >= 0; i++) {
+							if (categoryId) {
+								qu += "INSERT INTO dbo.[entity] VALUES ('" + name + "','" + desc + "', '" + categoryId + "', '" + index + "');";
+								i = -1
+								break outerloop;
+							}
+						}
+
+					}
+				}
+			})
+			.on('end', async () => {
+				try {
+					console.log("Reached the end of the file, inserting into DB now for index: " + alphabets[z])
+					let pool = await sql.connect(sqlConfig)
+					let result = await pool.request().query(qu)
+					resolve(result)
+				} catch (err) {
+					console.log(err)
+				}
+
+				/* sql.connect(sqlConfig).then(pool => {
+					console.log("Reached the end of the file, inserting into DB now for index: " + alphabets[z])
+					return await pool.request().query(qu)
+				}).then(result => {
+					console.log(result)
+				}).catch(err => {
+					console.log(err)
+				}) */
+
+			})
+	})
+
+}
+
+
+
 
 /**
  * returns the categoryId based on the keyword found
@@ -196,24 +249,24 @@ app.post('/api/insertCsvFile', excelConfig, async (req, res) => {
 function matchCompanyDescToCategory(row) {
 	let description = row.primary_ssic_description
 	let descArr = description.trim().split(/[\s,\-()\/]+/)
-	
-	
-		for (let i = 0; i < categories.length; i++) {
-			for (let j = 0; j < descArr.length; j++) {
-				//console.log(descArr[j].toUpperCase() + " vs " + categories[i].keyword)
 
 
-				if (descArr[j].length !== categories[i].keyword.length) {
+	for (let i = 0; i < categories.length; i++) {
+		for (let j = 0; j < descArr.length; j++) {
+			//console.log(descArr[j].toUpperCase() + " vs " + categories[i].keyword)
 
-				} else if (descArr[j].toUpperCase().includes(categories[i].keyword)) {
-					return categories[i].categoryId
-				} 
-				
-				if (i === categories.length - 1 && j === descArr.length - 1) {
-					return 101;
-				}
+
+			if (descArr[j].length !== categories[i].keyword.length) {
+
+			} else if (descArr[j].toUpperCase().includes(categories[i].keyword)) {
+				return categories[i].categoryId
+			}
+
+			if (i === categories.length - 1 && j === descArr.length - 1) {
+				return 101;
 			}
 		}
+	}
 
 }
 
