@@ -32,7 +32,8 @@ var pdfUtil = require('pdf-to-text');
 const csv = require('csv-parser')
 
 
-var parser = require("./parser")
+var parser = require("./parser");
+const { query } = require('express');
 
 // Configuration for file uploads
 var storage = multer.diskStorage({
@@ -64,10 +65,12 @@ var sqlConfig = {
 
 
 // Start server and listen on http://localhost:5001/
-var server = app.listen(5001, function () {
+var server = app.listen(5002, function () {
+	updateListings()
 	var host = server.address().address
 	var port = server.address().port
 	console.log("app listening at %s", port)
+
 });
 
 
@@ -111,7 +114,7 @@ app.post('/api/searchCompanyByName', (req, res) => {
 
 	let index = req.body.name.charAt(0).toUpperCase()
 	if (req.body.name) {
-		let qu = "Select * from [dbo].[entity] e INNER JOIN [dbo].[category_keyword_mapping] c ON e.categoryId = c.categoryId AND e.entityName LIKE '%" + req.body.name + "%' AND [index_alphabet] = '" + index  + "'";
+		let qu = "Select * from [dbo].[entity] e INNER JOIN [dbo].[category_keyword_mapping] c ON e.categoryId = c.categoryId AND e.entityName LIKE '%" + req.body.name + "%' AND [index_alphabet] = '" + index + "'";
 
 
 		sql.connect(sqlConfig).then(pool => {
@@ -168,7 +171,7 @@ async function updateListings() {
 	for (let z = 0; z < alphabets.length; z++) {
 		result = await insertIntoDB(z, alphabets)
 		console.log(result)
-		if (z === alphabets.length-1) {
+		if (z === alphabets.length - 1) {
 			console.log("Update completed")
 			var end = new Date() - start
 			console.info('Execution time: %dms', end)
@@ -179,47 +182,87 @@ async function updateListings() {
 
 
 
-})
+}
 
 
 function insertIntoDB(z, alphabets) {
-	let qu = '';
+	/* let qu = '';
+	let qu2 = ''
+	let qu3 = ''; */
+
+	let queryStrings = []
+	/* let qu = '' */
 	return new Promise(function (resolve, reject) {
 		fs.createReadStream('./uploads/acra_listings/acra-information-on-corporate-entities-' + alphabets[z] + '.csv')/* req.files['csvFile'][0].originalname) */
 			.pipe(csv())
 			.on('data', (row) => {
 
 
-				if (!row.primary_ssic_description || row.primary_ssic_description === 'na') {
-
-				} else {
-					if (row.entity_status_description === "Live" || row.entity_status_description === "Live Company") {
 
 
 
-						let name = row.entity_name.replace(/'/g, '"')
-						let desc = row.primary_ssic_description.replace(/'/g, '"')
-						let index = row.entity_name.charAt(0) //index partitioning
-						let categoryId = matchCompanyDescToCategory(row)
 
-						outerloop: //using a loop to check instead of await keyword
-						for (let i = 0; i >= 0; i++) {
-							if (categoryId) {
-								qu += "INSERT INTO dbo.[entity] VALUES ('" + name + "','" + desc + "', '" + categoryId + "', '" + index + "');";
-								i = -1
-								break outerloop;
+				let name = row.entity_name.replace(/'/g, '"')
+				let desc = row.primary_ssic_description.replace(/'/g, '"')
+				let index = row.entity_name.charAt(0) //index partitioning
+				let categoryId = matchCompanyDescToCategory(row)
+
+				outerloop: //using a loop to check instead of await keyword
+				for (let i = 0; i >= 0; i++) {
+					if (categoryId) {
+						if (queryStrings.length === 0) {
+							queryStrings[0] = "INSERT INTO dbo.[entity] VALUES ('" + name + "','" + desc + "', '" + categoryId + "', '" + index + "');"
+						} else {
+							for (let k = 0; k < queryStrings.length; k++) {
+								if (queryStrings[k].length < 4000000) {
+									queryStrings[k] = queryStrings[k] += "INSERT INTO dbo.[entity] VALUES ('" + name + "','" + desc + "', '" + categoryId + "', '" + index + "');"
+									i = -1
+									break outerloop;
+								} else {
+									queryStrings[k + 1] = "INSERT INTO dbo.[entity] VALUES ('" + name + "','" + desc + "', '" + categoryId + "', '" + index + "');"
+									i = -1
+									break outerloop;
+								}
 							}
 						}
 
+
+
+
+						/* if (qu.length < 8000000) {
+							qu += "INSERT INTO dbo.[entity] VALUES ('" + name + "','" + desc + "', '" + categoryId + "', '" + index + "');";
+							i = -1
+							break outerloop;
+						} else {
+							if (qu2.length < 8000000) {
+								qu2 += "INSERT INTO dbo.[entity] VALUES ('" + name + "','" + desc + "', '" + categoryId + "', '" + index + "');";
+								i = -1
+								break outerloop;
+							} else {
+								qu3 += "INSERT INTO dbo.[entity] VALUES ('" + name + "','" + desc + "', '" + categoryId + "', '" + index + "');";
+								i = -1
+								break outerloop;
+							}
+							
+						} */
+
 					}
 				}
+
+
 			})
 			.on('end', async () => {
 				try {
 					console.log("Reached the end of the file, inserting into DB now for index: " + alphabets[z])
-					let pool = await sql.connect(sqlConfig)
-					let result = await pool.request().query(qu)
-					resolve(result)
+
+					for (let i = 0; i < queryStrings.length; i++) {
+						let pool = await sql.connect(sqlConfig)
+						let result = await pool.request().query(queryStrings[i])
+						console.log(result)
+					}
+
+
+					resolve("Success")
 				} catch (err) {
 					console.log(err)
 				}
