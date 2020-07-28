@@ -153,7 +153,7 @@ async function updateListings() {
 	//res.status(200).send("Uploading now, check the database later")
 	console.log("Dropping current values in the table")
 	let pool = await sql.connect(sqlConfig)
-	let result = await pool.request().query("Delete from [dbo].[entity]")
+	let result = await pool.request().query("Delete from [dbo].[entity_test]")
 	console.log("Values dropped:")
 	console.log(result)
 
@@ -209,19 +209,29 @@ function insertIntoDB(z, alphabets) {
 
 				outerloop: //using a loop to check instead of await keyword
 				for (let i = 0; i >= 0; i++) {
+
 					if (categoryId) {
-						if (queryStrings.length === 0) {
-							queryStrings[0] = "INSERT INTO dbo.[entity] VALUES ('" + name + "','" + desc + "', '" + categoryId + "', '" + index + "');"
+						if (queryStrings.length === 0) { //Nothing has been added to queryStrings initially
+							queryStrings[0] = "INSERT INTO dbo.[entity_test] VALUES ('" + name + "','" + desc + "', '" + categoryId + "', '" + index + "');"
 						} else {
 							for (let k = 0; k < queryStrings.length; k++) {
-								if (queryStrings[k].length < 4000000) {
-									queryStrings[k] = queryStrings[k] += "INSERT INTO dbo.[entity] VALUES ('" + name + "','" + desc + "', '" + categoryId + "', '" + index + "');"
+								if (queryStrings[k].length < 4000000) { //if current query has lesser than 4million characters
+									queryStrings[k] = queryStrings[k] += "INSERT INTO dbo.[entity_test] VALUES ('" + name + "','" + desc + "', '" + categoryId + "', '" + index + "');"
+									
 									i = -1
 									break outerloop;
 								} else {
-									queryStrings[k + 1] = "INSERT INTO dbo.[entity] VALUES ('" + name + "','" + desc + "', '" + categoryId + "', '" + index + "');"
-									i = -1
-									break outerloop;
+									try {
+										if (queryStrings[k + 1].length) { //if not, we see if the next array lot has been inserted before. if there's no error, we'll go on to the next iteraction
+											
+										}
+									} catch (err) { //if there's err, it means it hasn't been inserted before. So we'll insert it in here
+										queryStrings[k + 1] = "INSERT INTO dbo.[entity_test] VALUES ('" + name + "','" + desc + "', '" + categoryId + "', '" + index + "');"
+										i = -1
+										break outerloop;
+									}
+
+
 								}
 							}
 						}
