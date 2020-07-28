@@ -132,7 +132,7 @@ app.post('/api/searchCompanyByName', (req, res) => {
 
 //let excelConfig = upload.fields([{ name: 'csvFile', maxCount: 1 }]);
 categories = []
-app.post('/api/updateListings', async (req, res) => {
+async function updateListings() {
 
 	/* console.log("Received CSV file: " + req.files['csvFile'][0].originalname) */
 
@@ -147,7 +147,7 @@ app.post('/api/updateListings', async (req, res) => {
 
 
 	let start = new Date()
-	res.status(200).send("Uploading now, check the database later")
+	//res.status(200).send("Uploading now, check the database later")
 	console.log("Dropping current values in the table")
 	let pool = await sql.connect(sqlConfig)
 	let result = await pool.request().query("Delete from [dbo].[entity]")
