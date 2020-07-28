@@ -153,7 +153,7 @@ async function updateListings() {
 	//res.status(200).send("Uploading now, check the database later")
 	console.log("Dropping current values in the table")
 	let pool = await sql.connect(sqlConfig)
-	let result = await pool.request().query("Delete from [dbo].[entity_test]")
+	let result = await pool.request().query("Delete from [dbo].[entity]")
 	console.log("Values dropped:")
 	console.log(result)
 
@@ -212,11 +212,11 @@ function insertIntoDB(z, alphabets) {
 
 					if (categoryId) {
 						if (queryStrings.length === 0) { //Nothing has been added to queryStrings initially
-							queryStrings[0] = "INSERT INTO dbo.[entity_test] VALUES ('" + name + "','" + desc + "', '" + categoryId + "', '" + index + "');"
+							queryStrings[0] = "INSERT INTO dbo.[entity] VALUES ('" + name + "','" + desc + "', '" + categoryId + "', '" + index + "');"
 						} else {
 							for (let k = 0; k < queryStrings.length; k++) {
 								if (queryStrings[k].length < 4000000) { //if current query has lesser than 4million characters
-									queryStrings[k] = queryStrings[k] += "INSERT INTO dbo.[entity_test] VALUES ('" + name + "','" + desc + "', '" + categoryId + "', '" + index + "');"
+									queryStrings[k] = queryStrings[k] += "INSERT INTO dbo.[entity] VALUES ('" + name + "','" + desc + "', '" + categoryId + "', '" + index + "');"
 									
 									i = -1
 									break outerloop;
@@ -226,7 +226,7 @@ function insertIntoDB(z, alphabets) {
 											
 										}
 									} catch (err) { //if there's err, it means it hasn't been inserted before. So we'll insert it in here
-										queryStrings[k + 1] = "INSERT INTO dbo.[entity_test] VALUES ('" + name + "','" + desc + "', '" + categoryId + "', '" + index + "');"
+										queryStrings[k + 1] = "INSERT INTO dbo.[entity] VALUES ('" + name + "','" + desc + "', '" + categoryId + "', '" + index + "');"
 										i = -1
 										break outerloop;
 									}
