@@ -66,7 +66,7 @@ var sqlConfig = {
 
 // Start server and listen on http://localhost:5001/
 var server = app.listen(5002, function () {
-	updateListings()
+	//updateListings()
 	var host = server.address().address
 	var port = server.address().port
 	console.log("app listening at %s", port)
