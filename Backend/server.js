@@ -953,7 +953,7 @@ app.post('/api/updateParsedData', (req, res) => {
 
 			qu = `INSERT INTO dbo.[parsedBankStatementData](dateAnalysed, userId, accountTypeId, previousMonthBalance, salary, currentMonthBalance, creditCardSpend, startDate, endDate, insurance, investments, homeLoan, 
 				userInputPreviousMonthBalance, userInputSalary, userInputCurrentMonthBalance, userInputCreditCardSpend, userInputStartDate, userInputEndDate, userInputInsurance, userInputInvestments, userInputHomeLoan) 
-			      VALUES (@dateAnalysed, @userId, @accountTypeId, @result_previousMonthBalance , @result_salary , @result_currentMonthBalance , @result_creditCardSpend, @result_startDate, '@result_endDate, @result_insurance, @result_investments, @result_homeLoan,
+			      VALUES (@dateAnalysed, @userId, @accountTypeId, @result_previousMonthBalance , @result_salary , @result_currentMonthBalance , @result_creditCardSpend, @result_startDate, @result_endDate, @result_insurance, @result_investments, @result_homeLoan,
 				@userInputPreviousMonthBalance, @userInputSalary, @userInputCurrentMonthBalance, @userInputCreditCardSpend, @userInputStartDate, @userInputEndDate, @userInputInsurance, @userInputInvestments, @userInputHomeLoan)`;
 		
 		}
