@@ -810,7 +810,7 @@ app.post('/api/uploadBankStatement', uploadConfig, authenticateToken, async (req
 		if (req.files['creditCard'] && req.files['creditCard'][0]) {
 			console.log("inside credit card")
 			let dataBufferCard = fs.readFileSync('./uploads/' + req.files['creditCard'][0].originalname);
-			creditCardParseData = await launchParseCard(options, dataBufferCard);
+			creditCardParseData = await launchParseCard(options, dataBufferCard, req.body.accountTypeId);
 			result['creditCardSpend'] = creditCardParseData['creditCardSpend']
 		}
 		console.log('transaction History parse data')
@@ -824,7 +824,7 @@ app.post('/api/uploadBankStatement', uploadConfig, authenticateToken, async (req
 		if (req.files['creditCard'] && req.files['creditCard'][0]) {
 			console.log("inside credit card")
 			let dataBufferCard = fs.readFileSync('./uploads/' + req.files['creditCard'][0].originalname);
-			creditCardParseData = await launchParseCard(options, dataBufferCard);
+			creditCardParseData = await launchParseCard(options, dataBufferCard, req.body.accountTypeId);
 			result['creditCardSpend'] = creditCardParseData['creditCardSpend']
 		}
 		console.log('Bank statement parse data')
@@ -952,7 +952,7 @@ app.post('/api/updateParsedData', (req, res) => {
 
 			qu = `INSERT INTO dbo.[parsedBankStatementData](dateAnalysed, userId, accountTypeId, previousMonthBalance, salary, currentMonthBalance, creditCardSpend, startDate, endDate, insurance, investments, homeLoan, 
 				userInputPreviousMonthBalance, userInputSalary, userInputCurrentMonthBalance, userInputCreditCardSpend, userInputStartDate, userInputEndDate, userInputInsurance, userInputInvestments, userInputHomeLoan) 
-			      VALUES (@dateAnalysed, @userId, @accountTypeId, @result_previousMonthBalance , @result_salary , @result_currentMonthBalance , @result_creditCardSpend, @result_startDate, '@result_endDate, @result_insurance, @result_investments, @result_homeLoan,
+			      VALUES (@dateAnalysed, @userId, @accountTypeId, @result_previousMonthBalance , @result_salary , @result_currentMonthBalance , @result_creditCardSpend, @result_startDate, @result_endDate, @result_insurance, @result_investments, @result_homeLoan,
 				@userInputPreviousMonthBalance, @userInputSalary, @userInputCurrentMonthBalance, @userInputCreditCardSpend, @userInputStartDate, @userInputEndDate, @userInputInsurance, @userInputInvestments, @userInputHomeLoan)`;
 		
 		}
@@ -976,14 +976,22 @@ app.post('/api/updateParsedData', (req, res) => {
 	});
 })
 
-function launchParseCard(options, dataBufferCard) {
+function launchParseCard(options, dataBufferCard, accountTypeId) {
 	return new promise(function (resolve, reject) {
 		PDFParser(dataBufferCard, options).then(async function (data) {
 			var random = randomize('0', 6);
 			var filename = './uploads/resultCard' + String(random) + '.txt'
 			fs.writeFileSync(filename, data.text);
-			creditCardParseData = await parser.parseCard(filename);
-			resolve(creditCardParseData);
+			if(accountTypeId == 1)
+			{
+				creditCardParseData = await parser.parseCardDBS(filename);
+				resolve(creditCardParseData);
+			}
+			else if(accountTypeId == 2)
+			{
+				creditCardParseData = await parser.parseCardOCBC(filename);
+				resolve(creditCardParseData);
+			}
 		});
 	});
 }
